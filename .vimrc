@@ -96,7 +96,7 @@ set guioptions-=L  "remove left-hand scroll bar
 
 " session directoryy
 let g:session_directory = "~/.vim/tmp/sessions"
-
+ 
 " Set backup directory
 set backup
 set backupdir=~/.vim/tmp/backups,~/tmp,/var/tmp,/tmp
