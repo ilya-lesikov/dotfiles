@@ -137,7 +137,7 @@ let mapleader = ","
 let g:mapleader = ","
 
 " turn off search highlight
-nnoremap <leader><space> :nohlsearch<CR> 
+nnoremap <leader>/ :nohlsearch<CR>
 
 " :W sudo saves the file
 command W w !sudo tee % > /dev/null 
@@ -244,8 +244,10 @@ nnoremap <S-L> zLgm
 " move to the first char instead of beginning of line
 nnoremap 0 ^
 
-" space in normal mode insert blank space after char
+" space insert space after char, shift+space insert before
 nmap <space> a<space><Esc>h
+nmap <leader><space> i<space><Esc>
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
