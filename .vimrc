@@ -89,10 +89,6 @@ syntax enable
 set foldcolumn=1        " Add a bit extra margin to the left
 set tags=~/.vim/tags
 " set ch=2                " make cmd line 2 strings high
-set guioptions-=m  "remove menu bar
-set guioptions-=T  "remove toolbar
-set guioptions-=r  "remove right-hand scroll bar
-set guioptions-=L  "remove left-hand scroll bar
  
 " Set backup directory
 set backup
@@ -182,17 +178,6 @@ elseif has("unix")
     set gfn=Monospace\ 11
 endif
 
-" Colorscheme
-if has("gui_running")
-    " set background=dark
-    " colorscheme peaksea
-    colorscheme mac_classic
-else
-    colorscheme desert
-    let g:colors_name="desert"
-endif
-
-
 " Bash like keys for the command line
 cnoremap <C-A>		<Home>
 cnoremap <C-E>		<End>
@@ -245,6 +230,23 @@ nnoremap 0 ^
 nmap <space> a<space><Esc>
 nmap <leader><space> i<space><Esc>
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" GVIM SETTINGS
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("gui_running")
+    " set background=dark
+    " colorscheme peaksea
+    set guioptions-=m  "remove menu bar
+    set guioptions-=T  "remove toolbar
+    set guioptions-=r  "remove right-hand scroll bar
+    set guioptions-=L  "remove left-hand scroll bar
+    set guioptions+=a  "highlighted text automatically copies to "* register
+    set guioptions+=c  "no graphical popup dialogs
+    colorscheme mac_classic
+else
+    colorscheme desert
+    let g:colors_name="desert"
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
