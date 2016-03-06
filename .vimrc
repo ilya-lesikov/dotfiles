@@ -187,10 +187,10 @@ cnoremap <C-N> <Down>
 cnoremap <C-G> <C-A>
 
 " map pr/next buffers and pr/next tab
-" nnoremap <silent> <S-H> :bp<cr>
-" nnoremap <silent> <S-L> :bn<cr>
-nnoremap <silent> <C-P> gT
-nnoremap <silent> <C-N> gt
+nnoremap <silent> <C-P> :bp<cr>
+nnoremap <silent> <C-N> :bn<cr>
+" nnoremap <silent> <C-P> gT
+" nnoremap <silent> <C-N> gt
 
 " buffer last
 nmap <leader>bp :b #<cr>
@@ -227,8 +227,8 @@ nnoremap <S-L> zLgm
 nnoremap 0 ^
 
 " space insert space after char, shift+space insert before
-nmap <space> a<space><Esc>
-nmap <leader><space> i<space><Esc>
+nmap <space> a<space><Esc>h
+nmap <leader><space> i<space><Esc>l
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " GVIM SETTINGS
