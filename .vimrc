@@ -242,7 +242,7 @@ nnoremap <S-L> zLgm
 nnoremap 0 ^
 
 " space insert space after char, shift+space insert before
-nmap <space> a<space><Esc>h
+nmap <space> a<space><Esc>
 nmap <leader><space> i<space><Esc>
 
 
