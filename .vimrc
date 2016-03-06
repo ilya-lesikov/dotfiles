@@ -93,9 +93,6 @@ set guioptions-=m  "remove menu bar
 set guioptions-=T  "remove toolbar
 set guioptions-=r  "remove right-hand scroll bar
 set guioptions-=L  "remove left-hand scroll bar
-
-" session directoryy
-let g:session_directory = "~/.vim/tmp/sessions"
  
 " Set backup directory
 set backup
