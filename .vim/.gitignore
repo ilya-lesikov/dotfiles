@@ -1,0 +1,11 @@
+
+*
+
+!.backups
+!.bundle
+!.colors
+!.s
+!.tags
+!.undodir
+
+!.gitignore

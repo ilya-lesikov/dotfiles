@@ -78,7 +78,7 @@ set matchtime=5         " bracket blinking
 set laststatus=2        " always show status bar
 set showfulltag     
 set hidden              " buffers don't close
-set undodir=~/.vim/tmp/undodir
+set undodir=~/.vim/undodir
 set undofile
 set shortmess+=I        
 set confirm             " prompts instead of errors
@@ -87,21 +87,18 @@ set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 syntax enable
 " set termencoding=utf8
 set foldcolumn=1        " Add a bit extra margin to the left
-set tags=~/.vim/tmp/tags
+set tags=~/.vim/tags
 " set ch=2                " make cmd line 2 strings high
 set guioptions-=m  "remove menu bar
 set guioptions-=T  "remove toolbar
 set guioptions-=r  "remove right-hand scroll bar
 set guioptions-=L  "remove left-hand scroll bar
-
-" session directoryy
-let g:session_directory = "~/.vim/tmp/sessions"
  
 " Set backup directory
 set backup
-set backupdir=~/.vim/tmp/backups,~/tmp,/var/tmp,/tmp
+set backupdir=~/.vim/backups,~/tmp,/var/tmp,/tmp
 set backupskip=/tmp/*,/private/tmp/*
-set directory=~/.vim/tmp/backups,~/tmp,/var/tmp,/tmp
+set directory=~/.vim/backups,~/tmp,/var/tmp,/tmp
 set writebackup
 
 " pymode recommended
