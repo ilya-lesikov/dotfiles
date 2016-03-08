@@ -146,8 +146,8 @@ map <C-h> <C-W>h
 map <C-l> <C-W>l
 
 " new line without insert mode
-nmap <leader>O O<Esc>
-nmap <leader>o o<Esc>
+nmap <leader>O O<Esc>j
+nmap <leader>o o<Esc>k
 
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
