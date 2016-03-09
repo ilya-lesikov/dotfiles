@@ -14,7 +14,7 @@ Plugin 'scrooloose/nerdcommenter'
 " Plugin 'bling/vim-airline'
 " Plugin 'tobes/vim-budget-airline'
 Plugin 'majutsushi/tagbar'
-Plugin 'ervandew/supertab'
+" Plugin 'ervandew/supertab'
 Plugin 'rking/ag.vim'
 Plugin 'ctrlpvim/ctrlp.vim'
 " Plugin 'Raimondi/delimitMate'
@@ -89,7 +89,16 @@ syntax enable
 set foldcolumn=1        " Add a bit extra margin to the left
 set tags=~/.vim/tags
 " set ch=2                " make cmd line 2 strings high
- 
+
+" statusline
+function! GetFileDirectory ()
+    silent !clear
+    let fileDirectory = expand("%:p:h")
+    return fileDirectory
+endfunction
+set statusline=%t%<%m%H%W%q%=%{GetFileDirectory()}\ %l-%L\ %p%%
+
+
 " Set backup directory
 set backup
 set backupdir=~/.vim/backups,~/tmp,/var/tmp,/tmp
@@ -148,6 +157,7 @@ map <C-l> <C-W>l
 " new line without insert mode
 nmap <leader>O O<Esc>j
 nmap <leader>o o<Esc>k
+
 
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
@@ -370,4 +380,4 @@ let g:pymode_syntax_builtin_types = g:pymode_syntax_all
 let g:pymode_syntax_highlight_exceptions = g:pymode_syntax_all
 let g:pymode_syntax_docstrings = g:pymode_syntax_all
 
-
+" TODO colors (in terminal in particular)
