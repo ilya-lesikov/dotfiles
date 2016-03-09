@@ -11,8 +11,8 @@ Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 " Plugin 'lyokha/vim-xkbswitch'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
-Plugin 'bling/vim-airline'
-Plugin 'tobes/vim-budget-airline'
+" Plugin 'bling/vim-airline'
+" Plugin 'tobes/vim-budget-airline'
 Plugin 'majutsushi/tagbar'
 Plugin 'ervandew/supertab'
 Plugin 'rking/ag.vim'
@@ -274,11 +274,11 @@ nmap <leader>sf :CtrlP<cr>
 nmap <leader>sb :CtrlPBuffer<cr>
 
 " airline
-let g:airline#extensions#default#section_truncate_width = {}
-let g:airline#extensions#whitespace#show_message = 0
-" let g:airline#extensions#budgetairline#enabled
-" let g:airline#extensions#tabline#enabled = 1
-" let g:airline#extensions#tabline#fnamemod = ':t'
+" let g:airline#extensions#default#section_truncate_width = {}
+" let g:airline#extensions#whitespace#show_message = 0
+" " let g:airline#extensions#budgetairline#enabled
+" " let g:airline#extensions#tabline#enabled = 1
+" " let g:airline#extensions#tabline#fnamemod = ':t'
 
 " autocmd FileType * AirlineTheme term
 " autocmd FileType * AirlineToggleWhitespace
