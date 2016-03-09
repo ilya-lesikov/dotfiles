@@ -67,7 +67,6 @@ set magic               " For regular expressions turn magic on
 set noerrorbells        " disable errors
 set novisualbell        " disable errors
 set vb t_vb=            " disable errors
-set t_Co=256            " 256 colors
 set encoding=utf8
 set ffs=unix,dos,mac
 set smarttab            " Be smart when using tabs ;)
@@ -92,12 +91,10 @@ set tags=~/.vim/tags
 
 " statusline
 function! GetFileDirectory ()
-    silent !clear
     let fileDirectory = expand("%:p:h")
     return fileDirectory
 endfunction
 set statusline=%t%<%m%H%W%q%=%{GetFileDirectory()}\ %l-%L\ %p%%
-
 
 " Set backup directory
 set backup
@@ -244,18 +241,20 @@ nmap <leader><space> i<space><Esc>l
 " GVIM SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("gui_running")
-    " set background=dark
-    " colorscheme peaksea
+    " set background=light
+    colorscheme mac_classic
     set guioptions-=m  "remove menu bar
     set guioptions-=T  "remove toolbar
     set guioptions-=r  "remove right-hand scroll bar
     set guioptions-=L  "remove left-hand scroll bar
     set guioptions+=a  "highlighted text automatically copies to "* register
     set guioptions+=c  "no graphical popup dialogs
-    colorscheme mac_classic
 else
-    colorscheme desert
-    let g:colors_name="desert"
+    " set background=dark
+    colorscheme industry
+    " let base16colorspace=256
+    " let g:colors_name="desert"
+    " set t_Co=256            " 256 colors
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
