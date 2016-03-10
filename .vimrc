@@ -35,7 +35,7 @@ set backupdir=~/.vim/backups,~/tmp,/var/tmp,/tmp
 set backupskip=/tmp/*,/private/tmp/*
 set directory=~/.vim/backups,~/tmp,/var/tmp,/tmp
 
-" tabs/spaces and indentation 
+" tabs/spaces and indentation
 set tabstop=4       " number of visual spaces per TAB
 set softtabstop=4   " number of spaces in tab when editing
 set shiftwidth=4
@@ -52,7 +52,7 @@ set laststatus=2        " always show status bar
 set incsearch           " search as characters are entered
 set hlsearch            " highlight matches
 set ignorecase
-set smartcase           " When searching try to be smart about cases 
+set smartcase           " When searching try to be smart about cases
 set magic               " For regular expressions turn magic on
 
 " folding
@@ -66,7 +66,6 @@ set novisualbell        " disable errors
 set vb t_vb=            " disable errors
 set confirm             " prompts instead of errors
 
-set history=500
 set scrolloff=999       " Set 7 lines to the cursor - when moving vertically using j/k
 set textwidth=80
 set nowrap
@@ -79,13 +78,14 @@ set showmatch           " highlight matching [{()}]
 set encoding=utf8
 set ffs=unix,dos,mac
 set matchtime=5         " bracket blinking
-set showfulltag     
+set showfulltag
 set hidden              " buffers don't close
 set nocompatible        " nocompatible with vi
 set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+set colorcolumn=+1
+set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h,n~/.vim/viminfo
+
 setlocal shortmess+=I   " hide intro message on start
-" fonts
-set gfn=Source\ Code\ Pro:h12,Hack:h14,Bitstream\ Vera\ Sans\ Mono:h14
 colorscheme industry
 syntax enable
 " cyrillic support
@@ -94,12 +94,15 @@ syntax enable
 " set imsearch=0
 
 " pymode recommended
-set complete+=t         
-set commentstring=#%s   
-set define=^\s*\\(def\\\\|class\\)    
+set complete+=t
+set commentstring=#%s
+set define=^\s*\\(def\\\\|class\\)
 
 " autocommenting disabled
-autocmd FileType * setlocal formatoptions-=r formatoptions-=o formatoptions+=t formatoptions+=c formatoptions+=n formatoptions+=w formatoptions+=l 
+autocmd FileType * setlocal formatoptions-=r formatoptions-=o formatoptions+=t formatoptions+=c formatoptions+=n formatoptions+=w formatoptions+=l
+
+" maximum history items
+autocmd FileType * setlocal history=300
 
 " mouse support
 if has('mouse')
@@ -145,7 +148,7 @@ let g:mapleader = ","
 nnoremap <leader>/ :nohlsearch<CR>
 
 " :W save the file as root
-command W w !sudo tee % > /dev/null 
+command W w !sudo tee % > /dev/null
 
 " move by visually wrapped lines too
 nnoremap j gj
@@ -192,6 +195,9 @@ nmap <leader><space> i<space><Right><Esc>
 
 if has("gui_running")
     colorscheme mac_classic
+    set guifont=Hack\ 10
+    " ,Hack:h14,Bitstream\ Vera\ Sans\ Mono:h14
+    " set gfn=Source\ Code\ Pro:h12
     set guioptions-=m  "remove menu bar
     set guioptions-=T  "remove toolbar
     set guioptions-=r  "remove right-hand scroll bar
