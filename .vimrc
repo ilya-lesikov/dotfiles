@@ -7,6 +7,8 @@ set rtp+=~/.vim/bundle/Vundle.vim " set the runtime path to include Vundle and i
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
+Plugin 'tomasr/molokai'
+Plugin 'morhetz/gruvbox'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'majutsushi/tagbar'
@@ -194,7 +196,8 @@ nmap <leader><space> i<space><Right><Esc>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has("gui_running")
-    colorscheme mac_classic
+    colorscheme molokai
+    set background=dark
     set guifont=Hack\ 10
     " ,Hack:h14,Bitstream\ Vera\ Sans\ Mono:h14
     " set gfn=Source\ Code\ Pro:h12
