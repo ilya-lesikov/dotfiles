@@ -143,6 +143,9 @@ autocmd BufWrite * :call DeleteTrailingWS()
 let mapleader = ","
 let g:mapleader = ","
 
+" search highlight disabling
+nnoremap <leader>/ :nohlsearch<CR>
+
 " :W save the file as root
 command W w !sudo tee % > /dev/null
 
