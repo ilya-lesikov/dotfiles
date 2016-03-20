@@ -8,6 +8,8 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
 Plugin 'tomasr/molokai'
+Plugin 'w0ng/vim-hybrid'
+Plugin 'morhetz/gruvbox'
 
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
@@ -21,6 +23,10 @@ filetype plugin indent on    " required
 """"""""""""""""""""""""""""""""""""""""
 " Vim settings
 """"""""""""""""""""""""""""""""""""""""
+
+" no lag in terminal vim
+set timeoutlen=1000
+set ttimeoutlen=0
 
 " default paths
 set rtp+=~/.vim " set runtime path to add .vim
@@ -91,7 +97,6 @@ set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h,n~/.vim/viminfo
 set complete+=t
 
 setlocal shortmess+=I   " hide intro message on start
-colorscheme industry
 syntax enable
 " cyrillic support
 " set keymap=russian-jcukenwin
@@ -157,11 +162,10 @@ nnoremap k gk
 nmap <leader>bd :bp<bar>bd #<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" GVIM SETTINGS (GRAPHICAL, GUI)
+" DEPENDENT ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has("gui_running")
-    colorscheme molokai
     set background=dark
     set guifont=Hack\ 10
     set guioptions-=m  "remove menu bar
@@ -170,6 +174,13 @@ if has("gui_running")
     set guioptions-=L  "remove left-hand scroll bar
     set guioptions+=a  "highlighted text automatically copies to "* register
     set guioptions+=c  "no graphical popup dialogs
+else
+    if $KONSOLE_PROFILE_NAME != '' || $COLORTERM == 'gnome-terminal' || $TERM == 'screen' || $TERM == 'screen-256color'
+        " colorscheme hybrid
+        colorscheme gruvbox
+    else
+        colorscheme industry
+    endif
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
