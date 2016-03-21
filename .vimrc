@@ -145,8 +145,8 @@ autocmd BufWrite * :call DeleteTrailingWS()
 """"""""""""""""""""""""""""""""""""""""
 
 " map leader
-let mapleader = ","
-let g:mapleader = ","
+" let mapleader = "\"
+" let g:mapleader = "\"
 
 " search highlight disabling
 nnoremap <leader>/ :nohlsearch<CR>
