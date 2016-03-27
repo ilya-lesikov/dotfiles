@@ -7,14 +7,14 @@ set rtp+=~/.vim/bundle/Vundle.vim " set the runtime path to include Vundle and i
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
-Plugin 'tomasr/molokai'
+"Plugin 'tomasr/molokai'
 Plugin 'w0ng/vim-hybrid'
 Plugin 'morhetz/gruvbox'
 
-Plugin 'scrooloose/nerdtree'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'rking/ag.vim'
-Plugin 'ctrlpvim/ctrlp.vim'
+"Plugin 'scrooloose/nerdtree'
+"Plugin 'scrooloose/nerdcommenter'
+"Plugin 'rking/ag.vim'
+"Plugin 'ctrlpvim/ctrlp.vim'
 
 " All of your Plugins must be added before this line
 call vundle#end()            " required
@@ -155,11 +155,11 @@ nnoremap <leader>/ :nohlsearch<CR>
 command W w !sudo tee % > /dev/null
 
 " move by visually wrapped lines too
-nnoremap j gj
-nnoremap k gk
+"nnoremap j gj
+"nnoremap k gk
 
 " delete buffer without closing split (windows)
-nmap <leader>bd :bp<bar>bd #<cr>
+"nmap <leader>bd :bp<bar>bd #<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " DEPENDENT ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
@@ -188,16 +188,16 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " nerdtree
-map <leader>tt :NERDTreeToggle<CR>
+"map <leader>tt :NERDTreeToggle<CR>
 
 " nerdcommenter
-let g:NERDSpaceDelims=1
+"let g:NERDSpaceDelims=1
 
 " ctrlp
-let g:ctrlp_map = ''
-let g:ctrlp_switch_buffer = 'Et'
-let g:ctrlp_show_hidden = 0
-let g:ctrlp_use_caching = 1
-let g:ctrlp_switch_buffer = ''
-nmap <leader>sf :CtrlP<cr>
-nmap <leader>sb :CtrlPBuffer<cr>
+"let g:ctrlp_map = ''
+"let g:ctrlp_switch_buffer = 'Et'
+"let g:ctrlp_show_hidden = 0
+"let g:ctrlp_use_caching = 1
+"let g:ctrlp_switch_buffer = ''
+"nmap <leader>sf :CtrlP<cr>
+"nmap <leader>sb :CtrlPBuffer<cr>
