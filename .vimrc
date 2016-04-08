@@ -149,7 +149,7 @@ autocmd BufWrite * :call DeleteTrailingWS()
 " let g:mapleader = "\"
 
 " search highlight disabling
-nnoremap <leader>/ :nohlsearch<CR>
+"nnoremap <leader>/ :nohlsearch<CR>
 
 " :W save the file as root
 command W w !sudo tee % > /dev/null
@@ -178,8 +178,10 @@ else
     if $KONSOLE_PROFILE_NAME != '' || $COLORTERM == 'gnome-terminal' || $TERM == 'screen' || $TERM == 'screen-256color'
         " colorscheme hybrid
         colorscheme gruvbox
+        set background=dark
     else
         colorscheme industry
+        set background=dark
     endif
 endif
 
