@@ -10,10 +10,6 @@ Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 Plugin 'morhetz/gruvbox'
 
 Plugin 'Valloric/YouCompleteMe'
-"Plugin 'scrooloose/nerdtree'
-"Plugin 'scrooloose/nerdcommenter'
-"Plugin 'rking/ag.vim'
-"Plugin 'ctrlpvim/ctrlp.vim'
 
 " All of your Plugins must be added before this line
 call vundle#end()            " required
