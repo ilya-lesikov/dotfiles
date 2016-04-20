@@ -190,7 +190,5 @@ endif
 " PLUGIN SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" nerdtree
-"map <leader>tt :NERDTreeToggle<CR>
 
 
