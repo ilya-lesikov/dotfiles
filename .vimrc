@@ -193,6 +193,4 @@ endif
 " nerdtree
 "map <leader>tt :NERDTreeToggle<CR>
 
-" nerdcommenter
-"let g:NERDSpaceDelims=1
 
