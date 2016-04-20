@@ -142,10 +142,6 @@ autocmd BufWrite * :call DeleteTrailingWS()
 " :W save the file as root
 command W w !sudo tee % > /dev/null
 
-" move by visually wrapped lines too
-"nnoremap j gj
-"nnoremap k gk
-
 " delete buffer without closing split (windows)
 "nmap <leader>bd :bp<bar>bd #<cr>
 
