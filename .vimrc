@@ -196,11 +196,3 @@ endif
 " nerdcommenter
 "let g:NERDSpaceDelims=1
 
-" ctrlp
-"let g:ctrlp_map = ''
-"let g:ctrlp_switch_buffer = 'Et'
-"let g:ctrlp_show_hidden = 0
-"let g:ctrlp_use_caching = 1
-"let g:ctrlp_switch_buffer = ''
-"nmap <leader>sf :CtrlP<cr>
-"nmap <leader>sb :CtrlPBuffer<cr>
