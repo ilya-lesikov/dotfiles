@@ -139,9 +139,6 @@ autocmd BufWrite * :call DeleteTrailingWS()
 " MAPPINGS (keys, bindings)
 """"""""""""""""""""""""""""""""""""""""
 
-" search highlight disabling
-"nnoremap <leader>/ :nohlsearch<CR>
-
 " :W save the file as root
 command W w !sudo tee % > /dev/null
 
