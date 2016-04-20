@@ -142,9 +142,6 @@ autocmd BufWrite * :call DeleteTrailingWS()
 " :W save the file as root
 command W w !sudo tee % > /dev/null
 
-" delete buffer without closing split (windows)
-"nmap <leader>bd :bp<bar>bd #<cr>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " DEPENDENT ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
