@@ -7,7 +7,6 @@ set rtp+=~/.vim/bundle/Vundle.vim " set the runtime path to include Vundle and i
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
-"Plugin 'tomasr/molokai'
 Plugin 'morhetz/gruvbox'
 
 Plugin 'Valloric/YouCompleteMe'
