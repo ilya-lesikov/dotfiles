@@ -11,6 +11,7 @@ Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 Plugin 'w0ng/vim-hybrid'
 Plugin 'morhetz/gruvbox'
 
+Plugin 'Valloric/YouCompleteMe'
 "Plugin 'scrooloose/nerdtree'
 "Plugin 'scrooloose/nerdcommenter'
 "Plugin 'rking/ag.vim'
