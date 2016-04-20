@@ -143,7 +143,7 @@ autocmd BufWrite * :call DeleteTrailingWS()
 command W w !sudo tee % > /dev/null
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" DEPENDENT ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
+" DEPEND ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has("gui_running")
@@ -168,6 +168,3 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-
-
