@@ -139,10 +139,6 @@ autocmd BufWrite * :call DeleteTrailingWS()
 " MAPPINGS (keys, bindings)
 """"""""""""""""""""""""""""""""""""""""
 
-" map leader
-" let mapleader = "\"
-" let g:mapleader = "\"
-
 " search highlight disabling
 "nnoremap <leader>/ :nohlsearch<CR>
 
