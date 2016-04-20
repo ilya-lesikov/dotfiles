@@ -8,7 +8,6 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
 "Plugin 'tomasr/molokai'
-Plugin 'w0ng/vim-hybrid'
 Plugin 'morhetz/gruvbox'
 
 Plugin 'Valloric/YouCompleteMe'
@@ -177,7 +176,6 @@ if has("gui_running")
     set guioptions+=c  "no graphical popup dialogs
 else
     if $KONSOLE_PROFILE_NAME != '' || $COLORTERM == 'gnome-terminal' || $TERM == 'screen' || $TERM == 'screen-256color'
-        " colorscheme hybrid
         colorscheme gruvbox
         set background=dark
     else
