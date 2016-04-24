@@ -1,4 +1,4 @@
-""""""""""""""""""""""""""""""""""""""""
+    """"""""""""""""""""""""""""""""""""""""
 " Vundle initialization
 """"""""""""""""""""""""""""""""""""""""
 set shell=bash          " posix shell needed for vundle
@@ -9,7 +9,9 @@ Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
 Plugin 'morhetz/gruvbox'
 
-Plugin 'Valloric/YouCompleteMe'
+if has('nvim')
+    Plugin 'Valloric/YouCompleteMe'
+endif
 
 " All of your Plugins must be added before this line
 call vundle#end()            " required
@@ -25,16 +27,16 @@ set ttimeoutlen=0
 
 " default paths
 set rtp+=~/.vim " set runtime path to add .vim
-set tags=~/.vim/tags
+"set tags=~/.vim/tags
 
 set undofile
-set undodir=~/.vim/undodir
+"set undodir=~/.vim/undodir
 
 set backup
 set writebackup
-set backupdir=~/.vim/backups,~/tmp,/var/tmp,/tmp
+"set backupdir=~/.vim/backups,~/tmp,/var/tmp,/tmp
 set backupskip=/tmp/*,/private/tmp/*
-set directory=~/.vim/backups,~/tmp,/var/tmp,/tmp
+"set directory=~/.vim/backups,~/tmp,/var/tmp,/tmp
 
 " tabs/spaces and indentation
 set tabstop=4       " number of visual spaces per TAB
@@ -134,6 +136,11 @@ autocmd BufWrite * :call DeleteTrailingWS()
 
 " :W save the file as root
 command W w !sudo tee % > /dev/null
+
+if has('nvim')
+    tnoremap <C-[> <C-\><C-n>
+endif
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " DEPEND ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
