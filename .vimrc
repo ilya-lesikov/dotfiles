@@ -169,3 +169,10 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" YouCompleteMe
+if has('nvim')
+    let g:ycm_complete_in_comments = 1
+    let g:ycm_seed_identifiers_with_syntax = 1
+endif
+
