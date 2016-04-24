@@ -88,7 +88,7 @@ set showfulltag
 set hidden              " buffers don't close
 set nocompatible        " nocompatible with vi
 set colorcolumn=80
-set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h,n~/.vim/viminfo
+set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
 set complete+=t
 
 setlocal shortmess+=I   " hide intro message on start
