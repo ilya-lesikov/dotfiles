@@ -178,5 +178,9 @@ endif
 " YouCompleteMe
 if has('nvim')
     let g:ycm_seed_identifiers_with_syntax = 1
+    nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+    nmap <leader>D :YcmCompleter GoToDefinition<CR>
+    nmap <leader>* :YcmCompleter GoToReferences<CR>
+    nmap <leader>k :YcmCompleter GetDoc<CR>
 endif
 
