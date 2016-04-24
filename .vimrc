@@ -112,6 +112,12 @@ if has('mouse')
   set mouse=a
 endif
 
+" fix shift+k didn't have page by page scroll
+if has('nvim')
+    set keywordprg=:term\ man
+    autocmd FileType python,python3 setlocal keywordprg=:term\ pydoc
+endif
+
 """"""""""""""""""""""""""""""""""""""""
 " FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""
