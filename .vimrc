@@ -1,4 +1,4 @@
-    """"""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""
 " Vundle initialization
 """"""""""""""""""""""""""""""""""""""""
 set shell=bash          " posix shell needed for vundle
@@ -94,11 +94,12 @@ set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
 set complete+=t
 
 setlocal shortmess+=I   " hide intro message on start
-syntax enable
 " cyrillic support
 " set keymap=russian-jcukenwin
 " set iminsert=0
 " set imsearch=0
+
+autocmd FileType * syntax on
 
 " autocommenting disabled
 autocmd FileType * setlocal formatoptions-=r formatoptions-=o formatoptions-=t formatoptions+=c formatoptions+=n formatoptions+=w formatoptions+=l
