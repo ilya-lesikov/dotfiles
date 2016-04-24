@@ -148,7 +148,6 @@ if has('nvim')
     tnoremap <C-[> <C-\><C-n>
 endif
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " DEPEND ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -178,7 +177,6 @@ endif
 
 " YouCompleteMe
 if has('nvim')
-    let g:ycm_complete_in_comments = 1
     let g:ycm_seed_identifiers_with_syntax = 1
 endif
 
