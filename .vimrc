@@ -178,9 +178,10 @@ endif
 " YouCompleteMe
 if has('nvim')
     let g:ycm_seed_identifiers_with_syntax = 1
+    let g:ycm_server_keep_logfiles = 1
+    "let g:ycm_server_log_level = 'debug'
     nmap <leader>d :YcmCompleter GoToDeclaration<CR>
     nmap <leader>D :YcmCompleter GoToDefinition<CR>
     nmap <leader>* :YcmCompleter GoToReferences<CR>
     nmap <leader>k :YcmCompleter GetDoc<CR>
 endif
-
