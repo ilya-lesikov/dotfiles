@@ -58,7 +58,6 @@ set ttimeoutlen=0
 " backups, etc..
 set rtp+=~/.vim " set runtime path to add .vim
 set undofile
-set background
 set backup
 set writebackup
 set backupskip=/tmp/*,/private/tmp/*
