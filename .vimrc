@@ -18,6 +18,36 @@ call vundle#end()            " required
 filetype plugin indent on    " required
 
 """"""""""""""""""""""""""""""""""""""""
+" FUNCTIONS
+""""""""""""""""""""""""""""""""""""""""
+
+function! SetKeywordprg()
+    " for shift+K in nvim ':tabnew | term' should precede the command
+    if &ft =~ 'vim'
+        setlocal keywordprg=:help
+    elseif &ft =~ 'help'
+        setlocal keywordprg=:help
+    elseif &ft =~ 'python\|python3' && has('nvim')
+        setlocal keywordprg=:tabnew\ \|\ term\ pydoc
+    elseif has('nvim')
+        setlocal keywordprg=:tabnew\ \|\ term\ man
+    endif
+endfunction
+
+function! GetFileDirectory ()
+    " get directory of opened file for statusline
+    let fileDirectory = expand("%:p:h")
+    return fileDirectory
+endfunction
+
+func! DeleteTrailingWS()
+    " delete trailing spaces on save
+    exe "normal mz"
+    %s/\s\+$//ge
+    exe "normal `z"
+endfunc
+
+""""""""""""""""""""""""""""""""""""""""
 " Vim settings
 """"""""""""""""""""""""""""""""""""""""
 
@@ -25,20 +55,15 @@ filetype plugin indent on    " required
 set timeoutlen=1000
 set ttimeoutlen=0
 
-" default paths
+" backups, etc..
 set rtp+=~/.vim " set runtime path to add .vim
-"set tags=~/.vim/tags
-
 set undofile
-"set undodir=~/.vim/undodir
-
+set background
 set backup
 set writebackup
-"set backupdir=~/.vim/backups,~/tmp,/var/tmp,/tmp
 set backupskip=/tmp/*,/private/tmp/*
-"set directory=~/.vim/backups,~/tmp,/var/tmp,/tmp
 
-" tabs/spaces and indentation
+" tabs/spaces, indentation
 set tabstop=4       " number of visual spaces per TAB
 set softtabstop=4   " number of spaces in tab when editing
 set shiftwidth=4
@@ -54,9 +79,6 @@ set laststatus=2        " always show status bar
 " search, highlighting
 set incsearch           " search as characters are entered
 set hlsearch            " highlight matches
-set ignorecase
-set smartcase           " When searching try to be smart about cases
-set magic               " For regular expressions turn magic on
 
 " folding
 set foldenable          " enable folding
@@ -92,6 +114,7 @@ set nocompatible        " nocompatible with vi
 set colorcolumn=80
 set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
 set complete+=t
+set omnifunc=syntaxcomplete#Complete
 
 setlocal shortmess+=I   " hide intro message on start
 " cyrillic support
@@ -107,35 +130,14 @@ autocmd FileType * setlocal formatoptions-=r formatoptions-=o formatoptions-=t f
 " maximum history items
 autocmd FileType * setlocal history=300
 
+autocmd FileType * call SetKeywordprg()
+
+autocmd BufWrite * call DeleteTrailingWS()
+
 " mouse support
 if has('mouse')
   set mouse=a
 endif
-
-" fix shift+k didn't have page by page scroll
-if has('nvim')
-    set keywordprg=:tabnew\ \|\ term\ man
-    autocmd FileType python,python3 setlocal keywordprg=:tabnew\ \|\ term\ pydoc
-endif
-
-""""""""""""""""""""""""""""""""""""""""
-" FUNCTIONS
-""""""""""""""""""""""""""""""""""""""""
-
-" get directory of opened file for statusline
-function! GetFileDirectory ()
-    let fileDirectory = expand("%:p:h")
-    return fileDirectory
-endfunction
-
-" delete trailing spaces on save
-func! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
-endfunc
-
-autocmd BufWrite * :call DeleteTrailingWS()
 
 """"""""""""""""""""""""""""""""""""""""
 " MAPPINGS (keys, bindings)
@@ -179,7 +181,6 @@ endif
 if has('nvim')
     let g:ycm_seed_identifiers_with_syntax = 1
     let g:ycm_server_keep_logfiles = 1
-    "let g:ycm_server_log_level = 'debug'
     nmap <leader>d :YcmCompleter GoToDeclaration<CR>
     nmap <leader>D :YcmCompleter GoToDefinition<CR>
     nmap <leader>* :YcmCompleter GoToReferences<CR>
