@@ -22,15 +22,15 @@ filetype plugin indent on    " required
 """"""""""""""""""""""""""""""""""""""""
 
 function! SetKeywordprg()
-    " for shift+K in nvim ':tabnew | term' should precede the command
+    " for shift+K in nvim ':-tabnew | term' should precede the command
     if &ft =~ 'vim'
         setlocal keywordprg=:help
     elseif &ft =~ 'help'
         setlocal keywordprg=:help
     elseif &ft =~ 'python\|python3' && has('nvim')
-        setlocal keywordprg=:tabnew\ \|\ term\ pydoc
+        setlocal keywordprg=:-tabnew\ \|\ term\ pydoc
     elseif has('nvim')
-        setlocal keywordprg=:tabnew\ \|\ term\ man
+        setlocal keywordprg=:-tabnew\ \|\ term\ man
     endif
 endfunction
 
