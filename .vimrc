@@ -69,7 +69,7 @@ set shiftwidth=4
 set expandtab       " tabs are spaces
 set smarttab            " Be smart when using tabs ;)
 set autoindent
-set smartindent
+set cindent
 
 " statusline
 set statusline=%t%<%m%H%W%q%=%{GetFileDirectory()}\ %l-%L\ %p%%
