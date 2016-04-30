@@ -10,7 +10,7 @@ Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 Plugin 'morhetz/gruvbox'
 
 if has('nvim')
-    Plugin 'Valloric/YouCompleteMe'
+    Plugin 'klen/python-mode'
 endif
 
 " All of your Plugins must be added before this line
@@ -20,19 +20,6 @@ filetype plugin indent on    " required
 """"""""""""""""""""""""""""""""""""""""
 " FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""
-
-function! SetKeywordprg()
-    " for shift+K in nvim ':-tabnew | term' should precede the command
-    if &ft =~ 'vim'
-        setlocal keywordprg=:help
-    elseif &ft =~ 'help'
-        setlocal keywordprg=:help
-    elseif &ft =~ 'python\|python3' && has('nvim')
-        setlocal keywordprg=:-tabnew\ \|\ term\ pydoc
-    elseif has('nvim')
-        setlocal keywordprg=:-tabnew\ \|\ term\ man
-    endif
-endfunction
 
 function! GetFileDirectory ()
     " get directory of opened file for statusline
@@ -52,15 +39,15 @@ endfunc
 """"""""""""""""""""""""""""""""""""""""
 
 " no lag in terminal vim
-set timeoutlen=1000
+"set timeoutlen=1000
 set ttimeoutlen=0
 
 " backups, etc..
-set rtp+=~/.vim " set runtime path to add .vim
+"set rtp+=~/.vim " set runtime path to add .vim
 set undofile
 set backup
-set writebackup
-set backupskip=/tmp/*,/private/tmp/*
+"set writebackup
+"set backupskip=/tmp/*,/private/tmp/*
 
 " tabs/spaces, indentation
 set tabstop=4       " number of visual spaces per TAB
@@ -80,39 +67,41 @@ set incsearch           " search as characters are entered
 set hlsearch            " highlight matches
 
 " folding
-set foldenable          " enable folding
-set foldmethod=manual   " fold based on indent level
+"set foldenable          " enable folding
+"set foldmethod=manual   " fold based on indent level
 set foldcolumn=1        " Add a bit extra margin to the left
 
 " wrapping
-set wrap
-set linebreak
-set nolist              " list disables linebreak
-set textwidth=0
-set wrapmargin=0
+"set wrap
+"set linebreak
+"set nolist              " list disables linebreak
+"set textwidth=80
+"set wrapmargin=0
 
 " disable error signals
-set noerrorbells        " disable errors
-set novisualbell        " disable errors
-set vb t_vb=            " disable errors
-set confirm             " prompts instead of errors
+"set noerrorbells        " disable errors
+"set novisualbell        " disable errors
+"set vb t_vb=            " disable errors
+"set confirm             " prompts instead of errors
 
-set scrolloff=7       " Set 7 lines to the cursor - when moving vertically using j/k
+"set scrolloff=7       " Set 7 lines to the cursor - when moving vertically using j/k
 set autoread            " autoreload buffer if changes
 set lazyredraw          " redraw only when we need to.
 set showcmd             " show command in bottom bar
 set cursorline          " highlight current line
 set wildmenu            " visual autocomplete for command menu
 set showmatch           " highlight matching [{()}]
-set encoding=utf8
+"set encoding=utf8
 set ffs=unix,dos,mac
-set matchtime=5         " bracket blinking
+"set matchtime=5         " bracket blinking
 set showfulltag
 set hidden              " buffers don't close
 set nocompatible        " nocompatible with vi
 set colorcolumn=80
 set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
-set complete+=t
+
+"set dictionary=/usr/share/dict/words
+"set complete+=t
 set omnifunc=syntaxcomplete#Complete
 
 setlocal shortmess+=I   " hide intro message on start
@@ -122,15 +111,11 @@ setlocal shortmess+=I   " hide intro message on start
 " set imsearch=0
 
 autocmd FileType * syntax on
-
 " autocommenting disabled
-autocmd FileType * setlocal formatoptions-=r formatoptions-=o formatoptions-=t formatoptions+=c formatoptions+=n formatoptions+=w formatoptions+=l
-
+"autocmd FileType * setlocal formatoptions-=r formatoptions-=o formatoptions-=t formatoptions+=c formatoptions+=n formatoptions+=w formatoptions+=l
+autocmd FileType * setlocal formatoptions-=t 
 " maximum history items
 autocmd FileType * setlocal history=300
-
-autocmd FileType * call SetKeywordprg()
-
 autocmd BufWrite * call DeleteTrailingWS()
 
 " mouse support
@@ -146,6 +131,7 @@ endif
 command W w !sudo tee % > /dev/null
 
 if has('nvim')
+    " leave ins mode in :term easier
     tnoremap <C-[> <C-\><C-n>
 endif
 
@@ -176,12 +162,6 @@ endif
 " PLUGIN SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" YouCompleteMe
-if has('nvim')
-    let g:ycm_seed_identifiers_with_syntax = 1
-    let g:ycm_server_keep_logfiles = 1
-    nmap <leader>d :YcmCompleter GoToDeclaration<CR>
-    nmap <leader>D :YcmCompleter GoToDefinition<CR>
-    nmap <leader>* :YcmCompleter GoToReferences<CR>
-    nmap <leader>k :YcmCompleter GetDoc<CR>
-endif
+" pymode
+let g:pymode_lint_on_fly = 1
+
