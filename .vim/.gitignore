@@ -1,11 +1,7 @@
 *
 
-!backups
 !bundle
 !colors
 !colors/*
-!s
-!tags
-!undodir
 
 !.gitignore
