@@ -11,6 +11,7 @@ Plugin 'morhetz/gruvbox'
 
 if has('nvim')
     Plugin 'klen/python-mode'
+    Plugin 'davidhalter/jedi-vim'
 endif
 
 " All of your Plugins must be added before this line
@@ -142,3 +143,8 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" python-mode
+if has('nvim')
+    let g:pymode_lint_cwindow = 0
+    let g:pymode_rope_completion = 0
+endif
