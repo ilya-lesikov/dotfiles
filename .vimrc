@@ -127,7 +127,11 @@ else
     if $KONSOLE_PROFILE_NAME != '' || $COLORTERM == 'gnome-terminal' ||
                 \ $TERM == 'screen' || $TERM == 'screen-256color' ||
                 \ $TERM == 'xterm-256color'
-        colorscheme gruvbox
+        try
+            colorscheme gruvbox
+        catch
+        endtry
+
         set background=dark
     else
         colorscheme desert
