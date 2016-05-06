@@ -147,4 +147,6 @@ endif
 if has('nvim')
     let g:pymode_lint_cwindow = 0
     let g:pymode_rope_completion = 0
+    let g:pymode_folding = 0
+    let g:jedi#popup_on_dot = 0
 endif
