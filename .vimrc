@@ -10,8 +10,13 @@ Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 Plugin 'morhetz/gruvbox'
 
 if has('nvim')
-    Plugin 'klen/python-mode'
-    Plugin 'davidhalter/jedi-vim'
+    "Plugin 'klen/python-mode'
+    "Plugin 'davidhalter/jedi-vim'
+    Plugin 'Valloric/YouCompleteMe'
+    Plugin 'SirVer/ultisnips'
+    Plugin 'honza/vim-snippets'
+    Plugin 'scrooloose/syntastic'
+    Plugin 'vim-utils/vim-husk'
 endif
 
 " All of your Plugins must be added before this line
@@ -44,7 +49,10 @@ set ttimeoutlen=0
 
 " backups, etc..
 set undofile
+set undodir=~/.vim/misc
 set backup
+set backupdir=~/.vim/misc
+set directory=~/.vim/misc
 
 " tabs/spaces, indentation
 set tabstop=4       " number of visual spaces per TAB
@@ -65,6 +73,7 @@ set hlsearch            " highlight matches
 
 set foldcolumn=1        " Add a bit extra margin to the left
 
+set scrolloff=999
 set autoread            " autoreload buffer if changes
 set lazyredraw          " redraw only when we need to.
 set showcmd             " show command in bottom bar
@@ -78,6 +87,7 @@ set nocompatible        " nocompatible with vi
 set colorcolumn=80
 set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
 set shiftround
+set sessionoptions-=blank
 
 set omnifunc=syntaxcomplete#Complete
 
@@ -143,10 +153,41 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" python-mode
 if has('nvim')
-    let g:pymode_lint_cwindow = 0
-    let g:pymode_rope_completion = 0
-    let g:pymode_folding = 0
-    let g:jedi#popup_on_dot = 0
+    " python-mode
+    "let g:pymode_lint_cwindow = 0
+    "let g:pymode_rope_completion = 0
+    "let g:pymode_folding = 0
+
+    " jedi-vim
+    "let g:jedi#popup_on_doeed_identifiers_with_syntax = 1
+
+    " youcompleteme
+    "let g:ycm_seed_identifiers_with_syntax = 1
+    "let g:ycm_server_keep_logfiles = 1
+    let g:ycm_autoclose_preview_window_after_insertion = 1
+    let g:ycm_key_list_select_completion = ['<Down>', 'CTRL-N']
+    let g:ycm_key_list_previous_completion = ['<Up>', 'CTRL-P']
+    nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+    nmap <leader>D :YcmCompleter GoToDefinition<CR>
+    nmap <leader>* :YcmCompleter GoToReferences<CR>
+    nmap <leader>k :YcmCompleter GetDoc<CR>
+
+    " ultisnips
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsJumpForwardTrigger="<c-b>"
+    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+    " syntastic
+    "let g:syntastic_always_populate_loc_list = 1
+    "let g:syntastic_auto_loc_list = 1
+    "let g:syntastic_check_on_open = 1
+    "let g:syntastic_check_on_wq = 0
+    "let g:syntastic_error_symbol = 'E'
+    "let g:syntastic_warning_symbol = 'W'
+    "let g:syntastic_style_error_symbol = 'e'
+    "let g:syntastic_style_warning_symbol = 'w'
+    "let g:syntastic_python_python_use_codec = 1
+    let g:syntastic_aggregate_errors = 1
+    let g:syntastic_python_checkers = ["python", "pyflakes", "pep8"]
 endif
