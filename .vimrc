@@ -17,6 +17,8 @@ if has('nvim')
     Plugin 'honza/vim-snippets'
     Plugin 'scrooloose/syntastic'
     Plugin 'vim-utils/vim-husk'
+    Plugin 'python-rope/ropevim'
+    Plugin 'hynek/vim-python-pep8-indent'
 endif
 
 " All of your Plugins must be added before this line
@@ -99,6 +101,7 @@ setlocal shortmess+=I   " hide intro message on start
 
 autocmd FileType * syntax on
 autocmd FileType * setlocal formatoptions-=t
+autocmd FileType * setlocal formatoptions-=o
 " maximum history items
 autocmd FileType * setlocal history=300
 autocmd BufWrite * call DeleteTrailingWS()
@@ -175,7 +178,7 @@ if has('nvim')
 
     " ultisnips
     let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<c-b>"
+    let g:UltiSnipsJumpForwardTrigger="<tab>"
     let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
     " syntastic
@@ -190,4 +193,8 @@ if has('nvim')
     "let g:syntastic_python_python_use_codec = 1
     let g:syntastic_aggregate_errors = 1
     let g:syntastic_python_checkers = ["python", "pyflakes", "pep8"]
+
+    " ropevim
+    "let ropevim_extended_complete = 1
+    "let g:ropevim_autoimport_modules = ["os.*", "sys"]
 endif
