@@ -11,14 +11,18 @@ Plugin 'morhetz/gruvbox'
 
 if has('nvim')
     "Plugin 'klen/python-mode'
+    "Plugin 'Valloric/YouCompleteMe'
     "Plugin 'davidhalter/jedi-vim'
-    Plugin 'Valloric/YouCompleteMe'
     Plugin 'SirVer/ultisnips'
     Plugin 'honza/vim-snippets'
     Plugin 'scrooloose/syntastic'
     Plugin 'vim-utils/vim-husk'
     Plugin 'python-rope/ropevim'
     Plugin 'hynek/vim-python-pep8-indent'
+    Plugin 'Shougo/deoplete.nvim'
+    Plugin 'carlitux/deoplete-ternjs'
+    Plugin 'Shougo/neco-vim'
+    Plugin 'zchee/deoplete-jedi'
 endif
 
 " All of your Plugins must be added before this line
@@ -166,15 +170,15 @@ if has('nvim')
     "let g:jedi#popup_on_doeed_identifiers_with_syntax = 1
 
     " youcompleteme
-    "let g:ycm_seed_identifiers_with_syntax = 1
-    "let g:ycm_server_keep_logfiles = 1
-    let g:ycm_autoclose_preview_window_after_insertion = 1
-    let g:ycm_key_list_select_completion = ['<Down>', 'CTRL-N']
-    let g:ycm_key_list_previous_completion = ['<Up>', 'CTRL-P']
-    nmap <leader>d :YcmCompleter GoToDeclaration<CR>
-    nmap <leader>D :YcmCompleter GoToDefinition<CR>
-    nmap <leader>* :YcmCompleter GoToReferences<CR>
-    nmap <leader>k :YcmCompleter GetDoc<CR>
+    ""let g:ycm_seed_identifiers_with_syntax = 1
+    ""let g:ycm_server_keep_logfiles = 1
+    "let g:ycm_autoclose_preview_window_after_insertion = 1
+    "let g:ycm_key_list_select_completion = ['<Down>', 'CTRL-N']
+    "let g:ycm_key_list_previous_completion = ['<Up>', 'CTRL-P']
+    "nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+    "nmap <leader>D :YcmCompleter GoToDefinition<CR>
+    "nmap <leader>* :YcmCompleter GoToReferences<CR>
+    "nmap <leader>k :YcmCompleter GetDoc<CR>
 
     " ultisnips
     let g:UltiSnipsExpandTrigger="<tab>"
@@ -197,4 +201,14 @@ if has('nvim')
     " ropevim
     "let ropevim_extended_complete = 1
     "let g:ropevim_autoimport_modules = ["os.*", "sys"]
+
+    " deoplete
+    let g:deoplete#enable_at_startup = 1
+    let g:deoplete#enable_ignore_case = 1
+    let g:deoplete#auto_complete_start_length = 1
+    let g:deoplete#omni#input_patterns = {}
+    let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
+    let g:deoplete#sources#jedi#show_docstring = 1
+    let g:deoplete#sources#jedi#enable_cache = 0
+	autocmd CompleteDone * pclose!
 endif
