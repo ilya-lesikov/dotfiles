@@ -4,5 +4,6 @@
 !colors
 !colors/*
 !misc
+!syntax
 
 !.gitignore

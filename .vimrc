@@ -23,6 +23,8 @@ if has('nvim')
     Plugin 'carlitux/deoplete-ternjs'
     Plugin 'Shougo/neco-vim'
     Plugin 'zchee/deoplete-jedi'
+    "Plugin 'majutsushi/tagbar'
+    "Plugin 'scrooloose/nerdtree'
 endif
 
 " All of your Plugins must be added before this line
@@ -45,6 +47,26 @@ func! DeleteTrailingWS()
     %s/\s\+$//ge
     exe "normal `z"
 endfunc
+
+function! Bclose()
+    " delete buffer without closing window
+    let curbufnr = bufnr("%")
+    let altbufnr = bufnr("#")
+
+    if buflisted(altbufnr)
+        buffer #
+    else
+        bnext
+    endif
+
+    if bufnr("%") == curbufnr
+        new
+    endif
+
+    if buflisted(curbufnr)
+        execute("bdelete! " . curbufnr)
+    endif
+endfunction
 
 """"""""""""""""""""""""""""""""""""""""
 " Vim settings
@@ -77,6 +99,7 @@ set laststatus=2        " always show status bar
 set incsearch           " search as characters are entered
 set hlsearch            " highlight matches
 
+" folding
 set foldcolumn=1        " Add a bit extra margin to the left
 
 set scrolloff=999
@@ -94,6 +117,7 @@ set colorcolumn=80
 set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
 set shiftround
 set sessionoptions-=blank
+set path=**,/usr/local/lib/**,/usr/lib/**,/lib/**,/var/lib/**,/usr/local/include/**,/usr/include/**,/usr/local/share/**,/usr/share/**,/**
 
 set omnifunc=syntaxcomplete#Complete
 
@@ -106,6 +130,7 @@ setlocal shortmess+=I   " hide intro message on start
 autocmd FileType * syntax on
 autocmd FileType * setlocal formatoptions-=t
 autocmd FileType * setlocal formatoptions-=o
+autocmd FileType * setlocal formatoptions-=r
 " maximum history items
 autocmd FileType * setlocal history=300
 autocmd BufWrite * call DeleteTrailingWS()
@@ -121,6 +146,9 @@ endif
 
 " :W save the file as root
 command W w !sudo tee % > /dev/null
+
+" don't close window if :bd
+command Bd call Bclose()
 
 if has('nvim')
     " leave ins mode in :term easier
@@ -156,6 +184,15 @@ else
         set background=dark
     endif
 endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" PYTHON-SPECIFIC
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let python_highlight_all = 1
+"autocmd Filetype python setlocal foldmethod=syntax
+autocmd Filetype python setlocal foldlevel=1
+autocmd Filetype python setlocal foldminlines=10
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
@@ -204,11 +241,20 @@ if has('nvim')
 
     " deoplete
     let g:deoplete#enable_at_startup = 1
-    let g:deoplete#enable_ignore_case = 1
+    let g:deoplete#enable_smart_case = 1
     let g:deoplete#auto_complete_start_length = 1
     let g:deoplete#omni#input_patterns = {}
     let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
     let g:deoplete#sources#jedi#show_docstring = 1
     let g:deoplete#sources#jedi#enable_cache = 0
 	autocmd CompleteDone * pclose!
+
+    " tagbar
+    "let g:tagbar_compact = 1
+    "autocmd FileType * nested :call tagbar#autoopen(0)
+
+    " nerdtree
+    "let NERDTreeIgnore=['\.pyc$', '\.vim$', '\~$']
+    "let NERDTreeMinimalUI=1
+    "autocmd VimEnter * NERDTree
 endif
