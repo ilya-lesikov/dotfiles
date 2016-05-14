@@ -13,23 +13,43 @@ if has('nvim')
     "Plugin 'klen/python-mode'
     "Plugin 'Valloric/YouCompleteMe'
     "Plugin 'davidhalter/jedi-vim'
-    Plugin 'SirVer/ultisnips'
-    Plugin 'honza/vim-snippets'
-    Plugin 'scrooloose/syntastic'
-    Plugin 'vim-utils/vim-husk'
-    Plugin 'python-rope/ropevim'
-    Plugin 'hynek/vim-python-pep8-indent'
-    Plugin 'Shougo/deoplete.nvim'
-    Plugin 'carlitux/deoplete-ternjs'
-    Plugin 'Shougo/neco-vim'
-    Plugin 'zchee/deoplete-jedi'
     "Plugin 'majutsushi/tagbar'
     "Plugin 'scrooloose/nerdtree'
+    "Plugin 'Yggdroot/indentLine'
+    "Plugin 'mjbrownie/vim-htmldjango_omnicomplete'
+    "Plugin 'lambdalisue/vim-django-support'
+    "Plugin 'shougo/neocomplete.vim'
+
+    Plugin 'python-rope/ropevim'
+    Plugin 'hynek/vim-python-pep8-indent'
+    Plugin 'hdima/python-syntax'
+
+    Plugin 'hail2u/vim-css3-syntax'
+    Plugin 'othree/html5.vim'
+
+    Plugin 'Shougo/deoplete.nvim'
+    Plugin 'carlitux/deoplete-ternjs'
+    Plugin 'zchee/deoplete-jedi'
+    Plugin 'Shougo/neco-vim'
+    Plugin 'Shougo/neco-syntax'
+
+    Plugin 'SirVer/ultisnips'
+    Plugin 'honza/vim-snippets'
+
+    Plugin 'scrooloose/syntastic'
+    Plugin 'vim-utils/vim-husk'
+    Plugin 'nathanaelkane/vim-indent-guides'
+    Plugin 'raimondi/delimitmate'
+    Plugin 'tpope/vim-surround'
+    Plugin 'moll/vim-bbye'
 endif
 
 " All of your Plugins must be added before this line
 call vundle#end()            " required
 filetype plugin indent on    " required
+
+runtime macros/matchit.vim
+"runtime macros/editexisting.vim
 
 """"""""""""""""""""""""""""""""""""""""
 " FUNCTIONS
@@ -47,26 +67,6 @@ func! DeleteTrailingWS()
     %s/\s\+$//ge
     exe "normal `z"
 endfunc
-
-function! Bclose()
-    " delete buffer without closing window
-    let curbufnr = bufnr("%")
-    let altbufnr = bufnr("#")
-
-    if buflisted(altbufnr)
-        buffer #
-    else
-        bnext
-    endif
-
-    if bufnr("%") == curbufnr
-        new
-    endif
-
-    if buflisted(curbufnr)
-        execute("bdelete! " . curbufnr)
-    endif
-endfunction
 
 """"""""""""""""""""""""""""""""""""""""
 " Vim settings
@@ -148,7 +148,7 @@ endif
 command W w !sudo tee % > /dev/null
 
 " don't close window if :bd
-command Bd call Bclose()
+nmap <leader>bd :bp<CR>:bd#<CR>
 
 if has('nvim')
     " leave ins mode in :term easier
@@ -191,7 +191,8 @@ endif
 let python_highlight_all = 1
 "autocmd Filetype python setlocal foldmethod=syntax
 autocmd Filetype python setlocal foldlevel=1
-autocmd Filetype python setlocal foldminlines=10
+"autocmd Filetype python setlocal foldminlines=5
+"autocmd Filetype python setlocal foldnestmax=3
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -242,11 +243,11 @@ if has('nvim')
     " deoplete
     let g:deoplete#enable_at_startup = 1
     let g:deoplete#enable_smart_case = 1
-    let g:deoplete#auto_complete_start_length = 1
-    let g:deoplete#omni#input_patterns = {}
-    let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
+    "let g:deoplete#auto_complete_start_length = 1
+    "let g:deoplete#omni#input_patterns = {}
+    "let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
     let g:deoplete#sources#jedi#show_docstring = 1
-    let g:deoplete#sources#jedi#enable_cache = 0
+    let g:deoplete#sources#jedi#enable_cache = 1
 	autocmd CompleteDone * pclose!
 
     " tagbar
@@ -257,4 +258,42 @@ if has('nvim')
     "let NERDTreeIgnore=['\.pyc$', '\.vim$', '\~$']
     "let NERDTreeMinimalUI=1
     "autocmd VimEnter * NERDTree
+
+    " indentline
+    " let g:indentLine_loaded = 1
+
+    " vim-indent-guides
+    let g:indent_guides_enable_on_vim_startup = 1
+    let g:indent_guides_start_level = 2
+    let g:indent_guides_guide_size = 1
+
+    " delimitmate
+    let delimitMate_matchpairs = "(:),[:],{:},<:>"
+    let delimitMate_nesting_quotes = ['"','`',"'"]
+    let delimitMate_expand_cr = 1
+    let delimitMate_expand_space = 1
+    let delimitMate_expand_inside_quotes = 1
+    let delimitMate_jump_expansion = 1
+    let delimitMate_balance_matchpairs = 1
+    "au FileType c,perl let b:delimitMate_insert_eol_marker = 2
+
+    " htmldjango_omnicomplete
+    "au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
+    "let g:htmldjangocomplete_html_flavour = 'html5'
+
+    " neocomplete
+	" let g:neocomplete#enable_at_startup = 1
+    " let g:neocomplete#enable_smart_case = 1
+    " let g:neocomplete#enable_auto_close_preview = 1
+    " let g:neocomplete#fallback_mappings =
+    " \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
+    " "let g:neocomplete#skip_auto_completion_time
+
+	"autocmd FileType python setlocal omnifunc=jedi#completions
+	"let g:jedi#completions_enabled = 0
+	"let g:jedi#auto_vim_configuration = 0
+	"let g:jedi#smart_auto_mappings = 0
+	"let g:neocomplete#force_omni_input_patterns.python =
+	"\ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+	"" alternative pattern: '\h\w*\|[^. \t]\.\w*'
 endif
