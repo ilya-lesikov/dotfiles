@@ -13,7 +13,6 @@ if has('nvim')
     "Plugin 'klen/python-mode'
     "Plugin 'Valloric/YouCompleteMe'
     "Plugin 'davidhalter/jedi-vim'
-    "Plugin 'majutsushi/tagbar'
     "Plugin 'scrooloose/nerdtree'
     "Plugin 'Yggdroot/indentLine'
     "Plugin 'mjbrownie/vim-htmldjango_omnicomplete'
@@ -42,6 +41,7 @@ if has('nvim')
     Plugin 'raimondi/delimitmate'
     Plugin 'tpope/vim-surround'
     Plugin 'moll/vim-bbye'
+    Plugin 'majutsushi/tagbar'
 endif
 
 " All of your Plugins must be added before this line
@@ -189,10 +189,10 @@ endif
 " PYTHON-SPECIFIC
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let python_highlight_all = 1
-"autocmd Filetype python setlocal foldmethod=syntax
+autocmd Filetype python setlocal foldmethod=syntax
 autocmd Filetype python setlocal foldlevel=1
-"autocmd Filetype python setlocal foldminlines=5
-"autocmd Filetype python setlocal foldnestmax=3
+autocmd Filetype python setlocal foldminlines=15
+autocmd Filetype python setlocal foldnestmax=2
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -251,8 +251,8 @@ if has('nvim')
 	autocmd CompleteDone * pclose!
 
     " tagbar
-    "let g:tagbar_compact = 1
-    "autocmd FileType * nested :call tagbar#autoopen(0)
+    let g:tagbar_compact = 1
+    autocmd FileType * nested :call tagbar#autoopen(0)
 
     " nerdtree
     "let NERDTreeIgnore=['\.pyc$', '\.vim$', '\~$']
