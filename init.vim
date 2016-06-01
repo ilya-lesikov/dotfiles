@@ -9,40 +9,38 @@ Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
 Plugin 'morhetz/gruvbox'
 
-if has('nvim')
-    "Plugin 'klen/python-mode'
-    "Plugin 'Valloric/YouCompleteMe'
-    "Plugin 'davidhalter/jedi-vim'
-    "Plugin 'scrooloose/nerdtree'
-    "Plugin 'Yggdroot/indentLine'
-    "Plugin 'mjbrownie/vim-htmldjango_omnicomplete'
-    "Plugin 'lambdalisue/vim-django-support'
-    "Plugin 'shougo/neocomplete.vim'
+"Plugin 'klen/python-mode'
+"Plugin 'Valloric/YouCompleteMe'
+"Plugin 'davidhalter/jedi-vim'
+"Plugin 'scrooloose/nerdtree'
+"Plugin 'Yggdroot/indentLine'
+"Plugin 'mjbrownie/vim-htmldjango_omnicomplete'
+"Plugin 'lambdalisue/vim-django-support'
+"Plugin 'shougo/neocomplete.vim'
 
-    Plugin 'python-rope/ropevim'
-    Plugin 'hynek/vim-python-pep8-indent'
-    Plugin 'hdima/python-syntax'
+Plugin 'python-rope/ropevim'
+Plugin 'hynek/vim-python-pep8-indent'
+Plugin 'hdima/python-syntax'
 
-    Plugin 'hail2u/vim-css3-syntax'
-    Plugin 'othree/html5.vim'
+Plugin 'hail2u/vim-css3-syntax'
+Plugin 'othree/html5.vim'
 
-    Plugin 'Shougo/deoplete.nvim'
-    Plugin 'carlitux/deoplete-ternjs'
-    Plugin 'zchee/deoplete-jedi'
-    Plugin 'Shougo/neco-vim'
-    Plugin 'Shougo/neco-syntax'
+Plugin 'Shougo/deoplete.nvim'
+Plugin 'carlitux/deoplete-ternjs'
+Plugin 'zchee/deoplete-jedi'
+Plugin 'Shougo/neco-vim'
+Plugin 'Shougo/neco-syntax'
 
-    Plugin 'SirVer/ultisnips'
-    Plugin 'honza/vim-snippets'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
 
-    Plugin 'scrooloose/syntastic'
-    Plugin 'vim-utils/vim-husk'
-    Plugin 'nathanaelkane/vim-indent-guides'
-    Plugin 'raimondi/delimitmate'
-    Plugin 'tpope/vim-surround'
-    Plugin 'moll/vim-bbye'
-    Plugin 'majutsushi/tagbar'
-endif
+Plugin 'scrooloose/syntastic'
+Plugin 'vim-utils/vim-husk'
+Plugin 'nathanaelkane/vim-indent-guides'
+Plugin 'raimondi/delimitmate'
+Plugin 'tpope/vim-surround'
+Plugin 'moll/vim-bbye'
+Plugin 'majutsushi/tagbar'
 
 " All of your Plugins must be added before this line
 call vundle#end()            " required
@@ -194,106 +192,104 @@ autocmd Filetype python setlocal foldlevel=1
 autocmd Filetype python setlocal foldminlines=15
 autocmd Filetype python setlocal foldnestmax=2
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has('nvim')
-    " python-mode
-    "let g:pymode_lint_cwindow = 0
-    "let g:pymode_rope_completion = 0
-    "let g:pymode_folding = 0
 
-    " jedi-vim
-    "let g:jedi#popup_on_doeed_identifiers_with_syntax = 1
+" python-mode
+"let g:pymode_lint_cwindow = 0
+"let g:pymode_rope_completion = 0
+"let g:pymode_folding = 0
 
-    " youcompleteme
-    ""let g:ycm_seed_identifiers_with_syntax = 1
-    ""let g:ycm_server_keep_logfiles = 1
-    "let g:ycm_autoclose_preview_window_after_insertion = 1
-    "let g:ycm_key_list_select_completion = ['<Down>', 'CTRL-N']
-    "let g:ycm_key_list_previous_completion = ['<Up>', 'CTRL-P']
-    "nmap <leader>d :YcmCompleter GoToDeclaration<CR>
-    "nmap <leader>D :YcmCompleter GoToDefinition<CR>
-    "nmap <leader>* :YcmCompleter GoToReferences<CR>
-    "nmap <leader>k :YcmCompleter GetDoc<CR>
+" jedi-vim
+"let g:jedi#popup_on_doeed_identifiers_with_syntax = 1
 
-    " ultisnips
-    let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<tab>"
-    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+" youcompleteme
+""let g:ycm_seed_identifiers_with_syntax = 1
+""let g:ycm_server_keep_logfiles = 1
+"let g:ycm_autoclose_preview_window_after_insertion = 1
+"let g:ycm_key_list_select_completion = ['<Down>', 'CTRL-N']
+"let g:ycm_key_list_previous_completion = ['<Up>', 'CTRL-P']
+"nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+"nmap <leader>D :YcmCompleter GoToDefinition<CR>
+"nmap <leader>* :YcmCompleter GoToReferences<CR>
+"nmap <leader>k :YcmCompleter GetDoc<CR>
 
-    " syntastic
-    "let g:syntastic_always_populate_loc_list = 1
-    "let g:syntastic_auto_loc_list = 1
-    "let g:syntastic_check_on_open = 1
-    "let g:syntastic_check_on_wq = 0
-    "let g:syntastic_error_symbol = 'E'
-    "let g:syntastic_warning_symbol = 'W'
-    "let g:syntastic_style_error_symbol = 'e'
-    "let g:syntastic_style_warning_symbol = 'w'
-    "let g:syntastic_python_python_use_codec = 1
-    let g:syntastic_aggregate_errors = 1
-    let g:syntastic_python_checkers = ["python", "pyflakes", "pep8"]
+" ultisnips
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
-    " ropevim
-    "let ropevim_extended_complete = 1
-    "let g:ropevim_autoimport_modules = ["os.*", "sys"]
+" syntastic
+"let g:syntastic_always_populate_loc_list = 1
+"let g:syntastic_auto_loc_list = 1
+"let g:syntastic_check_on_open = 1
+"let g:syntastic_check_on_wq = 0
+"let g:syntastic_error_symbol = 'E'
+"let g:syntastic_warning_symbol = 'W'
+"let g:syntastic_style_error_symbol = 'e'
+"let g:syntastic_style_warning_symbol = 'w'
+"let g:syntastic_python_python_use_codec = 1
+let g:syntastic_aggregate_errors = 1
+let g:syntastic_python_checkers = ["python", "pyflakes", "pep8"]
 
-    " deoplete
-    let g:deoplete#enable_at_startup = 1
-    let g:deoplete#enable_smart_case = 1
-    "let g:deoplete#auto_complete_start_length = 1
-    "let g:deoplete#omni#input_patterns = {}
-    "let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
-    let g:deoplete#sources#jedi#show_docstring = 1
-    let g:deoplete#sources#jedi#enable_cache = 1
-	autocmd CompleteDone * pclose!
+" ropevim
+"let ropevim_extended_complete = 1
+"let g:ropevim_autoimport_modules = ["os.*", "sys"]
 
-    " tagbar
-    let g:tagbar_compact = 1
-    autocmd FileType * nested :call tagbar#autoopen(0)
+" deoplete
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_smart_case = 1
+"let g:deoplete#auto_complete_start_length = 1
+"let g:deoplete#omni#input_patterns = {}
+"let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
+let g:deoplete#sources#jedi#show_docstring = 1
+let g:deoplete#sources#jedi#enable_cache = 1
+autocmd CompleteDone * pclose!
 
-    " nerdtree
-    "let NERDTreeIgnore=['\.pyc$', '\.vim$', '\~$']
-    "let NERDTreeMinimalUI=1
-    "autocmd VimEnter * NERDTree
+" tagbar
+let g:tagbar_compact = 1
+autocmd FileType * nested :call tagbar#autoopen(0)
 
-    " indentline
-    " let g:indentLine_loaded = 1
+" nerdtree
+"let NERDTreeIgnore=['\.pyc$', '\.vim$', '\~$']
+"let NERDTreeMinimalUI=1
+"autocmd VimEnter * NERDTree
 
-    " vim-indent-guides
-    let g:indent_guides_enable_on_vim_startup = 1
-    let g:indent_guides_start_level = 2
-    let g:indent_guides_guide_size = 1
+" indentline
+" let g:indentLine_loaded = 1
 
-    " delimitmate
-    let delimitMate_matchpairs = "(:),[:],{:},<:>"
-    let delimitMate_nesting_quotes = ['"','`',"'"]
-    let delimitMate_expand_cr = 1
-    let delimitMate_expand_space = 1
-    let delimitMate_expand_inside_quotes = 1
-    let delimitMate_jump_expansion = 1
-    let delimitMate_balance_matchpairs = 1
-    "au FileType c,perl let b:delimitMate_insert_eol_marker = 2
+" vim-indent-guides
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_start_level = 2
+let g:indent_guides_guide_size = 1
 
-    " htmldjango_omnicomplete
-    "au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
-    "let g:htmldjangocomplete_html_flavour = 'html5'
+" delimitmate
+let delimitMate_matchpairs = "(:),[:],{:},<:>"
+let delimitMate_nesting_quotes = ['"','`',"'"]
+let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
+let delimitMate_expand_inside_quotes = 1
+let delimitMate_jump_expansion = 1
+let delimitMate_balance_matchpairs = 1
+"au FileType c,perl let b:delimitMate_insert_eol_marker = 2
 
-    " neocomplete
-	" let g:neocomplete#enable_at_startup = 1
-    " let g:neocomplete#enable_smart_case = 1
-    " let g:neocomplete#enable_auto_close_preview = 1
-    " let g:neocomplete#fallback_mappings =
-    " \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
-    " "let g:neocomplete#skip_auto_completion_time
+" htmldjango_omnicomplete
+"au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
+"let g:htmldjangocomplete_html_flavour = 'html5'
 
-	"autocmd FileType python setlocal omnifunc=jedi#completions
-	"let g:jedi#completions_enabled = 0
-	"let g:jedi#auto_vim_configuration = 0
-	"let g:jedi#smart_auto_mappings = 0
-	"let g:neocomplete#force_omni_input_patterns.python =
-	"\ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
-	"" alternative pattern: '\h\w*\|[^. \t]\.\w*'
-endif
+" neocomplete
+" let g:neocomplete#enable_at_startup = 1
+" let g:neocomplete#enable_smart_case = 1
+" let g:neocomplete#enable_auto_close_preview = 1
+" let g:neocomplete#fallback_mappings =
+" \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
+" "let g:neocomplete#skip_auto_completion_time
+
+"autocmd FileType python setlocal omnifunc=jedi#completions
+"let g:jedi#completions_enabled = 0
+"let g:jedi#auto_vim_configuration = 0
+"let g:jedi#smart_auto_mappings = 0
+"let g:neocomplete#force_omni_input_patterns.python =
+"\ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+"" alternative pattern: '\h\w*\|[^. \t]\.\w*'
