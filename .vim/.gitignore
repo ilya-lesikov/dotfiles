@@ -1,9 +1,11 @@
 *
 
 !bundle
+!misc
+
 !colors
 !colors/*
-!misc
+
 !syntax
 !syntax/*
 
