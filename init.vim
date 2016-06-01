@@ -1,50 +1,51 @@
 """"""""""""""""""""""""""""""""""""""""
-" Vundle initialization
+" Plug initialization
 """"""""""""""""""""""""""""""""""""""""
-set shell=bash          " posix shell needed for vundle
-set filetype=off           "  vundle needed
-set rtp+=~/.vim/bundle/Vundle.vim " set the runtime path to include Vundle and initialize
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim' " let Vundle manage Vundle, required
 
-Plugin 'morhetz/gruvbox'
+if has("win32")
+    call plug#begin('~\AppData\Local\nvim\.vim\plugged')
+else
+    call plug#begin('~/.config/nvim/.vim/plugged')
+endif
 
-"Plugin 'klen/python-mode'
-"Plugin 'Valloric/YouCompleteMe'
-"Plugin 'davidhalter/jedi-vim'
-"Plugin 'scrooloose/nerdtree'
-"Plugin 'Yggdroot/indentLine'
-"Plugin 'mjbrownie/vim-htmldjango_omnicomplete'
-"Plugin 'lambdalisue/vim-django-support'
-"Plugin 'shougo/neocomplete.vim'
+Plug 'morhetz/gruvbox'
 
-Plugin 'python-rope/ropevim'
-Plugin 'hynek/vim-python-pep8-indent'
-Plugin 'hdima/python-syntax'
+"Plug 'klen/python-mode'
+"Plug 'Valloric/YouCompleteMe'
+"Plug 'davidhalter/jedi-vim'
+"Plug 'scrooloose/nerdtree'
+"Plug 'Yggdroot/indentLine'
+"Plug 'mjbrownie/vim-htmldjango_omnicomplete'
+"Plug 'lambdalisue/vim-django-support'
+"Plug 'shougo/neocomplete.vim'
 
-Plugin 'hail2u/vim-css3-syntax'
-Plugin 'othree/html5.vim'
+Plug 'python-rope/ropevim'
+Plug 'hynek/vim-python-pep8-indent'
+Plug 'hdima/python-syntax'
 
-Plugin 'Shougo/deoplete.nvim'
-Plugin 'carlitux/deoplete-ternjs'
-Plugin 'zchee/deoplete-jedi'
-Plugin 'Shougo/neco-vim'
-Plugin 'Shougo/neco-syntax'
+Plug 'hail2u/vim-css3-syntax'
+Plug 'othree/html5.vim'
 
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
+if has('unix')
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'carlitux/deoplete-ternjs'
+    Plug 'zchee/deoplete-jedi'
+    Plug 'Shougo/neco-vim'
+    Plug 'Shougo/neco-syntax'
+endif
 
-Plugin 'scrooloose/syntastic'
-Plugin 'vim-utils/vim-husk'
-Plugin 'nathanaelkane/vim-indent-guides'
-Plugin 'raimondi/delimitmate'
-Plugin 'tpope/vim-surround'
-Plugin 'moll/vim-bbye'
-Plugin 'majutsushi/tagbar'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
-" All of your Plugins must be added before this line
-call vundle#end()            " required
-filetype plugin indent on    " required
+Plug 'scrooloose/syntastic'
+Plug 'vim-utils/vim-husk'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'raimondi/delimitmate'
+Plug 'tpope/vim-surround'
+Plug 'moll/vim-bbye'
+Plug 'majutsushi/tagbar'
+
+call plug#end()
 
 runtime macros/matchit.vim
 "runtime macros/editexisting.vim
@@ -75,10 +76,16 @@ set ttimeoutlen=0
 
 " backups, etc..
 set undofile
-set undodir=~/.vim/misc
 set backup
-set backupdir=~/.vim/misc
-set directory=~/.vim/misc
+if has("win32")
+	set undodir=~\AppData\Local\nvim\.vim\misc
+	set backupdir=~\AppData\Local\nvim\.vim\misc
+	set directory=~\AppData\Local\nvim\.vim\misc
+else
+	set undodir=~/.vim/misc
+	set backupdir=~/.vim/misc
+	set directory=~/.vim/misc
+endif
 
 " tabs/spaces, indentation
 set tabstop=4       " number of visual spaces per TAB
@@ -90,7 +97,7 @@ set autoindent
 set cindent
 
 " statusline
-set statusline=%t%<%m%H%W%q%=%{GetFileDirectory()}\ %l-%L\ %p%%
+set statusline=%t\ %<%m%H%W%q%=%{GetFileDirectory()}\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
 set laststatus=2        " always show status bar
 
 " search, highlighting
@@ -107,7 +114,7 @@ set showcmd             " show command in bottom bar
 set cursorline          " highlight current line
 set wildmenu            " visual autocomplete for command menu
 set showmatch           " highlight matching [{()}]
-set ffs=unix,dos,mac
+"set ffs=unix,dos,mac
 set showfulltag
 set hidden              " buffers don't close
 set nocompatible        " nocompatible with vi
@@ -115,7 +122,8 @@ set colorcolumn=80
 set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
 set shiftround
 set sessionoptions-=blank
-set path=**,/usr/local/lib/**,/usr/lib/**,/lib/**,/var/lib/**,/usr/local/include/**,/usr/include/**,/usr/local/share/**,/usr/share/**,/**
+
+filetype plugin indent on
 
 set omnifunc=syntaxcomplete#Complete
 
@@ -133,25 +141,20 @@ autocmd FileType * setlocal formatoptions-=r
 autocmd FileType * setlocal history=300
 autocmd BufWrite * call DeleteTrailingWS()
 
-" mouse support
-if has('mouse')
-  set mouse=a
-endif
-
 """"""""""""""""""""""""""""""""""""""""
 " MAPPINGS (keys, bindings)
 """"""""""""""""""""""""""""""""""""""""
 
 " :W save the file as root
-command W w !sudo tee % > /dev/null
+if has("unix")
+    command W w !sudo tee % > /dev/null
+endif
 
 " don't close window if :bd
 nmap <leader>bd :bp<CR>:bd#<CR>
 
-if has('nvim')
-    " leave ins mode in :term easier
-    tnoremap <C-[> <C-\><C-n>
-endif
+" leave ins mode in :term easier
+tnoremap <C-[> <C-\><C-n>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " DEPEND ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
@@ -170,7 +173,7 @@ if has("gui_running")
 else
     if $KONSOLE_PROFILE_NAME != '' || $COLORTERM == 'gnome-terminal' ||
                 \ $TERM == 'screen' || $TERM == 'screen-256color' ||
-                \ $TERM == 'xterm-256color'
+                \ $TERM == 'xterm-256color' || $OS == 'Windows_NT'
         try
             colorscheme gruvbox
         catch
