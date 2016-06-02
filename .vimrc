@@ -3,15 +3,15 @@
 """"""""""""""""""""""""""""""""""""""""
 
 if has("win32")
-    call plug#begin('~\AppData\Local\nvim\.vim\plugged')
+    call plug#begin('~\vimfiles\plugged')
 else
-    call plug#begin('~/.config/nvim/.vim/plugged')
+    call plug#begin('~/.vim/plugged')
 endif
 
 Plug 'morhetz/gruvbox'
 
 "Plug 'klen/python-mode'
-"Plug 'Valloric/YouCompleteMe'
+Plug 'Valloric/YouCompleteMe'
 "Plug 'davidhalter/jedi-vim'
 "Plug 'scrooloose/nerdtree'
 "Plug 'Yggdroot/indentLine'
@@ -26,13 +26,13 @@ Plug 'hdima/python-syntax'
 Plug 'hail2u/vim-css3-syntax'
 Plug 'othree/html5.vim'
 
-if has('unix')
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'carlitux/deoplete-ternjs'
-    Plug 'zchee/deoplete-jedi'
-    Plug 'Shougo/neco-vim'
-    Plug 'Shougo/neco-syntax'
-endif
+"if has('unix')
+"    Plug 'Shougo/deoplete.nvim'
+"    Plug 'carlitux/deoplete-ternjs'
+"    Plug 'zchee/deoplete-jedi'
+"    Plug 'Shougo/neco-vim'
+"    Plug 'Shougo/neco-syntax'
+"endif
 
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
@@ -78,9 +78,9 @@ set ttimeoutlen=0
 set undofile
 set backup
 if has("win32")
-	set undodir=~\AppData\Local\nvim\.vim\misc
-	set backupdir=~\AppData\Local\nvim\.vim\misc
-	set directory=~\AppData\Local\nvim\.vim\misc
+	set undodir=~\vimfiles\misc
+	set backupdir=~\vimfiles\misc
+	set directory=~\vimfiles\misc
 else
 	set undodir=~/.vim/misc
 	set backupdir=~/.vim/misc
@@ -114,7 +114,6 @@ set showcmd             " show command in bottom bar
 set cursorline          " highlight current line
 set wildmenu            " visual autocomplete for command menu
 set showmatch           " highlight matching [{()}]
-"set ffs=unix,dos,mac
 set showfulltag
 set hidden              " buffers don't close
 set nocompatible        " nocompatible with vi
@@ -137,7 +136,6 @@ autocmd FileType * syntax on
 autocmd FileType * setlocal formatoptions-=t
 autocmd FileType * setlocal formatoptions-=o
 autocmd FileType * setlocal formatoptions-=r
-" maximum history items
 autocmd FileType * setlocal history=300
 autocmd BufWrite * call DeleteTrailingWS()
 
@@ -153,9 +151,6 @@ endif
 " don't close window if :bd
 nmap <leader>bd :bp<CR>:bd#<CR>
 
-" leave ins mode in :term easier
-tnoremap <C-[> <C-\><C-n>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " DEPEND ON $TERM SETTINGS (graphical, gui, gvim, terminal, console, tty)
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -163,6 +158,7 @@ tnoremap <C-[> <C-\><C-n>
 if has("gui_running")
     colorscheme gruvbox
     set background=dark
+
     set guifont=Hack\ 10
     set guioptions-=m  "remove menu bar
     set guioptions-=T  "remove toolbar
@@ -176,10 +172,11 @@ else
                 \ $TERM == 'xterm-256color' || $OS == 'Windows_NT'
         try
             colorscheme gruvbox
+            set background=dark
         catch
+            colorscheme desert
+            set background=dark
         endtry
-
-        set background=dark
     else
         colorscheme desert
         set background=dark
@@ -208,11 +205,11 @@ autocmd Filetype python setlocal foldnestmax=2
 "let g:jedi#popup_on_doeed_identifiers_with_syntax = 1
 
 " youcompleteme
-""let g:ycm_seed_identifiers_with_syntax = 1
-""let g:ycm_server_keep_logfiles = 1
-"let g:ycm_autoclose_preview_window_after_insertion = 1
-"let g:ycm_key_list_select_completion = ['<Down>', 'CTRL-N']
-"let g:ycm_key_list_previous_completion = ['<Up>', 'CTRL-P']
+"let g:ycm_seed_identifiers_with_syntax = 1
+"let g:ycm_server_keep_logfiles = 1
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_key_list_select_completion = ['<Down>', 'CTRL-N']
+let g:ycm_key_list_previous_completion = ['<Up>', 'CTRL-P']
 "nmap <leader>d :YcmCompleter GoToDeclaration<CR>
 "nmap <leader>D :YcmCompleter GoToDefinition<CR>
 "nmap <leader>* :YcmCompleter GoToReferences<CR>
@@ -241,14 +238,14 @@ let g:syntastic_python_checkers = ["python", "pyflakes", "pep8"]
 "let g:ropevim_autoimport_modules = ["os.*", "sys"]
 
 " deoplete
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#enable_smart_case = 1
-"let g:deoplete#auto_complete_start_length = 1
-"let g:deoplete#omni#input_patterns = {}
-"let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
-let g:deoplete#sources#jedi#show_docstring = 1
-let g:deoplete#sources#jedi#enable_cache = 1
-autocmd CompleteDone * pclose!
+"let g:deoplete#enable_at_startup = 1
+"let g:deoplete#enable_smart_case = 1
+""let g:deoplete#auto_complete_start_length = 1
+""let g:deoplete#omni#input_patterns = {}
+""let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
+"let g:deoplete#sources#jedi#show_docstring = 1
+"let g:deoplete#sources#jedi#enable_cache = 1
+"autocmd CompleteDone * pclose!
 
 " tagbar
 let g:tagbar_compact = 1
