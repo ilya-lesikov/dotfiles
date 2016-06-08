@@ -49,6 +49,13 @@ function! s:IsFeatAvail(feature, msg)
     call s:Unavail(a:msg)
 endfunction
 
+function! s:IsPlugManAvail()
+    if filereadable(g:path#plug)
+        return 1
+    endif
+
+    call s:Unavail('Plugin manager')
+endfunction
 """"""""""""""""""""""""""""""""""""""""
 " VARS
 """"""""""""""""""""""""""""""""""""""""
@@ -65,12 +72,18 @@ let &rtp .= ','.expand(g:path#vimfiles)
 let g:path#plug = expand(g:path#vimfiles . '/autoload/plug.vim')
 let g:path#plugged = expand(g:path#vimfiles . '/plugged')
 
+if !exists('g:path#vimfiles') && has('win32')
+    let g:path#vimfiles = expand('$TEMP') 
+elseif !exists('g:path#vimfiles')
+    let g:path#vimfiles = '/var/tmp'
+endif
+
 """"""""""""""""""""""""""""""""""""""""
 " PLUGINS
 """"""""""""""""""""""""""""""""""""""""
 
 " skip if plugin manager not available
-if filereadable(g:path#plug)
+if s:IsPlugManAvail()
     call plug#begin(g:path#plugged)
 
     " colorschemes
@@ -142,73 +155,72 @@ if filereadable(g:path#plug)
     runtime macros/matchit.vim
 
     call plug#end()
-else
-    call s:Unavail('Plugin manager')
-endif
 
 """"""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
-" poshcomplete
-if !exists('g:PoshComplete_Port')
-    let g:PoshComplete_Port = '1234'
+    " poshcomplete
+    if !exists('g:PoshComplete_Port')
+        let g:PoshComplete_Port = '1234'
+    endif
+    if !exists('g:neocomplete#force_omni_input_patterns')
+        let g:neocomplete#force_omni_input_patterns = {}
+    endif
+    let g:neocomplete#force_omni_input_patterns.ps1 =
+        \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
+
+    " neocomplete
+    let g:neocomplete#enable_at_startup = 1
+    let g:neocomplete#enable_smart_case = 1
+    let g:neocomplete#enable_auto_close_preview = 1
+    let g:neocomplete#fallback_mappings =
+        \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
+    "let g:neocomplete#skip_auto_completion_time = ''
+
+    " jedi
+    autocmd FileType python setlocal omnifunc=jedi#completions
+    let g:jedi#completions_enabled = 0
+    let g:jedi#auto_vim_configuration = 0
+    let g:jedi#smart_auto_mappings = 0
+    " WORKAROUND to prevent error when appending to list
+    if !exists('g:neocomplete#force_omni_input_patterns')
+        let g:neocomplete#force_omni_input_patterns = {}
+    endif
+    let g:neocomplete#force_omni_input_patterns.python =
+        \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+
+    " ultisnips
+    let g:UltiSnipsExpandTrigger='<tab>'
+    let g:UltiSnipsJumpForwardTrigger='<tab>'
+    let g:UltiSnipsJumpBackwardTrigger='<c-z>'
+
+    " syntastic
+    let g:syntastic_aggregate_errors = 1
+    let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
+    let g:syntastic_vim_checkers = ['vint']
+    let g:syntastic_sh_checkers = ['sh', 'shellcheck']
+    let g:syntastic_javascript_checkers = ['eslint']
+
+    " indent_guides
+    let g:indent_guides_enable_on_vim_startup = 1
+    let g:indent_guides_start_level = 2
+    let g:indent_guides_guide_size = 1
+
+    " delimitmate
+    let delimitMate_matchpairs = '(:),[:],{:},<:>'
+    let delimitMate_nesting_quotes = ['"','`',"'"]
+    let delimitMate_expand_cr = 1
+    let delimitMate_expand_space = 1
+    let delimitMate_expand_inside_quotes = 1
+    let delimitMate_jump_expansion = 1
+    let delimitMate_balance_matchpairs = 1
+
+    " tagbar
+    let g:tagbar_compact = 1
+    autocmd FileType python nested :call tagbar#autoopen(0)
+
 endif
-if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.ps1 =
-    \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
-
-" neocomplete
-let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#enable_smart_case = 1
-let g:neocomplete#enable_auto_close_preview = 1
-let g:neocomplete#fallback_mappings =
-    \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
-"let g:neocomplete#skip_auto_completion_time = ''
-
-" jedi
-autocmd FileType python setlocal omnifunc=jedi#completions
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#smart_auto_mappings = 0
-" WORKAROUND to prevent error when appending to list
-if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.python =
-    \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
-
-" ultisnips
-let g:UltiSnipsExpandTrigger='<tab>'
-let g:UltiSnipsJumpForwardTrigger='<tab>'
-let g:UltiSnipsJumpBackwardTrigger='<c-z>'
-
-" syntastic
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-let g:syntastic_vim_checkers = ['vint']
-let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-let g:syntastic_javascript_checkers = ['eslint']
-
-" indent_guides
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_start_level = 2
-let g:indent_guides_guide_size = 1
-
-" delimitmate
-let delimitMate_matchpairs = '(:),[:],{:},<:>'
-let delimitMate_nesting_quotes = ['"','`',"'"]
-let delimitMate_expand_cr = 1
-let delimitMate_expand_space = 1
-let delimitMate_expand_inside_quotes = 1
-let delimitMate_jump_expansion = 1
-let delimitMate_balance_matchpairs = 1
-
-" tagbar
-let g:tagbar_compact = 1
-autocmd FileType python nested :call tagbar#autoopen(0)
 
 """"""""""""""""""""""""""""""""""""""""
 " SETTINGS
