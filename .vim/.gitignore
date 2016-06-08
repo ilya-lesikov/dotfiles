@@ -3,6 +3,9 @@
 !plugged
 !misc
 
+!autoload
+!autoload/*
+
 !colors
 !colors/*
 
