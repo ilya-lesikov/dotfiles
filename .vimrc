@@ -134,6 +134,12 @@ function! GetVimProcLibs(info)
     endif
 endfunction
 
+function! PromptExecute(cmd)
+    if input('Execute ' . a:cmd . ' ? Type Yes or No.\n') ==? ('y' || 'yes')
+        execute a:cmd
+    endif
+endfunction
+
 """"""""""""""""""""""""""""""""""""""""
 " VARS
 """"""""""""""""""""""""""""""""""""""""
@@ -166,7 +172,7 @@ endfor
 
 if !IsPlugManInst()
     call GetPlugMan()
-    autocmd VimEnter * PlugInstall
+    autocmd VimEnter * call PromptExecute('PlugInstall')
 endif
 
 call plug#begin(g:path#plug_man_dir)
