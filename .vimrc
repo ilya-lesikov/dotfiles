@@ -56,6 +56,13 @@ function! s:IsPlugManAvail()
 
     call s:Unavail('Plugin manager')
 endfunction
+
+function! s:EnsureDirExist(dir)
+    if !isdirectory(a:dir)
+        call mkdir(a:dir, 'p')
+    endif
+endfunction
+
 """"""""""""""""""""""""""""""""""""""""
 " VARS
 """"""""""""""""""""""""""""""""""""""""
@@ -72,11 +79,13 @@ let &rtp .= ','.expand(g:path#vimfiles)
 let g:path#plug = expand(g:path#vimfiles . '/autoload/plug.vim')
 let g:path#plugged = expand(g:path#vimfiles . '/plugged')
 
-if !exists('g:path#vimfiles') && has('win32')
-    let g:path#vimfiles = expand('$TEMP') 
-elseif !exists('g:path#vimfiles')
-    let g:path#vimfiles = '/var/tmp'
-endif
+let &undodir = expand(g:path#vimfiles . '/misc')
+let &backupdir = expand(g:path#vimfiles . '/misc')
+let &directory = expand(g:path#vimfiles . '/misc')
+
+for dir in [g:path#vimfiles, g:path#plugged, &undodir, &backupdir, &directory]
+    call s:EnsureDirExist(dir)
+endfor
 
 """"""""""""""""""""""""""""""""""""""""
 " PLUGINS
@@ -234,9 +243,6 @@ set ttimeoutlen=0
 " backup, swap, undo
 set undofile
 set backup
-let &undodir = expand(g:path#vimfiles . '/misc')
-let &backupdir = expand(g:path#vimfiles . '/misc')
-let &directory = expand(g:path#vimfiles . '/misc')
 
 " tabs, indent
 set tabstop=4
