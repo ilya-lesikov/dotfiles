@@ -1,3 +1,10 @@
+" 10 = normal version, with plugin manager, but w/o need to manually build
+" anything. Depends: windows - powershell; linux - curl.
+" 20 = full version, requires mingw/gcc for build. Depends: windows -
+" powershell; linux - curl, gcc.
+" Change the variable and restart vim
+let g:vim#version = 10
+
 """"""""""""""""""""""""""""""""""""""""
 " FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""
@@ -14,15 +21,20 @@ function! DeleteTrailingWS()
     %s/\s\+$//ge
     execute 'normal `z'
 endfunction
-autocmd BufWrite * call DeleteTrailingWS()
 
-function! s:Unavail(name)
+function! Unavail(name)
     let g:unavail#msg = a:name . ' not available.'
     " WORKAROUND for gvim popping up dialog box
     autocmd VimEnter * echomsg g:unavail#msg
 endfunction
 
-function! s:IsTerm256Colors()
+function! Msg(msg)
+    let g:msg#msg = a:msg
+    " WORKAROUND for gvim popping up dialog box
+    autocmd VimEnter * echomsg g:msg#msg
+endfunction
+
+functio! IsTerm256Colors()
     if $KONSOLE_PROFILE_NAME !=? '' || $COLORTERM ==? 'gnome-terminal' ||
                     \ $TERM ==? 'screen' || $TERM ==? 'screen-256color' ||
                     \ $TERM ==? 'xterm-256color'
@@ -30,7 +42,7 @@ function! s:IsTerm256Colors()
     endif
 endfunction
 
-function! s:SetColorScheme(colorscheme, ...)
+function! SetColorScheme(colorscheme, ...)
     " second optional arg: background (default = dark)
     execute 'colorscheme ' . a:colorscheme
 
@@ -41,195 +53,236 @@ function! s:SetColorScheme(colorscheme, ...)
     endif
 endfunction
 
-function! s:IsFeatAvail(feature, msg)
+function! IsFeatAvail(feature, msg)
     if has(a:feature)
         return 1
     endif
 
-    call s:Unavail(a:msg)
+    call Unavail(a:msg)
 endfunction
 
-function! s:IsPlugManAvail()
-    if filereadable(g:path#plug)
+function! IsPlugManInst()
+    if filereadable(g:path#plug_man_exec)
         return 1
     endif
 
-    call s:Unavail('Plugin manager')
+    call Unavail('Plugin manager')
 endfunction
 
-function! s:EnsureDirExist(dir)
+function! DownloadFile(url, path)
+    if has('win32')
+        silent! execute '!powershell -Command "& {(New-Object Net.WebClient).DownloadFile(\"' . a:url . '\", $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(\"' . a:path . '\"))}"'
+
+        if filereadable(a:path)
+            return 1
+        endif
+    else
+        silent! execute '!curl -fLo "' . a:path . '" --create-dirs "' . a:url . '"'
+
+        if filereadable(a:path)
+            return 1
+        endif
+    endif
+endfunction
+
+function! GetPlugMan()
+    if has('win32')
+        call EnsureDirExist(g:path#autoload)
+        let g:uri#plug_man = 'https://raw.githubusercontent.com/junegunn/
+                    \vim-plug/master/plug.vim'
+        if DownloadFile(g:uri#plug_man, g:path#plug_man_exec)
+            call Msg('Plugin manager installed.')
+        else
+            call Msg('Plugin manager failed to install.')
+        endif
+    endif
+endfunction
+
+function! EnsureDirExist(dir)
     if !isdirectory(a:dir)
         call mkdir(a:dir, 'p')
     endif
 endfunction
+
+function! GetVimProcLibs()
+    if has('win32')
+    else
+        silent! execute '!curl -fLo "' . a:path . '" --create-dirs "' . a:url . '"'
+        let g:uri#vimproc_dll_32 = system('curl -s https://api.github.com/repos/Shougo/vimproc.vim/releases | grep browser_download_url | sed -n 1p | cut -d '"' -f 4')
+        silent! execute '!curl -s '
 
 """"""""""""""""""""""""""""""""""""""""
 " VARS
 """"""""""""""""""""""""""""""""""""""""
 
 if has('win32')
-    let g:path#vimfiles = expand('~/_vim')
+    let g:path#vim_user_dir = expand('~/vimfiles')
     let g:path#vimrc = expand('~/_vimrc')
 else
-    let g:path#vimfiles = expand('~/.vim')
+    let g:path#vim_user_dir = expand('~/.vim')
     let g:path#vimrc = expand('~/.vimrc')
 endif
 
-let &rtp .= ','.expand(g:path#vimfiles)
-let g:path#plug = expand(g:path#vimfiles . '/autoload/plug.vim')
-let g:path#plugged = expand(g:path#vimfiles . '/plugged')
+let g:path#autoload = expand(g:path#vim_user_dir . '/autoload')
+let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
+let g:path#plug_man_dir = expand(g:path#vim_user_dir . '/plugged')
 
-let &undodir = expand(g:path#vimfiles . '/misc')
-let &backupdir = expand(g:path#vimfiles . '/misc')
-let &directory = expand(g:path#vimfiles . '/misc')
+let &rtp .= ','.expand(g:path#vim_user_dir)
 
-for dir in [g:path#vimfiles, g:path#plugged, &undodir, &backupdir, &directory]
-    call s:EnsureDirExist(dir)
+let &undodir = expand(g:path#vim_user_dir . '/misc')
+let &backupdir = expand(g:path#vim_user_dir . '/misc')
+let &directory = expand(g:path#vim_user_dir . '/misc')
+
+for dir in [g:path#vim_user_dir, g:path#plug_man_dir, &undodir, &backupdir, &directory]
+    call EnsureDirExist(dir)
 endfor
 
 """"""""""""""""""""""""""""""""""""""""
 " PLUGINS
 """"""""""""""""""""""""""""""""""""""""
 
-" skip if plugin manager not available
-if s:IsPlugManAvail()
-    call plug#begin(g:path#plugged)
+if !IsPlugManInst()
+    call GetPlugMan()
+    autocmd VimEnter * PlugInstall
+endif
 
-    " colorschemes
-    Plug 'morhetz/gruvbox'
+call plug#begin(g:path#plug_man_dir)
 
-    " general completion
-    if s:IsFeatAvail('lua', 'Neocomplete')
-        Plug 'shougo/neocomplete.vim'
-        " depends
+" colorschemes
+Plug 'morhetz/gruvbox'
+
+" general completion
+if IsFeatAvail('lua', 'Neocomplete')
+    Plug 'shougo/neocomplete.vim'
+    " depends
+    if has('win32') || g:vim#version = 20
         Plug 'Shougo/vimproc.vim' " not required
-        " misc
-		Plug 'Shougo/neco-vim' " vimscript
     endif
+    " misc
+    Plug 'Shougo/neco-vim' " vimscript
+endif
 
-    " powershell
-    if has('win32')
-        " completion
-        let g:path#poshcomplete = expand(g:path#plugged . '/poshcomplete-vim')
-        Plug g:path#poshcomplete
-        " depends
-        Plug 'Shougo/vimproc.vim'
-        Plug 'mattn/webapi-vim'
-        " misc
-        Plug 'PProvost/vim-ps1'
-    endif
+" powershell
+if has('win32')
+    " completion
+    let g:path#poshcomplete = expand(g:path#plug_man_dir . '/poshcomplete-vim')
+    Plug g:path#poshcomplete
+    " depends
+    Plug 'Shougo/vimproc.vim'
+    Plug 'mattn/webapi-vim'
+    " misc
+    Plug 'PProvost/vim-ps1'
+endif
 
-    " python
-    if s:IsFeatAvail('python', 'Python and python plugins')
-        " rope
-        Plug 'python-rope/ropevim'
-        " jedi
-        Plug 'davidhalter/jedi-vim'
-        " misc
-        Plug 'hdima/python-syntax'
-        Plug 'hynek/vim-python-pep8-indent'
-    endif
+" python
+if IsFeatAvail('python', 'Python and python plugins')
+    " rope
+    Plug 'python-rope/ropevim'
+    " jedi
+    Plug 'davidhalter/jedi-vim'
+    " misc
+    Plug 'hdima/python-syntax'
+    Plug 'hynek/vim-python-pep8-indent'
+endif
 
-    " snippets
-    if s:IsFeatAvail('python', 'Ultisnips')
-        " ultisnips
-        Plug 'SirVer/ultisnips'
-        " depends
-        Plug 'honza/vim-snippets'
-    endif
+" snippets
+if IsFeatAvail('python', 'Ultisnips')
+    " ultisnips
+    Plug 'SirVer/ultisnips'
+    " depends
+    Plug 'honza/vim-snippets'
+endif
 
-    " syntastic
-    Plug 'scrooloose/syntastic'
-    " css misc
-    Plug 'hail2u/vim-css3-syntax'
-    " html omnicomplete, misc
-    Plug 'othree/html5.vim'
-    " readline bindings for cmd mode
-    Plug 'vim-utils/vim-husk'
-    " colorize indent levels
-    Plug 'nathanaelkane/vim-indent-guides'
-    " autoclose braces, quotes..
-    Plug 'raimondi/delimitmate'
-    " fast changing of braces, quotes..
-    Plug 'tpope/vim-surround'
-    " :Bd don't close split
-    Plug 'moll/vim-bbye'
-    " tagbar
-    Plug 'majutsushi/tagbar'
-    " django completion
-    "Plug 'mjbrownie/vim-htmldjango_omnicomplete'
-    "Plug 'lambdalisue/vim-django-support'
+" syntastic
+Plug 'scrooloose/syntastic'
+" css misc
+Plug 'hail2u/vim-css3-syntax'
+" html omnicomplete, misc
+Plug 'othree/html5.vim'
+" readline bindings for cmd mode
+Plug 'vim-utils/vim-husk'
+" colorize indent levels
+Plug 'nathanaelkane/vim-indent-guides'
+" autoclose braces, quotes..
+Plug 'raimondi/delimitmate'
+" fast changing of braces, quotes..
+Plug 'tpope/vim-surround'
+" :Bd don't close split
+Plug 'moll/vim-bbye'
+" tagbar
+Plug 'majutsushi/tagbar'
+" django completion
+"Plug 'mjbrownie/vim-htmldjango_omnicomplete'
+"Plug 'lambdalisue/vim-django-support'
 
-    " jumping with % for xml tags
-    runtime macros/matchit.vim
+" jumping with % for xml tags
+runtime macros/matchit.vim
 
-    call plug#end()
+call plug#end()
 
 """"""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
-    " poshcomplete
-    if !exists('g:PoshComplete_Port')
-        let g:PoshComplete_Port = '1234'
-    endif
-    if !exists('g:neocomplete#force_omni_input_patterns')
-        let g:neocomplete#force_omni_input_patterns = {}
-    endif
-    let g:neocomplete#force_omni_input_patterns.ps1 =
-        \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
-
-    " neocomplete
-    let g:neocomplete#enable_at_startup = 1
-    let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#enable_auto_close_preview = 1
-    let g:neocomplete#fallback_mappings =
-        \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
-    "let g:neocomplete#skip_auto_completion_time = ''
-
-    " jedi
-    autocmd FileType python setlocal omnifunc=jedi#completions
-    let g:jedi#completions_enabled = 0
-    let g:jedi#auto_vim_configuration = 0
-    let g:jedi#smart_auto_mappings = 0
-    " WORKAROUND to prevent error when appending to list
-    if !exists('g:neocomplete#force_omni_input_patterns')
-        let g:neocomplete#force_omni_input_patterns = {}
-    endif
-    let g:neocomplete#force_omni_input_patterns.python =
-        \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
-
-    " ultisnips
-    let g:UltiSnipsExpandTrigger='<tab>'
-    let g:UltiSnipsJumpForwardTrigger='<tab>'
-    let g:UltiSnipsJumpBackwardTrigger='<c-z>'
-
-    " syntastic
-    let g:syntastic_aggregate_errors = 1
-    let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-    let g:syntastic_vim_checkers = ['vint']
-    let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-    let g:syntastic_javascript_checkers = ['eslint']
-
-    " indent_guides
-    let g:indent_guides_enable_on_vim_startup = 1
-    let g:indent_guides_start_level = 2
-    let g:indent_guides_guide_size = 1
-
-    " delimitmate
-    let delimitMate_matchpairs = '(:),[:],{:},<:>'
-    let delimitMate_nesting_quotes = ['"','`',"'"]
-    let delimitMate_expand_cr = 1
-    let delimitMate_expand_space = 1
-    let delimitMate_expand_inside_quotes = 1
-    let delimitMate_jump_expansion = 1
-    let delimitMate_balance_matchpairs = 1
-
-    " tagbar
-    let g:tagbar_compact = 1
-    autocmd FileType python nested :call tagbar#autoopen(0)
-
+" poshcomplete
+if !exists('g:PoshComplete_Port')
+    let g:PoshComplete_Port = '1234'
 endif
+if !exists('g:neocomplete#force_omni_input_patterns')
+    let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.ps1 =
+    \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
+
+" neocomplete
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_smart_case = 1
+let g:neocomplete#enable_auto_close_preview = 1
+let g:neocomplete#fallback_mappings =
+    \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
+"let g:neocomplete#skip_auto_completion_time = ''
+
+" jedi
+autocmd FileType python setlocal omnifunc=jedi#completions
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#smart_auto_mappings = 0
+" WORKAROUND to prevent error when appending to list
+if !exists('g:neocomplete#force_omni_input_patterns')
+    let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.python =
+    \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+
+" ultisnips
+let g:UltiSnipsExpandTrigger='<tab>'
+let g:UltiSnipsJumpForwardTrigger='<tab>'
+let g:UltiSnipsJumpBackwardTrigger='<c-z>'
+
+" syntastic
+let g:syntastic_aggregate_errors = 1
+let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
+let g:syntastic_vim_checkers = ['vint']
+let g:syntastic_sh_checkers = ['sh', 'shellcheck']
+let g:syntastic_javascript_checkers = ['eslint']
+
+" indent_guides
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_start_level = 2
+let g:indent_guides_guide_size = 1
+
+" delimitmate
+let delimitMate_matchpairs = '(:),[:],{:},<:>'
+let delimitMate_nesting_quotes = ['"','`',"'"]
+let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
+let delimitMate_expand_inside_quotes = 1
+let delimitMate_jump_expansion = 1
+let delimitMate_balance_matchpairs = 1
+
+" tagbar
+let g:tagbar_compact = 1
+autocmd FileType python nested :call tagbar#autoopen(0)
 
 """"""""""""""""""""""""""""""""""""""""
 " SETTINGS
@@ -304,7 +357,6 @@ if has('gui_running')
     set guioptions-=T  "remove toolbar
     set guioptions-=r  "remove right-hand scroll bar
     set guioptions-=L  "remove left-hand scroll bar
-    set guioptions+=a  "highlighted text automatically copies to "* register
     set guioptions+=c  "no graphical popup dialogs
 
     if has('win32')
@@ -323,7 +375,7 @@ autocmd FileType * setlocal formatoptions-=o
 autocmd FileType * setlocal formatoptions-=r
 
 " python
-if s:IsFeatAvail('python', 'Python configuration')
+if IsFeatAvail('python', 'Python configuration')
     let python_highlight_all = 1
     autocmd Filetype python setlocal foldmethod=indent
     autocmd Filetype python setlocal foldlevel=1
@@ -335,6 +387,9 @@ endif
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
             \ exe "normal! g`\"" | endif
 
+" delete trailing spaces
+autocmd BufWrite * call DeleteTrailingWS()
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COLORSCHEME, FONTS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -342,9 +397,9 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
 if has('gui_running')
 
     try
-        call s:SetColorScheme('gruvbox')
+        call SetColorScheme('gruvbox')
     catch
-        call s:SetColorScheme('desert')
+        call SetColorScheme('desert')
     endtry
 
     if has('win32')
@@ -354,7 +409,7 @@ if has('gui_running')
         try
             set guifont=Hack\ 10
         catch
-            call s:Unavail('Guifont')
+            call Unavail('Guifont')
             set guifont=DejaVu\ Sans\ Mono\ 10
         endtry
 
@@ -363,15 +418,15 @@ if has('gui_running')
 else
 
     if has('win32')
-        call s:SetColorScheme('industry')
-    elseif s:IsTerm256Colors()
+        call SetColorScheme('industry')
+    elseif IsTerm256Colors()
         try
-            call s:SetColorScheme('gruvbox')
+            call SetColorScheme('gruvbox')
         catch
-            call s:SetColorScheme('desert')
+            call SetColorScheme('desert')
         endtry
     else
-        call s:SetColorScheme('desert')
+        call SetColorScheme('desert')
     endif
 
 endif
