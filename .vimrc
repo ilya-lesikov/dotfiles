@@ -68,7 +68,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""
 
 if has('win32')
-    let g:path#vimfiles = expand('~/vimfiles')
+    let g:path#vimfiles = expand('~/_vim')
     let g:path#vimrc = expand('~/_vimrc')
 else
     let g:path#vimfiles = expand('~/.vim')
@@ -235,13 +235,18 @@ endif
 " SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
-" english for all prompts (should be in the beginning)
+" language (let it be in the beginning)
 set langmenu=none
 if has('win32')
     language messages EN
 else
     language messages en_US.utf8
 endif
+
+" cyrillic support
+" set keymap=russian-jcukenwin
+" set iminsert=0
+" set imsearch=0
 
 filetype plugin indent on
 
@@ -292,11 +297,6 @@ set shiftround          " round indentation
 set backspace=indent,eol,start
 set omnifunc=syntaxcomplete#Complete
 setlocal shortmess+=I   " hide intro message on start
-
-" cyrillic support
-" set keymap=russian-jcukenwin
-" set iminsert=0
-" set imsearch=0
 
 " gui
 if has('gui_running')
