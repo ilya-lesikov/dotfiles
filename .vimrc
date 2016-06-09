@@ -3,6 +3,7 @@
 " 20 = full version, requires mingw/gcc for build. Depends: windows -
 " powershell; linux - curl, gcc.
 " Change the variable and restart vim
+
 let g:vim#version = 10
 
 """"""""""""""""""""""""""""""""""""""""
@@ -34,7 +35,7 @@ function! Msg(msg)
     autocmd VimEnter * echomsg g:msg#msg
 endfunction
 
-functio! IsTerm256Colors()
+function! IsTerm256Colors()
     if $KONSOLE_PROFILE_NAME !=? '' || $COLORTERM ==? 'gnome-terminal' ||
                     \ $TERM ==? 'screen' || $TERM ==? 'screen-256color' ||
                     \ $TERM ==? 'xterm-256color'
@@ -71,7 +72,8 @@ endfunction
 
 function! DownloadFile(url, path)
     if has('win32')
-        silent! execute '!powershell -Command "& {(New-Object Net.WebClient).DownloadFile(\"' . a:url . '\", $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(\"' . a:path . '\"))}"'
+        "silent! execute '!powershell -Command "& {(New-Object Net.WebClient).DownloadFile(\"' . a:url . '\", $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(\"' . a:path . '\"))}"'
+        silent! execute '!powershell -Command "& {Invoke-WebRequest -Uri \"' . a:url . '\" -OutFile \"' . a:path . '\"}"'
 
         if filereadable(a:path)
             return 1
@@ -98,18 +100,39 @@ function! GetPlugMan()
     endif
 endfunction
 
+function! DelNewLines(text)
+    let g:delnewlines#result = substitute(a:text, "\n", "", "g")
+    return g:delnewlines#result
+endfunction
+
 function! EnsureDirExist(dir)
     if !isdirectory(a:dir)
         call mkdir(a:dir, 'p')
     endif
 endfunction
 
-function! GetVimProcLibs()
-    if has('win32')
-    else
-        silent! execute '!curl -fLo "' . a:path . '" --create-dirs "' . a:url . '"'
-        let g:uri#vimproc_dll_32 = system('curl -s https://api.github.com/repos/Shougo/vimproc.vim/releases | grep browser_download_url | sed -n 1p | cut -d '"' -f 4')
-        silent! execute '!curl -s '
+function! GetVimProcLibs(info)
+    if a:info.status ==? 'installed' || a:info.status ==? 'updated' ||
+                \ a:info.force
+
+        if has('win32')
+            let g:uri#vimproc_dll_32 = system('powershell -Command "& { $json = Invoke-WebRequest -UseBasicParsing -Uri https://api.github.com/repos/Shougo/vimproc.vim/releases | ConvertFrom-Json ; $json.assets.browser_download_url | Select-Object -Index 0 }"')
+            let g:uri#vimproc_dll_64 = system('powershell -Command "& { $json = Invoke-WebRequest -UseBasicParsing -Uri https://api.github.com/repos/Shougo/vimproc.vim/releases | ConvertFrom-Json ; $json.assets.browser_download_url | Select-Object -Index 1 }"')
+
+            " fix newlines in powershell output
+            let g:uri#vimproc_dll_32 = DelNewLines(g:uri#vimproc_dll_32)
+            let g:uri#vimproc_dll_64 = DelNewLines(g:uri#vimproc_dll_64)
+
+            let g:path#vimproc_dll_32 = expand(g:path#plug_man_dir . '/vimproc.vim/lib/vimproc_win32.dll')
+            let g:path#vimproc_dll_64 = expand(g:path#plug_man_dir . '/vimproc.vim/lib/vimproc_win64.dll')
+
+            call DownloadFile(g:uri#vimproc_dll_32, g:path#vimproc_dll_32)
+            call DownloadFile(g:uri#vimproc_dll_64, g:path#vimproc_dll_64)
+        else
+            !make
+        endif
+    endif
+endfunction
 
 """"""""""""""""""""""""""""""""""""""""
 " VARS
@@ -155,8 +178,8 @@ Plug 'morhetz/gruvbox'
 if IsFeatAvail('lua', 'Neocomplete')
     Plug 'shougo/neocomplete.vim'
     " depends
-    if has('win32') || g:vim#version = 20
-        Plug 'Shougo/vimproc.vim' " not required
+    if has('win32') || g:vim#version == 20
+        Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')} " not required
     endif
     " misc
     Plug 'Shougo/neco-vim' " vimscript
@@ -168,7 +191,7 @@ if has('win32')
     let g:path#poshcomplete = expand(g:path#plug_man_dir . '/poshcomplete-vim')
     Plug g:path#poshcomplete
     " depends
-    Plug 'Shougo/vimproc.vim'
+    Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')}
     Plug 'mattn/webapi-vim'
     " misc
     Plug 'PProvost/vim-ps1'
