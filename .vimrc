@@ -235,6 +235,14 @@ endif
 " SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
+" english for all prompts (should be in the beginning)
+set langmenu=none
+if has('win32')
+    language messages EN
+else
+    language messages en_US.utf8
+endif
+
 filetype plugin indent on
 
 " FIX lag in terminal vim
@@ -278,7 +286,6 @@ set showfulltag
 set hidden
 set nocompatible
 set confirm
-set langmenu=none       " english for all prompts
 set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
 set sessionoptions-=blank
 set shiftround          " round indentation
