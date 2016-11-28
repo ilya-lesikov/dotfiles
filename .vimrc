@@ -88,15 +88,14 @@ function! DownloadFile(url, path)
 endfunction
 
 function! GetPlugMan()
-    if has('win32')
-        call EnsureDirExist(g:path#autoload)
-        let g:uri#plug_man = 'https://raw.githubusercontent.com/junegunn/
-                    \vim-plug/master/plug.vim'
-        if DownloadFile(g:uri#plug_man, g:path#plug_man_exec)
-            call Msg('Plugin manager installed.')
-        else
-            call Msg('Plugin manager failed to install.')
-        endif
+    call EnsureDirExist(g:path#autoload)
+    let g:uri#plug_man = 'https://raw.githubusercontent.com/junegunn/
+                \vim-plug/master/plug.vim'
+    if DownloadFile(g:uri#plug_man, g:path#plug_man_exec)
+        call Msg('Plugin manager installed.')
+        autocmd VimEnter * call PromptExecute('PlugInstall')
+    else
+        call Msg('Plugin manager failed to install.')
     endif
 endfunction
 
@@ -129,13 +128,14 @@ function! GetVimProcLibs(info)
             call DownloadFile(g:uri#vimproc_dll_32, g:path#vimproc_dll_32)
             call DownloadFile(g:uri#vimproc_dll_64, g:path#vimproc_dll_64)
         else
-            !make
+            " TODO
+            "!make
         endif
     endif
 endfunction
 
 function! PromptExecute(cmd)
-    if input('Execute ' . a:cmd . ' ? Type Yes or No.\n') ==? ('y' || 'yes')
+    if input('Execute ' . a:cmd . ' ? Type y or n.   ') ==? 'y'
         execute a:cmd
     endif
 endfunction
@@ -157,7 +157,6 @@ let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
 let g:path#plug_man_dir = expand(g:path#vim_user_dir . '/plugged')
 
 let &rtp .= ','.expand(g:path#vim_user_dir)
-
 let &undodir = expand(g:path#vim_user_dir . '/misc')
 let &backupdir = expand(g:path#vim_user_dir . '/misc')
 let &directory = expand(g:path#vim_user_dir . '/misc')
@@ -172,7 +171,6 @@ endfor
 
 if !IsPlugManInst()
     call GetPlugMan()
-    autocmd VimEnter * call PromptExecute('PlugInstall')
 endif
 
 call plug#begin(g:path#plug_man_dir)
@@ -184,9 +182,10 @@ Plug 'morhetz/gruvbox'
 if IsFeatAvail('lua', 'Neocomplete')
     Plug 'shougo/neocomplete.vim'
     " depends
-    if has('win32') || g:vim#version == 20
-        Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')} " not required
-    endif
+    " TODO
+    "if has('win32') || g:vim#version == 20
+    "    Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')} " not required
+    "endif
     " misc
     Plug 'Shougo/neco-vim' " vimscript
 endif
@@ -249,7 +248,7 @@ runtime macros/matchit.vim
 
 call plug#end()
 
-""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
@@ -313,7 +312,7 @@ let delimitMate_balance_matchpairs = 1
 let g:tagbar_compact = 1
 autocmd FileType python nested :call tagbar#autoopen(0)
 
-""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""
 " SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
@@ -333,7 +332,8 @@ endif
 filetype plugin indent on
 
 " FIX lag in terminal vim
-set ttimeoutlen=0
+set timeoutlen=1000
+set ttimeoutlen=50
 
 " backup, swap, undo
 set undofile
@@ -419,7 +419,7 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
 " delete trailing spaces
 autocmd BufWrite * call DeleteTrailingWS()
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COLORSCHEME, FONTS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
