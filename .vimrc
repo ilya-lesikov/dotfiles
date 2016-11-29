@@ -49,7 +49,7 @@ function! SendMessages()
     endif
     if g:msg#list != []
         let g:msg = join(g:msg#list)
-        autocmd VimEnter * echomsg g:msg#msg
+        autocmd VimEnter * echomsg g:msg
     endif
 endfunction
 
@@ -152,7 +152,33 @@ function! GetRopeModule(info)
             " TODO
         else
             call system('pip install --user ropevim')
-            "silent! execute '!pip install ropevim'
+        endif
+    endif
+endfunction
+
+function! IsPipInstalled()
+    if has('win32')
+        " TODO
+    else
+        call system('pip --version')
+        if v:shell_error ==? 0
+            return 1
+        endif
+    endif
+
+    call AddUnavailMsg('Pip-dependent plugins')
+endfunction
+
+function! GetSyntasticCheckers(info)
+    if a:info.status ==? 'installed' || a:info.status ==? 'updated' ||
+                \ a:info.force
+
+        if has('win32')
+            " TODO
+        else
+            call system('pip install --user pyflakes')
+            call system('pip install --user pep8')
+            call system('pip install --user vim-vint')
         endif
     endif
 endfunction
@@ -206,7 +232,7 @@ call plug#begin(g:path#plug_man_dir)
 Plug 'morhetz/gruvbox'
 
 " general completion
-if IsFeatAvail('lua', 'Neocomplete')
+if IsFeatAvail('lua', 'Lua-based plugins')
     Plug 'shougo/neocomplete.vim'
     " depends
     " TODO
@@ -231,27 +257,25 @@ if has('win32')
 endif
 
 " python
-if IsFeatAvail('python', 'Python and python plugins')
-    " rope
-    Plug 'python-rope/ropevim', {'do': function('GetRopeModule')}
-    call SetPythonPathForRope()
+if IsFeatAvail('python', 'Python-based plugins')
+    if IsPipInstalled()
+        " syntastic
+        Plug 'scrooloose/syntastic', {'do': function('GetSyntasticCheckers')}
+        " rope
+        Plug 'python-rope/ropevim', {'do': function('GetRopeModule')}
+        call SetPythonPathForRope()
+    endif
     " jedi
     Plug 'davidhalter/jedi-vim'
     " misc
     Plug 'hdima/python-syntax'
     Plug 'hynek/vim-python-pep8-indent'
-endif
-
-" snippets
-if IsFeatAvail('python', 'Ultisnips')
     " ultisnips
     Plug 'SirVer/ultisnips'
     " depends
     Plug 'honza/vim-snippets'
 endif
 
-" syntastic
-Plug 'scrooloose/syntastic'
 " css misc
 Plug 'hail2u/vim-css3-syntax'
 " html omnicomplete, misc
@@ -368,6 +392,14 @@ if isdirectory(expand(g:path#plug_man_dir . '/tagbar'))
     autocmd FileType python nested :call tagbar#autoopen(0)
 else
     call AddUnavailMsg('Tagbar')
+endif
+
+" ropevim
+if isdirectory(expand(g:path#plug_man_dir . '/ropevim'))
+    "let ropevim_extended_complete = 1
+    "let g:ropevim_autoimport_modules = ['os.*', 'sys']
+else
+    call AddUnavailMsg('Ropevim')
 endif
 
 """"""""""""""""""""""""""""""""""""""
@@ -533,10 +565,6 @@ command Ev execute 'edit ' . g:path#vimrc
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TRASH
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" ropevim
-"let ropevim_extended_complete = 1
-"let g:ropevim_autoimport_modules = ['os.*', 'sys']
 
 " htmldjango_omnicomplete
 "au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
