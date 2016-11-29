@@ -23,16 +23,14 @@ function! DeleteTrailingWS()
     execute 'normal `z'
 endfunction
 
-function! Unavail(name)
-    let g:unavail#msg = a:name . ' not available.'
-    " WORKAROUND for gvim popping up dialog box
-    autocmd VimEnter * echomsg g:unavail#msg
+let g:unavail#msg#list = []
+function! AddUnavailMsg(name)
+    let g:unavail#msg#list = add(g:unavail#msg#list, expand(a:name . ' not available.'))
 endfunction
 
-function! Msg(msg)
-    let g:msg#msg = a:msg
-    " WORKAROUND for gvim popping up dialog box
-    autocmd VimEnter * echomsg g:msg#msg
+let g:msg#list = []
+function! AddMsg(msg)
+    let g:msg#list = add(g:msg#list, expand(a:msg))
 endfunction
 
 function! IsTerm256Colors()
@@ -40,6 +38,18 @@ function! IsTerm256Colors()
                     \ $TERM ==? 'screen' || $TERM ==? 'screen-256color' ||
                     \ $TERM ==? 'xterm-256color'
         return 1
+    endif
+endfunction
+
+function! SendMessages()
+    " WORKAROUND with autocmd for gvim popping up dialog box
+    if g:unavail#msg#list != []
+        let g:unavail#msg = join(g:unavail#msg#list)
+        autocmd VimEnter * echomsg g:unavail#msg
+    endif
+    if g:msg#list != []
+        let g:msg = join(g:msg#list)
+        autocmd VimEnter * echomsg g:msg#msg
     endif
 endfunction
 
@@ -59,7 +69,7 @@ function! IsFeatAvail(feature, msg)
         return 1
     endif
 
-    call Unavail(a:msg)
+    call AddUnavailMsg(a:msg)
 endfunction
 
 function! IsPlugManInst()
@@ -67,7 +77,7 @@ function! IsPlugManInst()
         return 1
     endif
 
-    call Unavail('Plugin manager')
+    call AddUnavailMsg('Plugin manager')
 endfunction
 
 function! DownloadFile(url, path)
@@ -92,10 +102,10 @@ function! GetPlugMan()
     let g:uri#plug_man = 'https://raw.githubusercontent.com/junegunn/
                 \vim-plug/master/plug.vim'
     if DownloadFile(g:uri#plug_man, g:path#plug_man_exec)
-        call Msg('Plugin manager installed.')
+        call AddMsg('Plugin manager installed.')
         autocmd VimEnter * call PromptExecute('PlugInstall')
     else
-        call Msg('Plugin manager failed to install.')
+        call AddMsg('Plugin manager failed to install.')
     endif
 endfunction
 
@@ -134,10 +144,27 @@ function! GetVimProcLibs(info)
     endif
 endfunction
 
+function! GetRopeModule(info)
+    if a:info.status ==? 'installed' || a:info.status ==? 'updated' ||
+                \ a:info.force
+
+        if has('win32')
+            " TODO
+        else
+            call system('pip install --user ropevim')
+            "silent! execute '!pip install ropevim'
+        endif
+    endif
+endfunction
+
 function! PromptExecute(cmd)
     if input('Execute ' . a:cmd . ' ? Type y or n.   ') ==? 'y'
         execute a:cmd
     endif
+endfunction
+
+function! SetPythonPathForRope()
+    let $PYTHONPATH = join(split(expand("$HOME/.local/lib/*/site-packages")), ":")
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""
@@ -196,6 +223,7 @@ if has('win32')
     let g:path#poshcomplete = expand(g:path#plug_man_dir . '/poshcomplete-vim')
     Plug g:path#poshcomplete
     " depends
+    " TODO
     Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')}
     Plug 'mattn/webapi-vim'
     " misc
@@ -205,7 +233,8 @@ endif
 " python
 if IsFeatAvail('python', 'Python and python plugins')
     " rope
-    Plug 'python-rope/ropevim'
+    Plug 'python-rope/ropevim', {'do': function('GetRopeModule')}
+    call SetPythonPathForRope()
     " jedi
     Plug 'davidhalter/jedi-vim'
     " misc
@@ -252,6 +281,7 @@ call plug#end()
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
+" TODO check if poshcomplete installed at all
 " poshcomplete
 if !exists('g:PoshComplete_Port')
     let g:PoshComplete_Port = '1234'
@@ -263,54 +293,82 @@ let g:neocomplete#force_omni_input_patterns.ps1 =
     \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
 
 " neocomplete
-let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#enable_smart_case = 1
-let g:neocomplete#enable_auto_close_preview = 1
-let g:neocomplete#fallback_mappings =
-    \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
-"let g:neocomplete#skip_auto_completion_time = ''
+if isdirectory(expand(g:path#plug_man_dir . '/neocomplete.vim'))
+    let g:neocomplete#enable_at_startup = 1
+    let g:neocomplete#enable_smart_case = 1
+    let g:neocomplete#enable_auto_close_preview = 1
+    let g:neocomplete#fallback_mappings =
+        \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
+    "let g:neocomplete#skip_auto_completion_time = ''
+else
+    call AddUnavailMsg('Neocomplete')
+endif
 
 " jedi
-autocmd FileType python setlocal omnifunc=jedi#completions
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#smart_auto_mappings = 0
-" WORKAROUND to prevent error when appending to list
-if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
+if isdirectory(expand(g:path#plug_man_dir . '/jedi-vim'))
+    autocmd FileType python setlocal omnifunc=jedi#completions
+    let g:jedi#completions_enabled = 0
+    let g:jedi#auto_vim_configuration = 0
+    let g:jedi#smart_auto_mappings = 0
+    " WORKAROUND to prevent error when appending to list
+    if !exists('g:neocomplete#force_omni_input_patterns')
+        let g:neocomplete#force_omni_input_patterns = {}
+    endif
+    let g:neocomplete#force_omni_input_patterns.python =
+        \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+else
+    call AddUnavailMsg('Jedi')
 endif
-let g:neocomplete#force_omni_input_patterns.python =
-    \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
 
 " ultisnips
-let g:UltiSnipsExpandTrigger='<tab>'
-let g:UltiSnipsJumpForwardTrigger='<tab>'
-let g:UltiSnipsJumpBackwardTrigger='<c-z>'
+if isdirectory(expand(g:path#plug_man_dir . '/ultisnips'))
+    let g:UltiSnipsExpandTrigger = '<tab>'
+    let g:UltiSnipsJumpForwardTrigger = '<tab>'
+    let g:UltiSnipsJumpBackwardTrigger = '<c-z>'
+else
+    call AddUnavailMsg('UltiSnips')
+endif
 
 " syntastic
-let g:syntastic_aggregate_errors = 1
-let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-let g:syntastic_vim_checkers = ['vint']
-let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-let g:syntastic_javascript_checkers = ['eslint']
+if isdirectory(expand(g:path#plug_man_dir . '/syntastic'))
+    let g:syntastic_aggregate_errors = 1
+    let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
+    let g:syntastic_vim_checkers = ['vint']
+    let g:syntastic_sh_checkers = ['sh', 'shellcheck']
+    let g:syntastic_javascript_checkers = ['eslint']
+else
+    call AddUnavailMsg('Syntastic')
+endif
 
 " indent_guides
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_start_level = 2
-let g:indent_guides_guide_size = 1
+if isdirectory(expand(g:path#plug_man_dir . '/vim-indent-guides'))
+    let g:indent_guides_enable_on_vim_startup = 1
+    let g:indent_guides_start_level = 2
+    let g:indent_guides_guide_size = 1
+else
+    call AddUnavailMsg('IndentGuides')
+endif
 
 " delimitmate
-let delimitMate_matchpairs = '(:),[:],{:},<:>'
-let delimitMate_nesting_quotes = ['"','`',"'"]
-let delimitMate_expand_cr = 1
-let delimitMate_expand_space = 1
-let delimitMate_expand_inside_quotes = 1
-let delimitMate_jump_expansion = 1
-let delimitMate_balance_matchpairs = 1
+if isdirectory(expand(g:path#plug_man_dir . '/delimitmate'))
+    let delimitMate_matchpairs = '(:),[:],{:},<:>'
+    let delimitMate_nesting_quotes = ['"','`',"'"]
+    let delimitMate_expand_cr = 1
+    let delimitMate_expand_space = 1
+    let delimitMate_expand_inside_quotes = 1
+    let delimitMate_jump_expansion = 1
+    let delimitMate_balance_matchpairs = 1
+else
+    call AddUnavailMsg('DelimitMate')
+endif
 
 " tagbar
-let g:tagbar_compact = 1
-autocmd FileType python nested :call tagbar#autoopen(0)
+if isdirectory(expand(g:path#plug_man_dir . '/tagbar'))
+    let g:tagbar_compact = 1
+    autocmd FileType python nested :call tagbar#autoopen(0)
+else
+    call AddUnavailMsg('Tagbar')
+endif
 
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
@@ -438,7 +496,7 @@ if has('gui_running')
         try
             set guifont=Hack\ 10
         catch
-            call Unavail('Guifont')
+            call AddUnavailMsg('Guifont')
             set guifont=DejaVu\ Sans\ Mono\ 10
         endtry
 
@@ -483,3 +541,8 @@ command Ev execute 'edit ' . g:path#vimrc
 " htmldjango_omnicomplete
 "au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
 "let g:htmldjangocomplete_html_flavour = 'html5'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" POST-OPERATIONS
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call SendMessages()
