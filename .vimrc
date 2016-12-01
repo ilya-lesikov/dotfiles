@@ -357,6 +357,7 @@ endif
 if isdirectory(expand(g:path#plug_man_dir . '/syntastic'))
     let g:syntastic_aggregate_errors = 1
     let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
+    "let g:syntastic_python_checkers = ['python', 'flake8']
     let g:syntastic_vim_checkers = ['vint']
     let g:syntastic_sh_checkers = ['sh', 'shellcheck']
     let g:syntastic_javascript_checkers = ['eslint']
