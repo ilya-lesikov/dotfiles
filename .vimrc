@@ -10,6 +10,11 @@ let g:vim#version = 10
 " FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""
 
+function! SudoSaveFile() abort
+  execute (has('gui_running') ? '' : 'silent') 'write !env SUDO_EDITOR=tee sudo -e % >/dev/null'
+  let &modified = v:shell_error
+endfunction
+
 function! GetFileDirectory ()
     " get directory of opened file for statusline
     let fileDirectory = expand('%:p:h')
@@ -82,7 +87,6 @@ endfunction
 
 function! DownloadFile(url, path)
     if has('win32')
-        "silent! execute '!powershell -Command "& {(New-Object Net.WebClient).DownloadFile(\"' . a:url . '\", $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(\"' . a:path . '\"))}"'
         silent! execute '!powershell -Command "& {Invoke-WebRequest -Uri \"' . a:url . '\" -OutFile \"' . a:path . '\"}"'
 
         if filereadable(a:path)
@@ -292,9 +296,14 @@ Plug 'tpope/vim-surround'
 Plug 'moll/vim-bbye'
 " tagbar
 Plug 'majutsushi/tagbar'
-" django completion
-"Plug 'mjbrownie/vim-htmldjango_omnicomplete'
-"Plug 'lambdalisue/vim-django-support'
+" unite
+Plug 'Shougo/unite.vim'
+" vimfiler
+Plug 'Shougo/vimfiler.vim'
+" ag
+Plug 'mileszs/ack.vim'
+" comments
+Plug 'tpope/vim-commentary'
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -356,8 +365,8 @@ endif
 " syntastic
 if isdirectory(expand(g:path#plug_man_dir . '/syntastic'))
     let g:syntastic_aggregate_errors = 1
-    let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-    "let g:syntastic_python_checkers = ['python', 'flake8']
+    "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
+    let g:syntastic_python_checkers = ['python']
     let g:syntastic_vim_checkers = ['vint']
     let g:syntastic_sh_checkers = ['sh', 'shellcheck']
     let g:syntastic_javascript_checkers = ['eslint']
@@ -370,7 +379,11 @@ endif
 if isdirectory(expand(g:path#plug_man_dir . '/vim-indent-guides'))
     let g:indent_guides_enable_on_vim_startup = 1
     let g:indent_guides_start_level = 2
-    let g:indent_guides_guide_size = 1
+    "let g:indent_guides_guide_size = 1
+    let g:indent_guides_auto_colors = 0
+    autocmd BufEnter * :hi IndentGuidesOdd  guibg=red   ctermbg=0
+    autocmd BufEnter * :hi IndentGuidesEven guibg=green ctermbg=4
+
 else
     call AddUnavailMsg('IndentGuides')
 endif
@@ -391,7 +404,8 @@ endif
 " tagbar
 if isdirectory(expand(g:path#plug_man_dir . '/tagbar'))
     let g:tagbar_compact = 1
-    autocmd FileType python nested :call tagbar#autoopen(0)
+    nnoremap <F4> :TagbarToggle<CR>
+    "autocmd FileType python nested :call tagbar#autoopen(0)
 else
     call AddUnavailMsg('Tagbar')
 endif
@@ -404,6 +418,22 @@ else
     call AddUnavailMsg('Ropevim')
 endif
 
+" ack (ag)
+let g:ackprg = 'ag --vimgrep'
+let g:ack_qhandler = "botright copen 5"
+
+" unite
+nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
+
+" vimfiler
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_quick_look_command = 'gloobus-preview'
+nnoremap <F3> :VimFilerExplorer <CR>
+call vimfiler#custom#profile('default', 'context', {
+     \ 'safe' : 0,
+     \ 'preview_action': 'switch',
+     \ })
+
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
 """"""""""""""""""""""""""""""""""""""""
@@ -415,11 +445,6 @@ if has('win32')
 else
     language messages en_US.utf8
 endif
-
-" cyrillic support
-" set keymap=russian-jcukenwin
-" set iminsert=0
-" set imsearch=0
 
 filetype plugin indent on
 
@@ -449,12 +474,14 @@ set showmatch           " highlight matching [{()}]
 set hlsearch
 set cursorline
 set colorcolumn=80
+let g:loaded_matchparen = 1
+autocmd BufEnter * :highlight ColorColumn ctermbg=4 ctermfg=none cterm=none
+autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none ctermfg=0
 
 " folds
 set foldcolumn=1        " Add a bit extra margin to the left
 
 " misc
-set nomagic
 set incsearch
 set scrolloff=999
 set autoread            " autoreload buffer if changes
@@ -471,6 +498,8 @@ set shiftround          " round indentation
 set backspace=indent,eol,start
 set omnifunc=syntaxcomplete#Complete
 setlocal shortmess+=I   " hide intro message on start
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.ropeproject/*
+set wildignore+=Session.vim,*.pyc
 
 " gui
 if has('gui_running')
@@ -495,6 +524,8 @@ autocmd FileType * setlocal formatoptions-=t
 autocmd FileType * setlocal formatoptions-=o
 autocmd FileType * setlocal formatoptions-=r
 
+autocmd FileType htmldjango setlocal shiftwidth=2 tabstop=2 softtabstop=2
+
 " python
 if IsFeatAvail('python', 'Python configuration')
     let python_highlight_all = 1
@@ -502,6 +533,8 @@ if IsFeatAvail('python', 'Python configuration')
     autocmd Filetype python setlocal foldlevel=1
     autocmd Filetype python setlocal foldminlines=15
     autocmd Filetype python setlocal foldnestmax=2
+    autocmd FileType python map <buffer> <F1> oimport pudb; pudb.set_trace()<C-[>
+
 endif
 
 " restore cursor position on file open
@@ -558,19 +591,20 @@ endif
 
 " :W save the file as root
 if has('unix')
-    command W w !sudo tee % > /dev/null
+    cnoremap w!! call SudoSaveFile()
+    "command W w !sudo tee % > /dev/null
 endif
 
 " edit vimrc
 command Ev execute 'edit ' . g:path#vimrc
 
+" set paste
+nnoremap <F2> :set invpaste paste?<CR>
+set pastetoggle=<F2>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TRASH
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" htmldjango_omnicomplete
-"au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
-"let g:htmldjangocomplete_html_flavour = 'html5'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " POST-OPERATIONS
