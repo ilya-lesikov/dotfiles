@@ -280,6 +280,11 @@ if IsFeatAvail('python', 'Python-based plugins')
     Plug 'honza/vim-snippets'
 endif
 
+" silver searcher
+if executable('ag')
+    Plug 'mileszs/ack.vim'
+endif
+
 " css misc
 Plug 'hail2u/vim-css3-syntax'
 " html omnicomplete, misc
@@ -300,10 +305,10 @@ Plug 'majutsushi/tagbar'
 Plug 'Shougo/unite.vim'
 " vimfiler
 Plug 'Shougo/vimfiler.vim'
-" ag
-Plug 'mileszs/ack.vim'
 " comments
 Plug 'tpope/vim-commentary'
+" yaml support
+Plug 'chase/vim-ansible-yaml'
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -419,20 +424,32 @@ else
 endif
 
 " ack (ag)
-let g:ackprg = 'ag --vimgrep'
-let g:ack_qhandler = "botright copen 5"
+if isdirectory(expand(g:path#plug_man_dir . '/ack.vim'))
+    let g:ackprg = 'ag --vimgrep'
+    let g:ack_qhandler = "botright copen 5"
+else
+    call AddUnavailMsg('Ack')
+endif
 
 " unite
-nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
+if isdirectory(expand(g:path#plug_man_dir . '/unite.vim'))
+    nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
+else
+    call AddUnavailMsg('Unite')
+endif
 
 " vimfiler
-let g:vimfiler_as_default_explorer = 1
-let g:vimfiler_quick_look_command = 'gloobus-preview'
-nnoremap <F3> :VimFilerExplorer <CR>
-call vimfiler#custom#profile('default', 'context', {
+if isdirectory(expand(g:path#plug_man_dir . '/vimfiler.vim'))
+    let g:vimfiler_as_default_explorer = 1
+    let g:vimfiler_quick_look_command = 'gloobus-preview'
+    nnoremap <F3> :VimFilerExplorer <CR>
+    call vimfiler#custom#profile('default', 'context', {
      \ 'safe' : 0,
      \ 'preview_action': 'switch',
      \ })
+else
+    call AddUnavailMsg('Vimfiler')
+endif
 
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
