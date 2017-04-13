@@ -451,6 +451,13 @@ else
     call AddUnavailMsg('Vimfiler')
 endif
 
+" yaml syntax indent
+if isdirectory(expand(g:path#plug_man_dir . '/vim-ansible-yaml'))
+    let g:ansible_options = {'ignore_blank_lines': 0}
+else
+    call AddUnavailMsg('Vim-ansible-yaml')
+endif
+
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
 """"""""""""""""""""""""""""""""""""""""
