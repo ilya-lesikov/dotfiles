@@ -309,6 +309,7 @@ Plug 'Shougo/vimfiler.vim'
 Plug 'tpope/vim-commentary'
 " yaml support
 Plug 'chase/vim-ansible-yaml'
+Plug 'will133/vim-dirdiff'
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -484,7 +485,6 @@ set backup
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set expandtab
 set smarttab
 set autoindent
 set cindent
@@ -506,6 +506,8 @@ autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none cte
 set foldcolumn=1        " Add a bit extra margin to the left
 
 " misc
+set ignorecase
+set smartcase
 set incsearch
 set scrolloff=999
 set autoread            " autoreload buffer if changes
@@ -547,6 +549,7 @@ autocmd FileType * setlocal history=300
 autocmd FileType * setlocal formatoptions-=t
 autocmd FileType * setlocal formatoptions-=o
 autocmd FileType * setlocal formatoptions-=r
+autocmd FileType * setlocal expandtab
 
 autocmd FileType htmldjango setlocal shiftwidth=2 tabstop=2 softtabstop=2
 
@@ -615,7 +618,7 @@ endif
 
 " :W save the file as root
 if has('unix')
-    cnoremap w!! call SudoSaveFile()
+    cnoremap w!!! call SudoSaveFile()<CR>
     "command W w !sudo tee % > /dev/null
 endif
 
@@ -625,6 +628,12 @@ command Ev execute 'edit ' . g:path#vimrc
 " set paste
 nnoremap <F2> :set invpaste paste?<CR>
 set pastetoggle=<F2>
+
+" faster split navigation
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TRASH
