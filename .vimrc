@@ -292,7 +292,7 @@ Plug 'othree/html5.vim'
 " readline bindings for cmd mode
 Plug 'vim-utils/vim-husk'
 " colorize indent levels
-Plug 'nathanaelkane/vim-indent-guides'
+" Plug 'nathanaelkane/vim-indent-guides'
 " autoclose braces, quotes..
 Plug 'raimondi/delimitmate'
 " fast changing of braces, quotes..
@@ -310,6 +310,8 @@ Plug 'tpope/vim-commentary'
 " yaml support
 Plug 'chase/vim-ansible-yaml'
 Plug 'will133/vim-dirdiff'
+Plug 'Yggdroot/indentLine'
+
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -381,18 +383,18 @@ else
     call AddUnavailMsg('Syntastic')
 endif
 
-" indent_guides
-if isdirectory(expand(g:path#plug_man_dir . '/vim-indent-guides'))
-    let g:indent_guides_enable_on_vim_startup = 1
-    let g:indent_guides_start_level = 2
-    "let g:indent_guides_guide_size = 1
-    let g:indent_guides_auto_colors = 0
-    autocmd BufEnter * :hi IndentGuidesOdd  guibg=red   ctermbg=0
-    autocmd BufEnter * :hi IndentGuidesEven guibg=green ctermbg=4
+" " indent_guides
+" if isdirectory(expand(g:path#plug_man_dir . '/vim-indent-guides'))
+"     let g:indent_guides_enable_on_vim_startup = 1
+"     let g:indent_guides_start_level = 2
+"         "let g:indent_guides_guide_size = 1
+"             let g:indent_guides_auto_colors = 0
+"     autocmd BufEnter * :hi IndentGuidesOdd  guibg=red   ctermbg=0
+"     autocmd BufEnter * :hi IndentGuidesEven guibg=green ctermbg=4
 
-else
-    call AddUnavailMsg('IndentGuides')
-endif
+" else
+"     call AddUnavailMsg('IndentGuides')
+" endif
 
 " delimitmate
 if isdirectory(expand(g:path#plug_man_dir . '/delimitmate'))
@@ -485,8 +487,8 @@ set backup
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set smarttab
-set autoindent
+" set smarttab
+" set autoindent
 set cindent
 
 " statusline
@@ -619,7 +621,7 @@ endif
 " :W save the file as root
 if has('unix')
     cnoremap w!!! call SudoSaveFile()<CR>
-    "command W w !sudo tee % > /dev/null
+    cnoremap W!!! w !sudo tee % > /dev/null
 endif
 
 " edit vimrc
