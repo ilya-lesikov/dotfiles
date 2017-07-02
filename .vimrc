@@ -239,30 +239,30 @@ call plug#begin(g:path#plug_man_dir)
 " colorschemes
 Plug 'morhetz/gruvbox'
 
-" general completion
-if IsFeatAvail('lua', 'Lua-based plugins')
-  Plug 'shougo/neocomplete.vim'
-  " depends
-  " TODO
-  "if has('win32') || g:vim#version == 20
-  "    Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')} " not required
-  "endif
-  " misc
-  Plug 'Shougo/neco-vim' " vimscript
-endif
+" " general completion
+" if IsFeatAvail('lua', 'Lua-based plugins')
+"   Plug 'shougo/neocomplete.vim'
+"   " depends
+"   " TODO
+"   "if has('win32') || g:vim#version == 20
+"   "    Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')} " not required
+"   "endif
+"   " misc
+"   Plug 'Shougo/neco-vim' " vimscript
+" endif
 
-" powershell
-if has('win32')
-  " completion
-  let g:path#poshcomplete = expand(g:path#plug_man_dir . '/poshcomplete-vim')
-  Plug g:path#poshcomplete
-  " depends
-  " TODO
-  Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')}
-  Plug 'mattn/webapi-vim'
-  " misc
-  Plug 'PProvost/vim-ps1'
-endif
+" " powershell
+" if has('win32')
+"   " completion
+"   let g:path#poshcomplete = expand(g:path#plug_man_dir . '/poshcomplete-vim')
+"   Plug g:path#poshcomplete
+"   " depends
+"   " TODO
+"   Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')}
+"   Plug 'mattn/webapi-vim'
+"   " misc
+"   Plug 'PProvost/vim-ps1'
+" endif
 
 " python
 if IsFeatAvail('python', 'Python-based plugins')
@@ -270,11 +270,11 @@ if IsFeatAvail('python', 'Python-based plugins')
     " syntastic
     Plug 'scrooloose/syntastic', {'do': function('GetSyntasticCheckers')}
     " rope
-    Plug 'python-rope/ropevim', {'do': function('GetRopeModule')}
-    call SetPythonPathForRope()
+    " Plug 'python-rope/ropevim', {'do': function('GetRopeModule')}
+    " call SetPythonPathForRope()
   endif
   " jedi
-  Plug 'davidhalter/jedi-vim'
+  " Plug 'davidhalter/jedi-vim'
   " misc
   Plug 'hdima/python-syntax'
   Plug 'hynek/vim-python-pep8-indent'
@@ -318,7 +318,8 @@ Plug 'will133/vim-dirdiff'
 Plug 'Yggdroot/indentLine'
 Plug 'ingydotnet/yaml-vim'
 Plug 'dhruvasagar/vim-table-mode'
-
+Plug 'Valloric/YouCompleteMe'
+Plug 'tpope/vim-eunuch'
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -329,50 +330,50 @@ call plug#end()
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
-" TODO check if poshcomplete installed at all
-" poshcomplete
-if !exists('g:PoshComplete_Port')
-  let g:PoshComplete_Port = '1234'
-endif
-if !exists('g:neocomplete#force_omni_input_patterns')
-  let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.ps1 =
-      \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
+" " TODO check if poshcomplete installed at all
+" " poshcomplete
+" if !exists('g:PoshComplete_Port')
+"   let g:PoshComplete_Port = '1234'
+" endif
+" if !exists('g:neocomplete#force_omni_input_patterns')
+"   let g:neocomplete#force_omni_input_patterns = {}
+" endif
+" let g:neocomplete#force_omni_input_patterns.ps1 =
+"       \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
 
-" neocomplete
-if isdirectory(expand(g:path#plug_man_dir . '/neocomplete.vim'))
-  let g:neocomplete#enable_at_startup = 1
-  let g:neocomplete#enable_smart_case = 1
-  let g:neocomplete#enable_auto_close_preview = 1
-  let g:neocomplete#fallback_mappings =
-        \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
-  "let g:neocomplete#skip_auto_completion_time = ''
-else
-  call AddUnavailMsg('Neocomplete')
-endif
+" " neocomplete
+" if isdirectory(expand(g:path#plug_man_dir . '/neocomplete.vim'))
+"   let g:neocomplete#enable_at_startup = 1
+"   let g:neocomplete#enable_smart_case = 1
+"   let g:neocomplete#enable_auto_close_preview = 1
+"   let g:neocomplete#fallback_mappings =
+"         \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
+"   "let g:neocomplete#skip_auto_completion_time = ''
+" else
+"   call AddUnavailMsg('Neocomplete')
+" endif
 
-" jedi
-if isdirectory(expand(g:path#plug_man_dir . '/jedi-vim'))
-  autocmd FileType python setlocal omnifunc=jedi#completions
-  let g:jedi#completions_enabled = 0
-  let g:jedi#auto_vim_configuration = 0
-  let g:jedi#smart_auto_mappings = 0
-  " WORKAROUND to prevent error when appending to list
-  if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
-  endif
-  let g:neocomplete#force_omni_input_patterns.python =
-        \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
-else
-  call AddUnavailMsg('Jedi')
-endif
+" " jedi
+" if isdirectory(expand(g:path#plug_man_dir . '/jedi-vim'))
+"   autocmd FileType python setlocal omnifunc=jedi#completions
+"   let g:jedi#completions_enabled = 0
+"   let g:jedi#auto_vim_configuration = 0
+"   let g:jedi#smart_auto_mappings = 0
+"   " WORKAROUND to prevent error when appending to list
+"   if !exists('g:neocomplete#force_omni_input_patterns')
+"     let g:neocomplete#force_omni_input_patterns = {}
+"   endif
+"   let g:neocomplete#force_omni_input_patterns.python =
+"         \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+" else
+"   call AddUnavailMsg('Jedi')
+" endif
 
 " ultisnips
 if isdirectory(expand(g:path#plug_man_dir . '/ultisnips'))
   let g:UltiSnipsExpandTrigger = '<tab>'
   let g:UltiSnipsJumpForwardTrigger = '<tab>'
-  let g:UltiSnipsJumpBackwardTrigger = '<c-z>'
+  let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
 else
   call AddUnavailMsg('UltiSnips')
 endif
@@ -425,13 +426,13 @@ else
   call AddUnavailMsg('Tagbar')
 endif
 
-" ropevim
-if isdirectory(expand(g:path#plug_man_dir . '/ropevim'))
-  "let ropevim_extended_complete = 1
-  "let g:ropevim_autoimport_modules = ['os.*', 'sys']
-else
-  call AddUnavailMsg('Ropevim')
-endif
+" " ropevim
+" if isdirectory(expand(g:path#plug_man_dir . '/ropevim'))
+"   "let ropevim_extended_complete = 1
+"   "let g:ropevim_autoimport_modules = ['os.*', 'sys']
+" else
+"   call AddUnavailMsg('Ropevim')
+" endif
 
 " ack (ag)
 if isdirectory(expand(g:path#plug_man_dir . '/ack.vim'))
@@ -472,6 +473,29 @@ endif
 
 " table mode
 let g:table_mode_corner='|'
+
+" youcompleteme
+let g:ycm_autoclose_preview_window_after_completion = 1
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+nmap <leader>D :YcmCompleter GoToDefinition<CR>
+nmap <leader>* :YcmCompleter GoToReferences<CR>
+nmap <leader>k :YcmCompleter GetDoc<CR>
+let g:ycm_semantic_triggers =  {
+  \   'c' : ['->', '.'],
+  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+  \             're!\[.*\]\s'],
+  \   'ocaml' : ['.', '#'],
+  \   'cpp,objcpp' : ['->', '.', '::'],
+  \   'perl' : ['->'],
+  \   'php' : ['->', '::'],
+  \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
+  \   'ruby' : ['.', '::'],
+  \   'lua' : ['.', ':'],
+  \   'erlang' : [':'],
+  \   'python' : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
+  \ }
 
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
@@ -522,6 +546,7 @@ autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none cte
 set foldcolumn=1        " Add a bit extra margin to the left
 
 " misc
+set encoding=utf-8
 set ignorecase
 set smartcase
 set incsearch
@@ -643,8 +668,8 @@ endif
 command Ev execute 'edit ' . g:path#vimrc
 
 " set paste
-nnoremap <F2> :set invpaste paste?<CR>
-set pastetoggle=<F2>
+" nnoremap <F2> :set invpaste paste?<CR>
+" set pastetoggle=<F2>
 
 " faster split navigation
 nnoremap <C-J> <C-W><C-J>
@@ -659,6 +684,7 @@ nnoremap + <C-W>=
 " open 4 splits side by side
 function! SetupSplits()
   "silent! execute 'windo close'
+  execute 'silent! e /tmp/blank'
   execute 'only'
   execute 'split'
   execute 'vsplit'
@@ -671,6 +697,34 @@ command! Ss call SetupSplits()
 " save current buffer automatically
 command! As autocmd CursorHold,CursorHoldI <buffer> update
 
+"""""""""""""""""""""""""""""""""""""
+" WORKAROUND for autopaste mode
+"""""""""""""""""""""""""""""""""""""
+function! WrapForTmux(s)
+  if !exists('$TMUX')
+    return a:s
+  endif
+
+  let tmux_start = "\<Esc>Ptmux;"
+  let tmux_end = "\<Esc>\\"
+
+  return tmux_start . substitute(a:s, "\<Esc>", "\<Esc>\<Esc>", 'g') . tmux_end
+endfunction
+
+let &t_SI .= WrapForTmux("\<Esc>[?2004h")
+let &t_EI .= WrapForTmux("\<Esc>[?2004l")
+
+function! XTermPasteBegin()
+  set pastetoggle=<Esc>[201~
+  set paste
+  return ""
+endfunction
+
+inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
+"""""""""""""""""""""""""""""""""""""
+" end of WORKAROUND for autopaste mode
+"""""""""""""""""""""""""""""""""""""
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " TRASH
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -679,3 +733,4 @@ command! As autocmd CursorHold,CursorHoldI <buffer> update
 " POST-OPERATIONS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call SendMessages()
+
