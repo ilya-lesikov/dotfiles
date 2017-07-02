@@ -320,6 +320,7 @@ Plug 'ingydotnet/yaml-vim'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'Valloric/YouCompleteMe'
 Plug 'tpope/vim-eunuch'
+Plug 'christoomey/vim-tmux-navigator'
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -420,7 +421,8 @@ endif
 " tagbar
 if isdirectory(expand(g:path#plug_man_dir . '/tagbar'))
   let g:tagbar_compact = 1
-  nnoremap <F4> :TagbarToggle<CR>
+  "nnoremap <F4> :TagbarToggle<CR>
+  nnoremap <leader>E :TagbarToggle<CR>
   "autocmd FileType python nested :call tagbar#autoopen(0)
 else
   call AddUnavailMsg('Tagbar')
@@ -439,7 +441,8 @@ if isdirectory(expand(g:path#plug_man_dir . '/ack.vim'))
   let g:ackprg = 'ag --vimgrep'
   let g:ack_qhandler = "botright copen 3"
   let g:ackpreview = 1
-  nnoremap <F5> :Ack!<Space>''<Left>
+  "nnoremap <F5> :Ack!<Space>''<Left>
+  nnoremap <leader>a :Ack!<Space>''<Left>
 else
   call AddUnavailMsg('Ack')
 endif
@@ -455,7 +458,8 @@ endif
 if isdirectory(expand(g:path#plug_man_dir . '/vimfiler.vim'))
   let g:vimfiler_as_default_explorer = 1
   let g:vimfiler_quick_look_command = 'gloobus-preview'
-  nnoremap <F3> :VimFilerExplorer <CR>
+  "nnoremap <F3> :VimFilerExplorer <CR>
+  nnoremap <leader>e :VimFilerExplorer<CR>
   call vimfiler#custom#profile('default', 'context', {
         \ 'safe' : 0,
         \ 'preview_action': 'switch',
@@ -496,6 +500,14 @@ let g:ycm_semantic_triggers =  {
   \   'erlang' : [':'],
   \   'python' : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
   \ }
+
+" tmux-navigator
+let g:tmux_navigator_no_mappings = 1
+nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+let g:tmux_navigator_disable_when_zoomed = 1
 
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
@@ -600,7 +612,8 @@ if IsFeatAvail('python', 'Python configuration')
   autocmd Filetype python setlocal foldlevel=1
   autocmd Filetype python setlocal foldminlines=15
   autocmd Filetype python setlocal foldnestmax=2
-  autocmd FileType python map <buffer> <F1> oimport pudb; pudb.set_trace()<C-[>
+  "autocmd FileType python map <buffer> <F1> oimport pudb; pudb.set_trace()<C-[>
+  autocmd FileType python nmap <buffer> <leader>b oimport pudb; pudb.set_trace()<C-[>
   autocmd FileType python setlocal tabstop=2
   autocmd FileType python setlocal softtabstop=2
   autocmd FileType python setlocal shiftwidth=2
@@ -664,18 +677,22 @@ if has('unix')
   cnoremap W!!! w !sudo tee % > /dev/null
 endif
 
-" edit vimrc
+" edit config files
 command Ev execute 'edit ' . g:path#vimrc
+command Et execute 'edit ' . "~/.tmux.conf"
+command Eb execute 'edit ' . "~/.bashrc"
+command Ep execute 'edit ' . "~/.profile"
+command Ex execute 'edit ' . "~/.Xdefaults"
 
 " set paste
 " nnoremap <F2> :set invpaste paste?<CR>
 " set pastetoggle=<F2>
 
-" faster split navigation
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+" " faster split navigation
+" nnoremap <C-J> <C-W><C-J>
+" nnoremap <C-K> <C-W><C-K>
+" nnoremap <C-L> <C-W><C-L>
+" nnoremap <C-H> <C-W><C-H>
 
 " fast fullscreen split/revert back
 nnoremap \| <C-W>\|<C-W>_
