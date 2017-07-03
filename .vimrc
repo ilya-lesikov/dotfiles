@@ -10,11 +10,6 @@ let g:vim#version = 10
 " FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""
 
-function! SudoSaveFile() abort
-  execute (has('gui_running') ? '' : 'silent') 'write !env SUDO_EDITOR=tee sudo -e % >/dev/null'
-  let &modified = v:shell_error
-endfunction
-
 function! GetFileDirectory ()
   " get directory of opened file for statusline
   let fileDirectory = expand('%:p:h')
@@ -90,18 +85,10 @@ function! IsPlugManInst()
 endfunction
 
 function! DownloadFile(url, path)
-  if has('win32')
-    silent! execute '!powershell -Command "& {Invoke-WebRequest -Uri \"' . a:url . '\" -OutFile \"' . a:path . '\"}"'
+  silent! execute '!curl -fLo "' . a:path . '" --create-dirs "' . a:url . '"'
 
-    if filereadable(a:path)
-      return 1
-    endif
-  else
-    silent! execute '!curl -fLo "' . a:path . '" --create-dirs "' . a:url . '"'
-
-    if filereadable(a:path)
-      return 1
-    endif
+  if filereadable(a:path)
+    return 1
   endif
 endfunction
 
@@ -128,50 +115,10 @@ function! EnsureDirExist(dir)
   endif
 endfunction
 
-function! GetVimProcLibs(info)
-  if a:info.status ==? 'installed' || a:info.status ==? 'updated' ||
-        \ a:info.force
-
-    if has('win32')
-      let g:uri#vimproc_dll_32 = system('powershell -Command "& { $json = Invoke-WebRequest -UseBasicParsing -Uri https://api.github.com/repos/Shougo/vimproc.vim/releases | ConvertFrom-Json ; $json.assets.browser_download_url | Select-Object -Index 0 }"')
-      let g:uri#vimproc_dll_64 = system('powershell -Command "& { $json = Invoke-WebRequest -UseBasicParsing -Uri https://api.github.com/repos/Shougo/vimproc.vim/releases | ConvertFrom-Json ; $json.assets.browser_download_url | Select-Object -Index 1 }"')
-
-      " fix newlines in powershell output
-      let g:uri#vimproc_dll_32 = DelNewLines(g:uri#vimproc_dll_32)
-      let g:uri#vimproc_dll_64 = DelNewLines(g:uri#vimproc_dll_64)
-
-      let g:path#vimproc_dll_32 = expand(g:path#plug_man_dir . '/vimproc.vim/lib/vimproc_win32.dll')
-      let g:path#vimproc_dll_64 = expand(g:path#plug_man_dir . '/vimproc.vim/lib/vimproc_win64.dll')
-
-      call DownloadFile(g:uri#vimproc_dll_32, g:path#vimproc_dll_32)
-      call DownloadFile(g:uri#vimproc_dll_64, g:path#vimproc_dll_64)
-    else
-      " TODO
-      "!make
-    endif
-  endif
-endfunction
-
-function! GetRopeModule(info)
-  if a:info.status ==? 'installed' || a:info.status ==? 'updated' ||
-        \ a:info.force
-
-    if has('win32')
-      " TODO
-    else
-      call system('pip install --user ropevim')
-    endif
-  endif
-endfunction
-
 function! IsPipInstalled()
-  if has('win32')
-    " TODO
-  else
-    call system('pip --version')
-    if v:shell_error ==? 0
-      return 1
-    endif
+  call system('pip --version')
+  if v:shell_error ==? 0
+    return 1
   endif
 
   call AddUnavailMsg('Pip-dependent plugins')
@@ -181,13 +128,9 @@ function! GetSyntasticCheckers(info)
   if a:info.status ==? 'installed' || a:info.status ==? 'updated' ||
         \ a:info.force
 
-    if has('win32')
-      " TODO
-    else
-      call system('pip install --user pyflakes')
-      call system('pip install --user pep8')
-      call system('pip install --user vim-vint')
-    endif
+    call system('pip install --user pyflakes')
+    call system('pip install --user pep8')
+    call system('pip install --user vim-vint')
   endif
 endfunction
 
@@ -197,21 +140,16 @@ function! PromptExecute(cmd)
   endif
 endfunction
 
-function! SetPythonPathForRope()
-  let $PYTHONPATH = join(split(expand("$HOME/.local/lib/*/site-packages")), ":")
-endfunction
+" function! SetPythonPathForRope()
+"   let $PYTHONPATH = join(split(expand("$HOME/.local/lib/*/site-packages")), ":")
+" endfunction
 
 """"""""""""""""""""""""""""""""""""""""
 " VARS
 """"""""""""""""""""""""""""""""""""""""
 
-if has('win32')
-  let g:path#vim_user_dir = expand('~/vimfiles')
-  let g:path#vimrc = expand('~/_vimrc')
-else
-  let g:path#vim_user_dir = expand('~/.vim')
-  let g:path#vimrc = expand('~/.vimrc')
-endif
+let g:path#vim_user_dir = expand('~/.vim')
+let g:path#vimrc = expand('~/.vimrc')
 
 let g:path#autoload = expand(g:path#vim_user_dir . '/autoload')
 let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
@@ -239,42 +177,12 @@ call plug#begin(g:path#plug_man_dir)
 " colorschemes
 Plug 'morhetz/gruvbox'
 
-" " general completion
-" if IsFeatAvail('lua', 'Lua-based plugins')
-"   Plug 'shougo/neocomplete.vim'
-"   " depends
-"   " TODO
-"   "if has('win32') || g:vim#version == 20
-"   "    Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')} " not required
-"   "endif
-"   " misc
-"   Plug 'Shougo/neco-vim' " vimscript
-" endif
-
-" " powershell
-" if has('win32')
-"   " completion
-"   let g:path#poshcomplete = expand(g:path#plug_man_dir . '/poshcomplete-vim')
-"   Plug g:path#poshcomplete
-"   " depends
-"   " TODO
-"   Plug 'Shougo/vimproc.vim', {'do': function('GetVimProcLibs')}
-"   Plug 'mattn/webapi-vim'
-"   " misc
-"   Plug 'PProvost/vim-ps1'
-" endif
-
 " python
 if IsFeatAvail('python', 'Python-based plugins')
   if IsPipInstalled()
     " syntastic
-    Plug 'scrooloose/syntastic', {'do': function('GetSyntasticCheckers')}
-    " rope
-    " Plug 'python-rope/ropevim', {'do': function('GetRopeModule')}
-    " call SetPythonPathForRope()
+    Plug 'scrooloose/syntastic'
   endif
-  " jedi
-  " Plug 'davidhalter/jedi-vim'
   " misc
   Plug 'hdima/python-syntax'
   Plug 'hynek/vim-python-pep8-indent'
@@ -287,33 +195,25 @@ endif
 " silver searcher
 if executable('ag')
   Plug 'mileszs/ack.vim'
+else
+  call AddUnavailMsg('ag')
 endif
 
-" css misc
 Plug 'hail2u/vim-css3-syntax'
 " html omnicomplete, misc
 Plug 'othree/html5.vim'
 " readline bindings for cmd mode
 Plug 'vim-utils/vim-husk'
-" colorize indent levels
-" Plug 'nathanaelkane/vim-indent-guides'
 " autoclose braces, quotes..
 Plug 'raimondi/delimitmate'
 " fast changing of braces, quotes..
 Plug 'tpope/vim-surround'
 " :Bd don't close split
 Plug 'moll/vim-bbye'
-" tagbar
 Plug 'majutsushi/tagbar'
-" unite
 Plug 'Shougo/unite.vim'
-" vimfiler
 Plug 'Shougo/vimfiler.vim'
-" comments
-" Plug 'tpope/vim-commentary'
 Plug 'tomtom/tcomment_vim'
-" yaml support
-" Plug 'chase/vim-ansible-yaml'
 Plug 'will133/vim-dirdiff'
 Plug 'Yggdroot/indentLine'
 Plug 'ingydotnet/yaml-vim'
@@ -331,117 +231,43 @@ call plug#end()
 " PLUGIN SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
-" " TODO check if poshcomplete installed at all
-" " poshcomplete
-" if !exists('g:PoshComplete_Port')
-"   let g:PoshComplete_Port = '1234'
-" endif
-" if !exists('g:neocomplete#force_omni_input_patterns')
-"   let g:neocomplete#force_omni_input_patterns = {}
-" endif
-" let g:neocomplete#force_omni_input_patterns.ps1 =
-"       \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
-
-" " neocomplete
-" if isdirectory(expand(g:path#plug_man_dir . '/neocomplete.vim'))
-"   let g:neocomplete#enable_at_startup = 1
-"   let g:neocomplete#enable_smart_case = 1
-"   let g:neocomplete#enable_auto_close_preview = 1
-"   let g:neocomplete#fallback_mappings =
-"         \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
-"   "let g:neocomplete#skip_auto_completion_time = ''
-" else
-"   call AddUnavailMsg('Neocomplete')
-" endif
-
-" " jedi
-" if isdirectory(expand(g:path#plug_man_dir . '/jedi-vim'))
-"   autocmd FileType python setlocal omnifunc=jedi#completions
-"   let g:jedi#completions_enabled = 0
-"   let g:jedi#auto_vim_configuration = 0
-"   let g:jedi#smart_auto_mappings = 0
-"   " WORKAROUND to prevent error when appending to list
-"   if !exists('g:neocomplete#force_omni_input_patterns')
-"     let g:neocomplete#force_omni_input_patterns = {}
-"   endif
-"   let g:neocomplete#force_omni_input_patterns.python =
-"         \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
-" else
-"   call AddUnavailMsg('Jedi')
-" endif
-
 " ultisnips
-if isdirectory(expand(g:path#plug_man_dir . '/ultisnips'))
-  let g:UltiSnipsExpandTrigger = '<tab>'
-  let g:UltiSnipsJumpForwardTrigger = '<tab>'
-  let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
-else
-  call AddUnavailMsg('UltiSnips')
-endif
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
 
 " syntastic
-if isdirectory(expand(g:path#plug_man_dir . '/syntastic'))
-  let g:syntastic_aggregate_errors = 1
-  "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-  let g:syntastic_python_checkers = ['python']
-  let g:syntastic_vim_checkers = ['vint']
-  let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-  let g:syntastic_javascript_checkers = ['eslint']
-  let g:syntastic_spec_checkers = ['']
-else
-  call AddUnavailMsg('Syntastic')
-endif
-
-" " indent_guides
-" if isdirectory(expand(g:path#plug_man_dir . '/vim-indent-guides'))
-"     let g:indent_guides_enable_on_vim_startup = 1
-"     let g:indent_guides_start_level = 2
-"         "let g:indent_guides_guide_size = 1
-"             let g:indent_guides_auto_colors = 0
-"     autocmd BufEnter * :hi IndentGuidesOdd  guibg=red   ctermbg=0
-"     autocmd BufEnter * :hi IndentGuidesEven guibg=green ctermbg=4
-
-" else
-"     call AddUnavailMsg('IndentGuides')
-" endif
+let g:syntastic_aggregate_errors = 1
+"let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
+let g:syntastic_python_checkers = ['python']
+let g:syntastic_vim_checkers = ['vint']
+let g:syntastic_sh_checkers = ['sh', 'shellcheck']
+let g:syntastic_javascript_checkers = ['eslint']
+let g:syntastic_spec_checkers = ['']
 
 " delimitmate
-if isdirectory(expand(g:path#plug_man_dir . '/delimitmate'))
-  let delimitMate_matchpairs = '(:),[:],{:},<:>'
-  let delimitMate_nesting_quotes = ['"','`',"'"]
-  let delimitMate_expand_cr = 1
-  let delimitMate_expand_space = 1
-  let delimitMate_expand_inside_quotes = 1
-  let delimitMate_jump_expansion = 1
-  let delimitMate_balance_matchpairs = 1
-else
-  call AddUnavailMsg('DelimitMate')
-endif
+let delimitMate_matchpairs = '(:),[:],{:},<:>'
+let delimitMate_nesting_quotes = ['"','`',"'"]
+let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
+let delimitMate_expand_inside_quotes = 1
+let delimitMate_jump_expansion = 1
+let delimitMate_balance_matchpairs = 1
 
 " tagbar
 if isdirectory(expand(g:path#plug_man_dir . '/tagbar'))
   let g:tagbar_compact = 1
-  "nnoremap <F4> :TagbarToggle<CR>
   nnoremap <leader>E :TagbarToggle<CR>
   "autocmd FileType python nested :call tagbar#autoopen(0)
 else
   call AddUnavailMsg('Tagbar')
 endif
 
-" " ropevim
-" if isdirectory(expand(g:path#plug_man_dir . '/ropevim'))
-"   "let ropevim_extended_complete = 1
-"   "let g:ropevim_autoimport_modules = ['os.*', 'sys']
-" else
-"   call AddUnavailMsg('Ropevim')
-" endif
-
 " ack (ag)
 if isdirectory(expand(g:path#plug_man_dir . '/ack.vim'))
   let g:ackprg = 'ag --vimgrep'
   let g:ack_qhandler = "botright copen 3"
   let g:ackpreview = 1
-  "nnoremap <F5> :Ack!<Space>''<Left>
   nnoremap <leader>a :Ack!<Space>''<Left>
 else
   call AddUnavailMsg('Ack')
@@ -458,7 +284,6 @@ endif
 if isdirectory(expand(g:path#plug_man_dir . '/vimfiler.vim'))
   let g:vimfiler_as_default_explorer = 1
   let g:vimfiler_quick_look_command = 'gloobus-preview'
-  "nnoremap <F3> :VimFilerExplorer <CR>
   nnoremap <leader>e :VimFilerExplorer<CR>
   call vimfiler#custom#profile('default', 'context', {
         \ 'safe' : 0,
@@ -468,46 +293,53 @@ else
   call AddUnavailMsg('Vimfiler')
 endif
 
-" " yaml syntax indent
-" if isdirectory(expand(g:path#plug_man_dir . '/vim-ansible-yaml'))
-"   let g:ansible_options = {'ignore_blank_lines': 0}
-" else
-"   call AddUnavailMsg('Vim-ansible-yaml')
-" endif
-
 " table mode
 let g:table_mode_corner='|'
 
 " youcompleteme
-let g:ycm_autoclose_preview_window_after_completion = 1
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-nmap <leader>d :YcmCompleter GoToDeclaration<CR>
-nmap <leader>D :YcmCompleter GoToDefinition<CR>
-nmap <leader>* :YcmCompleter GoToReferences<CR>
-nmap <leader>k :YcmCompleter GetDoc<CR>
-let g:ycm_semantic_triggers =  {
-  \   'c' : ['->', '.'],
-  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-  \             're!\[.*\]\s'],
-  \   'ocaml' : ['.', '#'],
-  \   'cpp,objcpp' : ['->', '.', '::'],
-  \   'perl' : ['->'],
-  \   'php' : ['->', '::'],
-  \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
-  \   'ruby' : ['.', '::'],
-  \   'lua' : ['.', ':'],
-  \   'erlang' : [':'],
-  \   'python' : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
-  \ }
+if isdirectory(expand(g:path#plug_man_dir . '/YouCompleteMe'))
+  let g:ycm_autoclose_preview_window_after_completion = 1
+  let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+  let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+  nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+  nmap <leader>D :YcmCompleter GoToDefinition<CR>
+  nmap <leader>* :YcmCompleter GoToReferences<CR>
+  nmap <leader>k :YcmCompleter GetDoc<CR>
+  let g:ycm_semantic_triggers =  {
+    \   'c' : ['->', '.'],
+    \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+    \             're!\[.*\]\s'],
+    \   'ocaml' : ['.', '#'],
+    \   'cpp,objcpp' : ['->', '.', '::'],
+    \   'perl' : ['->'],
+    \   'php' : ['->', '::'],
+    \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
+    \   'ruby' : ['.', '::'],
+    \   'lua' : ['.', ':'],
+    \   'erlang' : [':'],
+    \   'python' : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
+    \ }
+else
+  call AddUnavailMsg('Youcompleteme')
+endif
 
 " tmux-navigator
-let g:tmux_navigator_no_mappings = 1
-nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
-nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
-nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
-let g:tmux_navigator_disable_when_zoomed = 1
+if isdirectory(expand(g:path#plug_man_dir . '/vim-tmux-navigator'))
+  let g:tmux_navigator_no_mappings = 1
+  nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+  nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+  nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+  nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+  let g:tmux_navigator_disable_when_zoomed = 1
+else
+  call AddUnavailMsg('Tmux navigator')
+  
+  " split navigation without plugin
+  nnoremap <C-J> <C-W><C-J>
+  nnoremap <C-K> <C-W><C-K>
+  nnoremap <C-L> <C-W><C-L>
+  nnoremap <C-H> <C-W><C-H>
+endif
 
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
@@ -515,11 +347,7 @@ let g:tmux_navigator_disable_when_zoomed = 1
 
 " language (let it be in the beginning)
 set langmenu=none
-if has('win32')
-  language messages EN
-else
-  language messages en_US.utf8
-endif
+language messages en_US.utf8
 
 filetype plugin indent on
 
@@ -589,12 +417,6 @@ if has('gui_running')
   set guioptions-=r  "remove right-hand scroll bar
   set guioptions-=L  "remove left-hand scroll bar
   set guioptions+=c  "no graphical popup dialogs
-
-  if has('win32')
-    " WORKAROUND for maximizing gvim on Windows
-    set lines=999
-    set columns=999
-  endif
 endif
 
 autocmd FileType * syntax on
@@ -606,18 +428,15 @@ autocmd FileType * setlocal formatoptions-=o
 autocmd FileType * setlocal formatoptions-=r
 
 " python
-if IsFeatAvail('python', 'Python configuration')
-  let python_highlight_all = 1
-  autocmd Filetype python setlocal foldmethod=indent
-  autocmd Filetype python setlocal foldlevel=1
-  autocmd Filetype python setlocal foldminlines=15
-  autocmd Filetype python setlocal foldnestmax=2
-  "autocmd FileType python map <buffer> <F1> oimport pudb; pudb.set_trace()<C-[>
-  autocmd FileType python nmap <buffer> <leader>b oimport pudb; pudb.set_trace()<C-[>
-  autocmd FileType python setlocal tabstop=2
-  autocmd FileType python setlocal softtabstop=2
-  autocmd FileType python setlocal shiftwidth=2
-endif
+let python_highlight_all = 1
+autocmd Filetype python setlocal foldmethod=indent
+autocmd Filetype python setlocal foldlevel=1
+autocmd Filetype python setlocal foldminlines=15
+autocmd Filetype python setlocal foldnestmax=2
+autocmd FileType python nmap <buffer> <leader>b oimport pudb; pudb.set_trace()<C-[>
+autocmd FileType python setlocal tabstop=2
+autocmd FileType python setlocal softtabstop=2
+autocmd FileType python setlocal shiftwidth=2
 
 " restore cursor position on file open
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
@@ -631,31 +450,20 @@ autocmd BufWrite * call DeleteTrailingWS()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has('gui_running')
-
   try
     call SetColorScheme('gruvbox')
   catch
     call SetColorScheme('desert')
   endtry
 
-  if has('win32')
-    set guifont=Courier_New:h10:cRUSSIAN:qDRAFT
-  else
-
-    try
-      set guifont=Hack\ 10
-    catch
-      call AddUnavailMsg('Guifont')
-      set guifont=DejaVu\ Sans\ Mono\ 10
-    endtry
-
-  endif
-
+  try
+    set guifont=Source\ Code\ Pro\ 10
+  catch
+    call AddUnavailMsg('Guifont')
+    set guifont=DejaVu\ Sans\ Mono\ 10
+  endtry
 else
-
-  if has('win32')
-    call SetColorScheme('industry')
-  elseif IsTerm256Colors()
+  if IsTerm256Colors()
     try
       call SetColorScheme('gruvbox')
     catch
@@ -664,7 +472,6 @@ else
   else
     call SetColorScheme('desert')
   endif
-
 endif
 
 """"""""""""""""""""""""""""""""""""""""
@@ -672,10 +479,12 @@ endif
 """"""""""""""""""""""""""""""""""""""""
 
 " :W save the file as root
-if has('unix')
-  cnoremap w!!! call SudoSaveFile()<CR>
-  cnoremap W!!! w !sudo tee % > /dev/null
-endif
+function! SudoSaveFile() abort
+  execute (has('gui_running') ? '' : 'silent') 'write !env SUDO_EDITOR=tee sudo -e % >/dev/null'
+  let &modified = v:shell_error
+endfunction
+cnoremap w!!! call SudoSaveFile()<CR>
+cnoremap W!!! w !sudo tee % > /dev/null
 
 " edit config files
 command Ev execute 'edit ' . g:path#vimrc
@@ -684,23 +493,12 @@ command Eb execute 'edit ' . "~/.bashrc"
 command Ep execute 'edit ' . "~/.profile"
 command Ex execute 'edit ' . "~/.Xdefaults"
 
-" set paste
-" nnoremap <F2> :set invpaste paste?<CR>
-" set pastetoggle=<F2>
-
-" " faster split navigation
-" nnoremap <C-J> <C-W><C-J>
-" nnoremap <C-K> <C-W><C-K>
-" nnoremap <C-L> <C-W><C-L>
-" nnoremap <C-H> <C-W><C-H>
-
 " fast fullscreen split/revert back
 nnoremap \| <C-W>\|<C-W>_
 nnoremap + <C-W>=
 
 " open 4 splits side by side
 function! SetupSplits()
-  "silent! execute 'windo close'
   execute 'silent! e /tmp/blank'
   execute 'only'
   execute 'split'
@@ -738,16 +536,8 @@ function! XTermPasteBegin()
 endfunction
 
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
-"""""""""""""""""""""""""""""""""""""
-" end of WORKAROUND for autopaste mode
-"""""""""""""""""""""""""""""""""""""
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" TRASH
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " POST-OPERATIONS
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call SendMessages()
-
