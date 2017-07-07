@@ -1,11 +1,3 @@
-" 10 = normal version, with plugin manager, but w/o need to manually build
-" anything. Depends: windows - powershell; linux - curl.
-" 20 = full version, requires mingw/gcc for build. Depends: windows -
-" powershell; linux - curl, gcc.
-" Change the variable and restart vim
-
-let g:vim#version = 10
-
 """"""""""""""""""""""""""""""""""""""""
 " FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""
@@ -140,10 +132,6 @@ function! PromptExecute(cmd)
   endif
 endfunction
 
-" function! SetPythonPathForRope()
-"   let $PYTHONPATH = join(split(expand("$HOME/.local/lib/*/site-packages")), ":")
-" endfunction
-
 """"""""""""""""""""""""""""""""""""""""
 " VARS
 """"""""""""""""""""""""""""""""""""""""
@@ -155,7 +143,9 @@ let g:path#autoload = expand(g:path#vim_user_dir . '/autoload')
 let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
 let g:path#plug_man_dir = expand(g:path#vim_user_dir . '/plugged')
 
-let &rtp .= ','.expand(g:path#vim_user_dir)
+" let &rtp .= ','.expand(g:path#vim_user_dir . '/ftplugin')
+" let &rtp .= ','.expand(g:path#vim_user_dir . '/indent')
+" let &rtp .= ','.expand(g:path#vim_user_dir . '/syntax')
 let &undodir = expand(g:path#vim_user_dir . '/misc')
 let &backupdir = expand(g:path#vim_user_dir . '/misc')
 let &directory = expand(g:path#vim_user_dir . '/misc')
@@ -174,69 +164,10 @@ endif
 
 call plug#begin(g:path#plug_man_dir)
 
-" colorschemes
+" theme
 Plug 'morhetz/gruvbox'
 
-" python
-if IsFeatAvail('python', 'Python-based plugins')
-  if IsPipInstalled()
-    " syntastic
-    Plug 'scrooloose/syntastic'
-  endif
-  " misc
-  Plug 'hdima/python-syntax'
-  Plug 'hynek/vim-python-pep8-indent'
-  " ultisnips
-  Plug 'SirVer/ultisnips'
-  " depends
-  Plug 'honza/vim-snippets'
-endif
-
-" silver searcher
-if executable('ag')
-  Plug 'mileszs/ack.vim'
-else
-  call AddUnavailMsg('ag')
-endif
-
-Plug 'hail2u/vim-css3-syntax'
-" html omnicomplete, misc
-Plug 'othree/html5.vim'
-" readline bindings for cmd mode
-Plug 'vim-utils/vim-husk'
-" autoclose braces, quotes..
-Plug 'raimondi/delimitmate'
-" fast changing of braces, quotes..
-Plug 'tpope/vim-surround'
-" :Bd don't close split
-Plug 'moll/vim-bbye'
-Plug 'majutsushi/tagbar'
-Plug 'Shougo/unite.vim'
-Plug 'Shougo/vimfiler.vim'
-Plug 'tomtom/tcomment_vim'
-Plug 'will133/vim-dirdiff'
-Plug 'Yggdroot/indentLine'
-Plug 'ingydotnet/yaml-vim'
-Plug 'dhruvasagar/vim-table-mode'
-Plug 'Valloric/YouCompleteMe'
-Plug 'tpope/vim-eunuch'
-Plug 'christoomey/vim-tmux-navigator'
-
-" jumping with % for xml tags
-runtime macros/matchit.vim
-
-call plug#end()
-
-"""""""""""""""""""""""""""""""""""""""
-" PLUGIN SETTINGS
-""""""""""""""""""""""""""""""""""""""""
-
-" ultisnips
-let g:UltiSnipsExpandTrigger = '<tab>'
-let g:UltiSnipsJumpForwardTrigger = '<tab>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
-
-" syntastic
+Plug 'scrooloose/syntastic'
 let g:syntastic_aggregate_errors = 1
 "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
 let g:syntastic_python_checkers = ['python']
@@ -245,7 +176,19 @@ let g:syntastic_sh_checkers = ['sh', 'shellcheck']
 let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_spec_checkers = ['']
 
-" delimitmate
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
+
+Plug 'mileszs/ack.vim'
+let g:ackprg = 'ag --vimgrep'
+let g:ack_qhandler = "botright copen 3"
+let g:ackpreview = 1
+nnoremap <leader>a :Ack!<Space>''<Left>
+
+Plug 'raimondi/delimitmate'
 let delimitMate_matchpairs = '(:),[:],{:},<:>'
 let delimitMate_nesting_quotes = ['"','`',"'"]
 let delimitMate_expand_cr = 1
@@ -254,92 +197,96 @@ let delimitMate_expand_inside_quotes = 1
 let delimitMate_jump_expansion = 1
 let delimitMate_balance_matchpairs = 1
 
-" tagbar
-if isdirectory(expand(g:path#plug_man_dir . '/tagbar'))
-  let g:tagbar_compact = 1
-  nnoremap <leader>E :TagbarToggle<CR>
-  "autocmd FileType python nested :call tagbar#autoopen(0)
-else
-  call AddUnavailMsg('Tagbar')
-endif
+Plug 'majutsushi/tagbar'
+let g:tagbar_compact = 1
+nnoremap <leader>E :TagbarToggle<CR>
+"autocmd FileType python nested :call tagbar#autoopen(0)
 
-" ack (ag)
-if isdirectory(expand(g:path#plug_man_dir . '/ack.vim'))
-  let g:ackprg = 'ag --vimgrep'
-  let g:ack_qhandler = "botright copen 3"
-  let g:ackpreview = 1
-  nnoremap <leader>a :Ack!<Space>''<Left>
-else
-  call AddUnavailMsg('Ack')
-endif
+Plug 'Shougo/unite.vim'
+nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
 
-" unite
-if isdirectory(expand(g:path#plug_man_dir . '/unite.vim'))
-  nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
-else
-  call AddUnavailMsg('Unite')
-endif
+" Plug 'Shougo/vimfiler.vim'
+" let g:vimfiler_as_default_explorer = 1
+" let g:vimfiler_quick_look_command = 'gloobus-preview'
+" nnoremap <leader>e :VimFilerExplorer<CR>
+" call vimfiler#custom#profile('default', 'context', {
+"       \ 'safe' : 0,
+"       \ 'preview_action': 'switch',
+"       \ })
 
-" vimfiler
-if isdirectory(expand(g:path#plug_man_dir . '/vimfiler.vim'))
-  let g:vimfiler_as_default_explorer = 1
-  let g:vimfiler_quick_look_command = 'gloobus-preview'
-  nnoremap <leader>e :VimFilerExplorer<CR>
-  call vimfiler#custom#profile('default', 'context', {
-        \ 'safe' : 0,
-        \ 'preview_action': 'switch',
-        \ })
-else
-  call AddUnavailMsg('Vimfiler')
-endif
+Plug 'francoiscabrol/ranger.vim'
+let g:ranger_map_keys = 0
+map <leader>e :Ranger<CR>
 
-" table mode
+Plug 'dhruvasagar/vim-table-mode'
 let g:table_mode_corner='|'
 
-" youcompleteme
-if isdirectory(expand(g:path#plug_man_dir . '/YouCompleteMe'))
-  let g:ycm_autoclose_preview_window_after_completion = 1
-  let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-  let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-  nmap <leader>d :YcmCompleter GoToDeclaration<CR>
-  nmap <leader>D :YcmCompleter GoToDefinition<CR>
-  nmap <leader>* :YcmCompleter GoToReferences<CR>
-  nmap <leader>k :YcmCompleter GetDoc<CR>
-  let g:ycm_semantic_triggers =  {
-    \   'c' : ['->', '.'],
-    \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-    \             're!\[.*\]\s'],
-    \   'ocaml' : ['.', '#'],
-    \   'cpp,objcpp' : ['->', '.', '::'],
-    \   'perl' : ['->'],
-    \   'php' : ['->', '::'],
-    \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
-    \   'ruby' : ['.', '::'],
-    \   'lua' : ['.', ':'],
-    \   'erlang' : [':'],
-    \   'python' : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
-    \ }
-else
-  call AddUnavailMsg('Youcompleteme')
-endif
+"Plug 'sbdchd/neoformat'
 
-" tmux-navigator
-if isdirectory(expand(g:path#plug_man_dir . '/vim-tmux-navigator'))
-  let g:tmux_navigator_no_mappings = 1
-  nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
-  nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
-  nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
-  nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
-  let g:tmux_navigator_disable_when_zoomed = 1
-else
-  call AddUnavailMsg('Tmux navigator')
-  
-  " split navigation without plugin
-  nnoremap <C-J> <C-W><C-J>
-  nnoremap <C-K> <C-W><C-K>
-  nnoremap <C-L> <C-W><C-L>
-  nnoremap <C-H> <C-W><C-H>
-endif
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --tern-completer' }
+let g:ycm_autoclose_preview_window_after_completion = 1
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+nmap <leader>D :YcmCompleter GoToDefinition<CR>
+nmap <leader>* :YcmCompleter GoToReferences<CR>
+nmap <leader>k :YcmCompleter GetDoc<CR>
+let g:ycm_semantic_triggers =  {
+  \   'c' : ['->', '.'],
+  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+  \             're!\[.*\]\s'],
+  \   'ocaml' : ['.', '#'],
+  \   'cpp,objcpp' : ['->', '.', '::'],
+  \   'perl' : ['->'],
+  \   'php' : ['->', '::'],
+  \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
+  \   'ruby' : ['.', '::'],
+  \   'lua' : ['.', ':'],
+  \   'erlang' : [':'],
+  \   'python' : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
+  \ }
+let g:ycm_filetype_specific_completion_to_disable = {
+      \ 'lua' : 1
+      \}
+
+
+Plug 'hail2u/vim-css3-syntax'
+Plug 'othree/html5.vim'
+" readline bindings
+Plug 'vim-utils/vim-husk'
+Plug 'tpope/vim-surround'
+Plug 'moll/vim-bbye'
+Plug 'tomtom/tcomment_vim'
+Plug 'will133/vim-dirdiff'
+Plug 'Yggdroot/indentLine'
+Plug 'ingydotnet/yaml-vim'
+Plug 'hdima/python-syntax'
+Plug 'hynek/vim-python-pep8-indent'
+Plug 'tpope/vim-eunuch'
+" Plug 'tbastos/vim-lua'
+Plug 'roxma/vim-paste-easy'
+" Plug 'metakirby5/codi.vim'
+" Plug 'shougo/vimshell.vim'
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+Plug 'andrewradev/splitjoin.vim'
+" Plug 'joonty/vdebug'
+
+" Plug 'idanarye/vim-vebugger'
+" let g:vebugger_leader='<Leader>z'
+
+" set shiftwidth automatically
+Plug 'tpope/vim-sleuth'
+
+Plug 'junegunn/vim-easy-align'
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+
+" jumping with % for xml tags
+runtime macros/matchit.vim
+
+call plug#end()
 
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
@@ -364,8 +311,9 @@ set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 " set smarttab
-set autoindent
+" set autoindent
 set cindent
+set cinoptions+=(0
 set expandtab
 autocmd FileType * setlocal expandtab
 
@@ -433,10 +381,12 @@ autocmd Filetype python setlocal foldmethod=indent
 autocmd Filetype python setlocal foldlevel=1
 autocmd Filetype python setlocal foldminlines=15
 autocmd Filetype python setlocal foldnestmax=2
-autocmd FileType python nmap <buffer> <leader>b oimport pudb; pudb.set_trace()<C-[>
-autocmd FileType python setlocal tabstop=2
-autocmd FileType python setlocal softtabstop=2
-autocmd FileType python setlocal shiftwidth=2
+autocmd FileType python nmap <buffer> <leader>b Oimport pudb; pudb.set_trace()<C-[>
+autocmd FileType python setlocal tabstop=4
+autocmd FileType python setlocal softtabstop=4
+autocmd FileType python setlocal shiftwidth=4
+
+autocmd FileType lua nmap <buffer> <leader>b Orequire("mobdebug").listen()<C-[>
 
 " restore cursor position on file open
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
@@ -487,11 +437,17 @@ cnoremap w!!! call SudoSaveFile()<CR>
 cnoremap W!!! w !sudo tee % > /dev/null
 
 " edit config files
-command Ev execute 'edit ' . g:path#vimrc
-command Et execute 'edit ' . "~/.tmux.conf"
-command Eb execute 'edit ' . "~/.bashrc"
-command Ep execute 'edit ' . "~/.profile"
-command Ex execute 'edit ' . "~/.Xdefaults"
+command! Ev execute 'edit ' . g:path#vimrc
+command! Et execute 'edit ' . "~/.tmux.conf"
+command! Etd execute 'edit ' . "~/.tmuxinator/default.yml"
+command! Eb execute 'edit ' . "~/.bashrc"
+command! Ep execute 'edit ' . "~/.profile"
+command! Ex execute 'edit ' . "~/.Xresources"
+command! Es execute 'edit ' . "~/git/linux-utils/wmctrl-session-autostart.sh"
+command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
+command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
+command! Ea execute 'edit ' . "~/.config/awesome/rc.lua"
+"command! Eat execute 'edit ' . "~/.config/awesome/themes/"
 
 " fast fullscreen split/revert back
 nnoremap \| <C-W>\|<C-W>_
@@ -512,32 +468,20 @@ command! Ss call SetupSplits()
 " save current buffer automatically
 command! As autocmd CursorHold,CursorHoldI <buffer> update
 
-"""""""""""""""""""""""""""""""""""""
-" WORKAROUND for autopaste mode
-"""""""""""""""""""""""""""""""""""""
-function! WrapForTmux(s)
-  if !exists('$TMUX')
-    return a:s
-  endif
+" split navigation without plugin
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
-  let tmux_start = "\<Esc>Ptmux;"
-  let tmux_end = "\<Esc>\\"
+" disable highlighting
+nnoremap <leader>h :noh l<CR>
 
-  return tmux_start . substitute(a:s, "\<Esc>", "\<Esc>\<Esc>", 'g') . tmux_end
-endfunction
+" remove unneeded spaces
+nnoremap <leader>oc :s/\([[:graph:]]\+\)[ ]\{2,\}/\1 /g<CR>
 
-let &t_SI .= WrapForTmux("\<Esc>[?2004h")
-let &t_EI .= WrapForTmux("\<Esc>[?2004l")
-
-function! XTermPasteBegin()
-  set pastetoggle=<Esc>[201~
-  set paste
-  return ""
-endfunction
-
-inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" POST-OPERATIONS
+" MISC
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call SendMessages()
