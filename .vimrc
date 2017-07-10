@@ -186,7 +186,7 @@ Plug 'mileszs/ack.vim'
 let g:ackprg = 'ag --vimgrep'
 let g:ack_qhandler = "botright copen 3"
 let g:ackpreview = 1
-nnoremap <leader>a :Ack!<Space>''<Left>
+nnoremap <leader>s :Ack!<Space>''<Left>
 
 Plug 'raimondi/delimitmate'
 let delimitMate_matchpairs = '(:),[:],{:},<:>'
@@ -227,6 +227,7 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py --tern-completer' }
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:ycm_python_binary_path = 'python2'
 nmap <leader>d :YcmCompleter GoToDeclaration<CR>
 nmap <leader>D :YcmCompleter GoToDefinition<CR>
 nmap <leader>* :YcmCompleter GoToReferences<CR>
@@ -269,19 +270,35 @@ Plug 'roxma/vim-paste-easy'
 " Plug 'shougo/vimshell.vim'
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 Plug 'andrewradev/splitjoin.vim'
-" Plug 'joonty/vdebug'
+Plug 'michaeljsmith/vim-indent-object'
+
+" Plug 'joonty/vdebug', { 'branch': 'v2-integration' }
+" if !exists('g:vdebug_options')
+"   let g:vdebug_options = {}
+" endif
+" let g:vdebug_options.port = 8172
 
 " Plug 'idanarye/vim-vebugger'
 " let g:vebugger_leader='<Leader>z'
 
 " set shiftwidth automatically
 Plug 'tpope/vim-sleuth'
+" Plug 'ludovicchabant/vim-gutentags'
+
+Plug 'xolox/vim-misc'
+" Plug 'xolox/vim-easytags', { 'commit': 'f5746bdfd9942b00c349e53f3f4917ae73bb6797' }
+Plug 'Wraul/vim-easytags', { 'branch': 'fix-universal-detection' }
+let g:easytags_async = 1
+let g:easytags_file = '~/.vim/tags'
+let g:easytags_autorecurse = 1
+let g:easytags_resolve_links = 1
 
 Plug 'junegunn/vim-easy-align'
 " Start interactive EasyAlign in visual mode (e.g. vipga)
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
+nmap <leader>a gaii
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -318,7 +335,8 @@ set expandtab
 autocmd FileType * setlocal expandtab
 
 " statusline
-set statusline=%t\ %<%m%H%W%q%=%{GetFileDirectory()}\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
+"set statusline=%t\ %<%m%H%W%q%=%{GetFileDirectory()}\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
+set statusline=%F\ %<%m%H%W%q%=\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
 set laststatus=2        " always show status bar
 
 " highlight
@@ -326,20 +344,21 @@ set showmatch           " highlight matching [{()}]
 set hlsearch
 set cursorline
 set colorcolumn=80
-let g:loaded_matchparen = 1
-autocmd BufEnter * :highlight ColorColumn ctermbg=4 ctermfg=none cterm=none
+" let g:loaded_matchparen = 1
+autocmd BufEnter * :highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
 autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none ctermfg=0
 
 " folds
 set foldcolumn=1        " Add a bit extra margin to the left
 
 " misc
+" set iskeyword+=:,::,.
 set encoding=utf-8
 set ignorecase
 set smartcase
 set incsearch
 set scrolloff=999
-set autoread            " autoreload buffer if changes
+" set autoread            " autoreload buffer if changes
 set lazyredraw          " redraw only when we need to.
 set showcmd             " show command in bottom bar
 set wildmenu            " visual autocomplete for command menu
@@ -356,7 +375,7 @@ set omnifunc=syntaxcomplete#Complete
 setlocal shortmess+=I   " hide intro message on start
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.ropeproject/*
 set wildignore+=Session.vim,*.pyc
-set updatetime=1000
+set updatetime=2000
 
 " gui
 if has('gui_running')
@@ -386,7 +405,10 @@ autocmd FileType python setlocal tabstop=4
 autocmd FileType python setlocal softtabstop=4
 autocmd FileType python setlocal shiftwidth=4
 
-autocmd FileType lua nmap <buffer> <leader>b Orequire("mobdebug").listen()<C-[>
+autocmd FileType lua nmap <buffer>
+      \ <leader>b Oif require("os").getenv("DISPLAY") ~= ":0.0"
+      \ then require("debugger")() end<C-[>
+      " \ then require("mobdebug").start() end<C-[>
 
 " restore cursor position on file open
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
@@ -437,6 +459,7 @@ cnoremap w!!! call SudoSaveFile()<CR>
 cnoremap W!!! w !sudo tee % > /dev/null
 
 " edit config files
+command! Rv execute 'source ' . g:path#vimrc
 command! Ev execute 'edit ' . g:path#vimrc
 command! Et execute 'edit ' . "~/.tmux.conf"
 command! Etd execute 'edit ' . "~/.tmuxinator/default.yml"
@@ -447,7 +470,7 @@ command! Es execute 'edit ' . "~/git/linux-utils/wmctrl-session-autostart.sh"
 command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
 command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
 command! Ea execute 'edit ' . "~/.config/awesome/rc.lua"
-"command! Eat execute 'edit ' . "~/.config/awesome/themes/"
+command! Eat execute 'edit ' . "~/.config/awesome/themes/copland/theme.lua"
 
 " fast fullscreen split/revert back
 nnoremap \| <C-W>\|<C-W>_
@@ -475,10 +498,13 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
 " disable highlighting
-nnoremap <leader>h :noh l<CR>
+nnoremap <leader>h :nohl<CR>
 
 " remove unneeded spaces
 nnoremap <leader>oc :s/\([[:graph:]]\+\)[ ]\{2,\}/\1 /g<CR>
+
+" show linenumbers
+nnoremap <leader>n :set number!<CR>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
