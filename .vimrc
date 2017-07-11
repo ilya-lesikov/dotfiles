@@ -49,9 +49,40 @@ function! SendMessages()
   endif
 endfunction
 
-function! SetColorScheme(colorscheme, ...)
+function! SetColorScheme(colors, ...)
+  " first arg: gui, 256, or tty
   " second optional arg: background (default = dark)
-  execute 'colorscheme ' . a:colorscheme
+
+  " colors for :terminal must be set explicitly
+  let g:terminal_color_0  = '#2e3436'
+  let g:terminal_color_1  = '#cc0000'
+  let g:terminal_color_2  = '#4e9a06'
+  let g:terminal_color_3  = '#c4a000'
+  let g:terminal_color_4  = '#3465a4'
+  let g:terminal_color_5  = '#75507b'
+  let g:terminal_color_6  = '#0b939b'
+  let g:terminal_color_7  = '#d3d7cf'
+  let g:terminal_color_8  = '#555753'
+  let g:terminal_color_9  = '#ef2929'
+  let g:terminal_color_10 = '#8ae234'
+  let g:terminal_color_11 = '#fce94f'
+  let g:terminal_color_12 = '#729fcf'
+  let g:terminal_color_13 = '#ad7fa8'
+  let g:terminal_color_14 = '#00f5e9'
+  let g:terminal_color_15 = '#eeeeec'
+
+  if a:colors == '256' || a:colors == 'gui'
+    set t_8f=[38;2;%lu;%lu;%lum
+    set t_8b=[48;2;%lu;%lu;%lum
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
+    execute 'colorscheme gruvbox'
+    let g:gruvbox_italic=1
+
+    set termguicolors
+  elseif a:colors == 'tty'
+    execute 'colorscheme desert'
+  endif
 
   if exists('a:1')
     let &background = a:1
@@ -136,8 +167,14 @@ endfunction
 " VARS
 """"""""""""""""""""""""""""""""""""""""
 
-let g:path#vim_user_dir = expand('~/.vim')
-let g:path#vimrc = expand('~/.vimrc')
+if has('nvim')
+  let g:path#vim_user_dir = expand('~/.config/nvim')
+  let g:path#vimrc = expand('~/.config/nvim/init.vim')
+else
+  let g:path#vim_user_dir = expand('~/.vim')
+  let g:path#vimrc = expand('~/.vimrc')
+endif
+
 
 let g:path#autoload = expand(g:path#vim_user_dir . '/autoload')
 let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
@@ -169,9 +206,14 @@ Plug 'morhetz/gruvbox'
 
 Plug 'scrooloose/syntastic'
 let g:syntastic_aggregate_errors = 1
+let g:syntastic_echo_current_error = 1
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_jump = 3
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_loc_list_height = 5
 "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
 let g:syntastic_python_checkers = ['python']
-let g:syntastic_vim_checkers = ['vint']
+" let g:syntastic_vim_checkers = ['vint']
 let g:syntastic_sh_checkers = ['sh', 'shellcheck']
 let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_spec_checkers = ['']
@@ -202,6 +244,9 @@ let g:tagbar_compact = 1
 nnoremap <leader>E :TagbarToggle<CR>
 "autocmd FileType python nested :call tagbar#autoopen(0)
 
+if has('nvim')
+  Plug 'rbgrouleff/bclose.vim'
+endif
 Plug 'Shougo/unite.vim'
 nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
 
@@ -214,9 +259,15 @@ nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
 "       \ 'preview_action': 'switch',
 "       \ })
 
-Plug 'francoiscabrol/ranger.vim'
+" Plug 'airodactyl/neovim-ranger'
+" Plug 'rbgrouleff/bclose.vim'
+Plug 'bititanb/ranger.vim'
 let g:ranger_map_keys = 0
-map <leader>e :Ranger<CR>
+" function! RangerOpen()
+"   execute 'tabnew'
+"   execute 'Ranger'
+" endfunction
+nmap <leader>e :Ranger<CR>
 
 Plug 'dhruvasagar/vim-table-mode'
 let g:table_mode_corner='|'
@@ -257,20 +308,27 @@ Plug 'othree/html5.vim'
 Plug 'vim-utils/vim-husk'
 Plug 'tpope/vim-surround'
 Plug 'moll/vim-bbye'
-Plug 'tomtom/tcomment_vim'
+" Plug 'tomtom/tcomment_vim'
 Plug 'will133/vim-dirdiff'
-Plug 'Yggdroot/indentLine'
 Plug 'ingydotnet/yaml-vim'
 Plug 'hdima/python-syntax'
 Plug 'hynek/vim-python-pep8-indent'
 Plug 'tpope/vim-eunuch'
 " Plug 'tbastos/vim-lua'
 Plug 'roxma/vim-paste-easy'
-" Plug 'metakirby5/codi.vim'
-" Plug 'shougo/vimshell.vim'
-Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+" Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 Plug 'andrewradev/splitjoin.vim'
 Plug 'michaeljsmith/vim-indent-object'
+Plug 'gioele/vim-autoswap'
+
+Plug 'tyru/caw.vim'
+let g:caw_hatpos_skip_blank_line = 1
+let g:caw_wrap_skip_blank_line = 1
+
+Plug 'raymond-w-ko/vim-lua-indent'
+
+Plug 'Yggdroot/indentLine'
+let g:indentLine_char = '┊'
 
 " Plug 'joonty/vdebug', { 'branch': 'v2-integration' }
 " if !exists('g:vdebug_options')
@@ -285,13 +343,12 @@ Plug 'michaeljsmith/vim-indent-object'
 Plug 'tpope/vim-sleuth'
 " Plug 'ludovicchabant/vim-gutentags'
 
-Plug 'xolox/vim-misc'
-" Plug 'xolox/vim-easytags', { 'commit': 'f5746bdfd9942b00c349e53f3f4917ae73bb6797' }
-Plug 'Wraul/vim-easytags', { 'branch': 'fix-universal-detection' }
-let g:easytags_async = 1
-let g:easytags_file = '~/.vim/tags'
-let g:easytags_autorecurse = 1
-let g:easytags_resolve_links = 1
+" Plug 'xolox/vim-misc'
+" Plug 'Wraul/vim-easytags', { 'branch': 'fix-universal-detection' }
+" let g:easytags_async = 1
+" let g:easytags_file = '~/.vim/tags'
+" let g:easytags_autorecurse = 1
+" let g:easytags_resolve_links = 1
 
 Plug 'junegunn/vim-easy-align'
 " Start interactive EasyAlign in visual mode (e.g. vipga)
@@ -334,6 +391,12 @@ set cinoptions+=(0
 set expandtab
 autocmd FileType * setlocal expandtab
 
+" matchparen plugin (CARE it can slow vim TOO MUCH)
+" when loaded_matchparen = 1 then the plugin is disabled
+let g:loaded_matchparen = 1
+" let g:matchparen_timeout = 200
+" let g:matchparen_insert_timeout = 200
+
 " statusline
 "set statusline=%t\ %<%m%H%W%q%=%{GetFileDirectory()}\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
 set statusline=%F\ %<%m%H%W%q%=\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
@@ -342,14 +405,44 @@ set laststatus=2        " always show status bar
 " highlight
 set showmatch           " highlight matching [{()}]
 set hlsearch
+" WARN cursorline might slow vim down A LOT
 set cursorline
 set colorcolumn=80
-" let g:loaded_matchparen = 1
 autocmd BufEnter * :highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
 autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none ctermfg=0
 
 " folds
 set foldcolumn=1        " Add a bit extra margin to the left
+
+" colors
+" let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+" let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+if has('gui_running')
+  try
+    call SetColorScheme('gui')
+  catch
+    call AddUnavailMsg('Gui colorscheme')
+    call SetColorScheme('tty')
+  endtry
+
+  try
+    set guifont=monospace\ 12
+  catch
+    call AddUnavailMsg('Guifont')
+    set guifont=DejaVu\ Sans\ Mono\ 12
+  endtry
+else
+  if IsTerm256Colors()
+    try
+      call SetColorScheme('256')
+    catch
+      call AddUnavailMsg('Terminal colorscheme')
+      call SetColorScheme('tty')
+    endtry
+  else
+    call SetColorScheme('tty')
+  endif
+endif
 
 " misc
 " set iskeyword+=:,::,.
@@ -358,7 +451,7 @@ set ignorecase
 set smartcase
 set incsearch
 set scrolloff=999
-" set autoread            " autoreload buffer if changes
+set autoread            " autoreload buffer if changes
 set lazyredraw          " redraw only when we need to.
 set showcmd             " show command in bottom bar
 set wildmenu            " visual autocomplete for command menu
@@ -417,35 +510,6 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
 " delete trailing spaces
 autocmd BufWrite * call DeleteTrailingWS()
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" COLORSCHEME, FONTS
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-if has('gui_running')
-  try
-    call SetColorScheme('gruvbox')
-  catch
-    call SetColorScheme('desert')
-  endtry
-
-  try
-    set guifont=Source\ Code\ Pro\ 10
-  catch
-    call AddUnavailMsg('Guifont')
-    set guifont=DejaVu\ Sans\ Mono\ 10
-  endtry
-else
-  if IsTerm256Colors()
-    try
-      call SetColorScheme('gruvbox')
-    catch
-      call SetColorScheme('desert')
-    endtry
-  else
-    call SetColorScheme('desert')
-  endif
-endif
-
 """"""""""""""""""""""""""""""""""""""""
 " MAPPINGS, COMMANDS
 """"""""""""""""""""""""""""""""""""""""
@@ -461,11 +525,12 @@ cnoremap W!!! w !sudo tee % > /dev/null
 " edit config files
 command! Rv execute 'source ' . g:path#vimrc
 command! Ev execute 'edit ' . g:path#vimrc
-command! Et execute 'edit ' . "~/.tmux.conf"
-command! Etd execute 'edit ' . "~/.tmuxinator/default.yml"
+command! Em execute 'edit ' . "~/.tmux.conf"
+command! Ems execute 'edit ' . "~/.tmuxinator/default.yml"
 command! Eb execute 'edit ' . "~/.bashrc"
 command! Ep execute 'edit ' . "~/.profile"
 command! Ex execute 'edit ' . "~/.Xresources"
+command! Et execute 'edit ' . "~/.config/alacritty/alacritty.yml"
 command! Es execute 'edit ' . "~/git/linux-utils/wmctrl-session-autostart.sh"
 command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
 command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
@@ -505,7 +570,6 @@ nnoremap <leader>oc :s/\([[:graph:]]\+\)[ ]\{2,\}/\1 /g<CR>
 
 " show linenumbers
 nnoremap <leader>n :set number!<CR>
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MISC
