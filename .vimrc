@@ -49,48 +49,6 @@ function! SendMessages()
   endif
 endfunction
 
-function! SetColorScheme(colors, ...)
-  " first arg: gui, 256, or tty
-  " second optional arg: background (default = dark)
-
-  " colors for :terminal must be set explicitly
-  let g:terminal_color_0  = '#2e3436'
-  let g:terminal_color_1  = '#cc0000'
-  let g:terminal_color_2  = '#4e9a06'
-  let g:terminal_color_3  = '#c4a000'
-  let g:terminal_color_4  = '#3465a4'
-  let g:terminal_color_5  = '#75507b'
-  let g:terminal_color_6  = '#0b939b'
-  let g:terminal_color_7  = '#d3d7cf'
-  let g:terminal_color_8  = '#555753'
-  let g:terminal_color_9  = '#ef2929'
-  let g:terminal_color_10 = '#8ae234'
-  let g:terminal_color_11 = '#fce94f'
-  let g:terminal_color_12 = '#729fcf'
-  let g:terminal_color_13 = '#ad7fa8'
-  let g:terminal_color_14 = '#00f5e9'
-  let g:terminal_color_15 = '#eeeeec'
-
-  if a:colors == '256' || a:colors == 'gui'
-    set t_8f=[38;2;%lu;%lu;%lum
-    set t_8b=[48;2;%lu;%lu;%lum
-    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-
-    execute 'colorscheme gruvbox'
-    let g:gruvbox_italic=1
-
-    set termguicolors
-  elseif a:colors == 'tty'
-    execute 'colorscheme desert'
-  endif
-
-  if exists('a:1')
-    let &background = a:1
-  else
-    set background=dark
-  endif
-endfunction
-
 function! IsFeatAvail(feature, msg)
   if has(a:feature)
     return 1
@@ -202,7 +160,62 @@ endif
 call plug#begin(g:path#plug_man_dir)
 
 " theme
-Plug 'morhetz/gruvbox'
+" Plug 'morhetz/gruvbox'
+Plug 'bititanb/gruvbox'
+let g:gruvbox_contrast_dark='none'
+let g:gruvbox_italic=1
+Plug 'joshdick/onedark.vim'
+let g:onedark_terminal_italics = 1
+Plug 'rakr/vim-one'
+let g:one_allow_italics = 1
+Plug 'frankier/neovim-colors-solarized-truecolor-only'
+Plug 'KeitaNakamura/neodark.vim'
+let g:neodark#terminal_transparent = 1
+" Plug 'MaxSt/FlatColor'
+Plug 'icymind/NeoSolarized'
+let g:neosolarized_italic = 1
+Plug 'jacoborus/tender.vim'
+function! SetColorScheme(colors, ...)
+  " first arg: gui, 256, or tty
+  " second optional arg: background (default = dark)
+
+  " colors for :terminal must be set explicitly
+  " let g:terminal_color_0  = '#2e3436'
+  " let g:terminal_color_1  = '#cc0000'
+  " let g:terminal_color_2  = '#4e9a06'
+  " let g:terminal_color_3  = '#c4a000'
+  " let g:terminal_color_4  = '#3465a4'
+  " let g:terminal_color_5  = '#75507b'
+  " let g:terminal_color_6  = '#0b939b'
+  " let g:terminal_color_7  = '#d3d7cf'
+  " let g:terminal_color_8  = '#555753'
+  " let g:terminal_color_9  = '#ef2929'
+  " let g:terminal_color_10 = '#8ae234'
+  " let g:terminal_color_11 = '#fce94f'
+  " let g:terminal_color_12 = '#729fcf'
+  " let g:terminal_color_13 = '#ad7fa8'
+  " let g:terminal_color_14 = '#00f5e9'
+  " let g:terminal_color_15 = '#eeeeec'
+
+  if a:colors == '256' || a:colors == 'gui'
+    set t_8f=[38;2;%lu;%lu;%lum
+    set t_8b=[48;2;%lu;%lu;%lum
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+    set termguicolors
+
+    execute 'colorscheme gruvbox'
+    " autocmd BufEnter * highlight Normal guibg=0
+  elseif a:colors == 'tty'
+    execute 'colorscheme desert'
+  endif
+
+  if exists('a:1')
+    let &background = a:1
+  else
+    set background=dark
+  endif
+endfunction
+
 
 Plug 'scrooloose/syntastic'
 let g:syntastic_aggregate_errors = 1
@@ -212,10 +225,10 @@ let g:syntastic_auto_jump = 3
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_loc_list_height = 5
 "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-let g:syntastic_python_checkers = ['python']
+" let g:syntastic_python_checkers = ['python']
 " let g:syntastic_vim_checkers = ['vint']
-let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-let g:syntastic_javascript_checkers = ['eslint']
+" let g:syntastic_sh_checkers = ['sh', 'shellcheck']
+" let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_spec_checkers = ['']
 
 Plug 'SirVer/ultisnips'
@@ -302,17 +315,12 @@ let g:ycm_filetype_specific_completion_to_disable = {
       \}
 
 
-Plug 'hail2u/vim-css3-syntax'
-Plug 'othree/html5.vim'
 " readline bindings
 Plug 'vim-utils/vim-husk'
 Plug 'tpope/vim-surround'
 Plug 'moll/vim-bbye'
 " Plug 'tomtom/tcomment_vim'
 Plug 'will133/vim-dirdiff'
-Plug 'ingydotnet/yaml-vim'
-Plug 'hdima/python-syntax'
-Plug 'hynek/vim-python-pep8-indent'
 Plug 'tpope/vim-eunuch'
 " Plug 'tbastos/vim-lua'
 Plug 'roxma/vim-paste-easy'
@@ -320,12 +328,20 @@ Plug 'roxma/vim-paste-easy'
 Plug 'andrewradev/splitjoin.vim'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'gioele/vim-autoswap'
+" Plug 'yuttie/comfortable-motion.vim'
+
+Plug 'raymond-w-ko/vim-lua-indent'
+" Plug 'hail2u/vim-css3-syntax'
+" Plug 'othree/html5.vim'
+" Plug 'ingydotnet/yaml-vim'
+" Plug 'hdima/python-syntax'
+" Plug 'hynek/vim-python-pep8-indent'
+Plug 'sheerun/vim-polyglot'
+let g:polyglot_disabled = ['lua']
 
 Plug 'tyru/caw.vim'
 let g:caw_hatpos_skip_blank_line = 1
 let g:caw_wrap_skip_blank_line = 1
-
-Plug 'raymond-w-ko/vim-lua-indent'
 
 Plug 'Yggdroot/indentLine'
 let g:indentLine_char = '┊'
@@ -390,6 +406,7 @@ set cindent
 set cinoptions+=(0
 set expandtab
 autocmd FileType * setlocal expandtab
+" autocmd BufEnter * silent! lcd %:p:h
 
 " matchparen plugin (CARE it can slow vim TOO MUCH)
 " when loaded_matchparen = 1 then the plugin is disabled
@@ -570,6 +587,16 @@ nnoremap <leader>oc :s/\([[:graph:]]\+\)[ ]\{2,\}/\1 /g<CR>
 
 " show linenumbers
 nnoremap <leader>n :set number!<CR>
+
+" leave insert mode in terminal
+tnoremap <Esc> <C-\><C-n>
+
+" fast load session from current dir
+function! LoadSession()
+  let l:pwd = getcwd()
+  execute 'source ' . l:pwd . '/Session.vim'
+endfunction
+command! Ls call LoadSession()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MISC
