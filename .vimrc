@@ -228,7 +228,7 @@ let g:syntastic_loc_list_height = 5
 " let g:syntastic_python_checkers = ['python']
 " let g:syntastic_vim_checkers = ['vint']
 " let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-" let g:syntastic_javascript_checkers = ['eslint']
+let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_spec_checkers = ['']
 
 Plug 'SirVer/ultisnips'
@@ -243,14 +243,17 @@ let g:ack_qhandler = "botright copen 3"
 let g:ackpreview = 1
 nnoremap <leader>s :Ack!<Space>''<Left>
 
-Plug 'raimondi/delimitmate'
-let delimitMate_matchpairs = '(:),[:],{:},<:>'
-let delimitMate_nesting_quotes = ['"','`',"'"]
-let delimitMate_expand_cr = 1
-let delimitMate_expand_space = 1
-let delimitMate_expand_inside_quotes = 1
-let delimitMate_jump_expansion = 1
-let delimitMate_balance_matchpairs = 1
+" Plug 'raimondi/delimitmate'
+" let delimitMate_matchpairs = '(:),[:],{:},<:>'
+" let delimitMate_nesting_quotes = ['"','`',"'"]
+" let delimitMate_expand_cr = 1
+" let delimitMate_expand_space = 1
+" let delimitMate_expand_inside_quotes = 1
+" let delimitMate_jump_expansion = 1
+" let delimitMate_balance_matchpairs = 1
+
+Plug 'jiangmiao/auto-pairs'
+let g:AutoPairsShortcutJump = '<s-tab>'
 
 Plug 'majutsushi/tagbar'
 let g:tagbar_compact = 1
@@ -515,6 +518,8 @@ autocmd FileType python setlocal tabstop=4
 autocmd FileType python setlocal softtabstop=4
 autocmd FileType python setlocal shiftwidth=4
 
+autocmd FileType javascript nmap <buffer> <leader>b Odebugger;<C-[>
+
 autocmd FileType lua nmap <buffer>
       \ <leader>b Oif require("os").getenv("DISPLAY") ~= ":0.0"
       \ then require("debugger")() end<C-[>
@@ -549,6 +554,7 @@ command! Ep execute 'edit ' . "~/.profile"
 command! Ex execute 'edit ' . "~/.Xresources"
 command! Et execute 'edit ' . "~/.config/alacritty/alacritty.yml"
 command! Es execute 'edit ' . "~/git/linux-utils/wmctrl-session-autostart.sh"
+command! Est execute 'edit ' . "~/git/linux-utils/wmctrl-session-tmux.sh"
 command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
 command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
 command! Ea execute 'edit ' . "~/.config/awesome/rc.lua"
