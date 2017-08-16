@@ -218,12 +218,12 @@ endfunction
 
 
 Plug 'scrooloose/syntastic'
-let g:syntastic_aggregate_errors = 1
+" let g:syntastic_aggregate_errors = 1
 let g:syntastic_echo_current_error = 1
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_jump = 3
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_loc_list_height = 5
+let g:syntastic_auto_jump = 0
+" let g:syntastic_auto_loc_list = 1
+" let g:syntastic_loc_list_height = 5
 "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
 " let g:syntastic_python_checkers = ['python']
 " let g:syntastic_vim_checkers = ['vint']
@@ -342,6 +342,8 @@ Plug 'raymond-w-ko/vim-lua-indent'
 Plug 'sheerun/vim-polyglot'
 let g:polyglot_disabled = ['lua']
 
+Plug 'dkprice/vim-easygrep'
+
 Plug 'tyru/caw.vim'
 let g:caw_hatpos_skip_blank_line = 1
 let g:caw_wrap_skip_blank_line = 1
@@ -359,7 +361,13 @@ let g:indentLine_char = '┊'
 " let g:vebugger_leader='<Leader>z'
 
 " set shiftwidth automatically
-Plug 'tpope/vim-sleuth'
+" Plug 'tpope/vim-sleuth'
+Plug 'roryokane/detectindent'
+augroup DetectIndent
+  autocmd!
+  autocmd BufReadPost *  DetectIndent
+augroup END
+
 " Plug 'ludovicchabant/vim-gutentags'
 
 " Plug 'xolox/vim-misc'
