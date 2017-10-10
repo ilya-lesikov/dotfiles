@@ -162,7 +162,7 @@ call plug#begin(g:path#plug_man_dir)
 " theme
 " Plug 'morhetz/gruvbox'
 Plug 'bititanb/gruvbox'
-let g:gruvbox_contrast_dark='none'
+"let g:gruvbox_contrast_dark='none'
 let g:gruvbox_italic=1
 Plug 'joshdick/onedark.vim'
 let g:onedark_terminal_italics = 1
@@ -217,19 +217,42 @@ function! SetColorScheme(colors, ...)
 endfunction
 
 
-Plug 'scrooloose/syntastic'
+" Plug 'scrooloose/syntastic'
+" let g:ycm_show_diagnostics_ui = 0
 " let g:syntastic_aggregate_errors = 1
-let g:syntastic_echo_current_error = 1
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_jump = 0
-" let g:syntastic_auto_loc_list = 1
-" let g:syntastic_loc_list_height = 5
-"let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-" let g:syntastic_python_checkers = ['python']
-" let g:syntastic_vim_checkers = ['vint']
-" let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-let g:syntastic_javascript_checkers = ['eslint']
-let g:syntastic_spec_checkers = ['']
+" let g:syntastic_echo_current_error = 1
+" let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_jump = 0
+" " let g:syntastic_auto_loc_list = 1
+" " let g:syntastic_loc_list_height = 5
+" "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
+" " let g:syntastic_python_checkers = ['python']
+" " let g:syntastic_vim_checkers = ['vint']
+" " let g:syntastic_sh_checkers = ['sh', 'shellcheck']
+" let g:syntastic_c_checkers = ['clang_check', 'clang_tidy']
+" let g:syntastic_cpp_checkers = ['clang_check', 'clang_tidy', 'cppcheck', 'cpplint',]
+" let g:syntastic_cpp_cpplint_exec = "cpplint"
+" let g:syntastic_javascript_checkers = ['eslint']
+" let g:syntastic_spec_checkers = ['']
+
+Plug 'w0rp/ale'
+      " \ 'cpp'        : ['clangcheck', 'cppcheck', 'cpplint'],
+let g:ale_linters = {
+      \ 'cpp'        : ['clangtidy', 'cpplint'],
+      \ 'c'          : ['clangtidy'],
+      \ 'javascript' : ['eslint'],
+      \ 'python'     : ['pylint', 'flake8', 'autopep8'],
+      \ }
+let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
+let g:ale_cpp_clangtidy_options = '-std=c++11'
+" let g:ale_cpp_clangtidy_checks = []
+let g:ale_echo_msg_format = "%linter% %s"
+let g:ale_cpp_cpplint_options = '--linelength=120 --filter=-readability/todo,-whitespace/operators'
+autocmd BufEnter PKGBUILD,.env
+      \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
+" let g:ale_c_cppcheck_options = '--enable=style --suppress="unusedStructMember" --suppress="unreadVariable"'
+nmap <silent> <leader>lp <Plug>(ale_previous_wrap)
+nmap <silent> <leader>ln <Plug>(ale_next_wrap)
 
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
@@ -239,9 +262,12 @@ let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
 
 Plug 'mileszs/ack.vim'
 let g:ackprg = 'ag --vimgrep'
-let g:ack_qhandler = "botright copen 3"
+" let g:ack_qhandler = "botright copen 3"
+let g:ack_qhandler = "botright copen 10"
 let g:ackpreview = 1
+let g:ackhighlight = 1
 nnoremap <leader>s :Ack!<Space>''<Left>
+
 
 " Plug 'raimondi/delimitmate'
 " let delimitMate_matchpairs = '(:),[:],{:},<:>'
@@ -252,8 +278,10 @@ nnoremap <leader>s :Ack!<Space>''<Left>
 " let delimitMate_jump_expansion = 1
 " let delimitMate_balance_matchpairs = 1
 
-Plug 'jiangmiao/auto-pairs'
-let g:AutoPairsShortcutJump = '<s-tab>'
+" Plug 'jiangmiao/auto-pairs'
+" let g:AutoPairsShortcutJump = '<s-tab>'
+" let g:AutoPairsFlyMode = 1
+Plug 'ervandew/matchem'
 
 Plug 'majutsushi/tagbar'
 let g:tagbar_compact = 1
@@ -263,8 +291,12 @@ nnoremap <leader>E :TagbarToggle<CR>
 if has('nvim')
   Plug 'rbgrouleff/bclose.vim'
 endif
-Plug 'Shougo/unite.vim'
-nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
+" Plug 'Shougo/unite.vim'
+" nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
+Plug 'Shougo/denite.nvim'
+      " \ ['ag', "--ignore=/third_party/", "--ignore=/build/",
+nnoremap <C-P> :Denite -smartcase file_rec<CR>
+" -smartcase
 
 " Plug 'Shougo/vimfiler.vim'
 " let g:vimfiler_as_default_explorer = 1
@@ -290,32 +322,81 @@ let g:table_mode_corner='|'
 
 "Plug 'sbdchd/neoformat'
 
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --tern-completer' }
+" Plug 'Valloric/YouCompleteMe', { 'do': './install.py --tern-completer --clang-completer' }
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
+let g:ycm_confirm_extra_conf = 0
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:ycm_show_diagnostics_ui = 0
+let g:ycm_max_num_candidates = 100
+let g:ycm_complete_in_comments = 1
 let g:ycm_python_binary_path = 'python2'
-nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+" nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+nmap <leader>d :YcmCompleter GoTo<CR>
 nmap <leader>D :YcmCompleter GoToDefinition<CR>
 nmap <leader>* :YcmCompleter GoToReferences<CR>
 nmap <leader>k :YcmCompleter GetDoc<CR>
+nmap <leader>t :YcmCompleter GetType<CR>
 let g:ycm_semantic_triggers =  {
-  \   'c' : ['->', '.'],
-  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-  \             're!\[.*\]\s'],
-  \   'ocaml' : ['.', '#'],
+  \   'c'          : ['->', '.'],
+  \   'objc'       : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s', 're!\[.*\]\s'],
+  \   'ocaml'      : ['.', '#'],
   \   'cpp,objcpp' : ['->', '.', '::'],
-  \   'perl' : ['->'],
-  \   'php' : ['->', '::'],
+  \   'perl'       : ['->'],
+  \   'php'        : ['->', '::'],
+  \   'ruby'       : ['.', '::'],
+  \   'lua'        : ['.', ':'],
+  \   'erlang'     : [':'],
+  \   'python'     : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
   \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
-  \   'ruby' : ['.', '::'],
-  \   'lua' : ['.', ':'],
-  \   'erlang' : [':'],
-  \   'python' : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
   \ }
 let g:ycm_filetype_specific_completion_to_disable = {
       \ 'lua' : 1
       \}
+
+Plug 'Shougo/echodoc.vim'
+
+" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+" let g:deoplete#enable_at_startup = 1
+" autocmd CompleteDone * pclose!
+" inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
+" inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
+" <CR>: close popup and save indent.
+" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+" function! s:my_cr_function() abort
+"   return deoplete#close_popup() . "\<CR>"
+" endfunction
+" Plug 'Shougo/neco-vim'
+" Plug 'Shougo/neoinclude.vim'
+" Plug 'ujihisa/neco-look'
+" Plug 'zchee/deoplete-jedi'
+" Plug 'tweekmonster/deoplete-clang2'
+" Plug 'Shougo/context_filetype.vim'
+
+" Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+
+" Plug 'Shougo/denite.nvim'
+" let g:LanguageClient_serverCommands = {
+"     \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+"     \ 'javascript': ['/opt/javascript-typescript-langserver/lib/language-server-stdio.js'],
+"     \ 'python': ['pyls'],
+"     \ }
+
+" " Automatically start language servers.
+" let g:LanguageClient_autoStart = 1
+
+" nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
+" nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
+" nnoremap <silent> <F2> :call LanguageClient_textDocument_rename()<CR>
+
+"let g:deoplete#omni#input_patterns = {}
+"let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
+" let g:deoplete#sources#jedi#show_docstring = 1
+" let g:deoplete#sources#jedi#enable_cache = 1
+
+" Plug 'carlitux/deoplete-ternjs'
+" Plug 'zchee/deoplete-jedi'
 
 
 " readline bindings
@@ -339,17 +420,42 @@ Plug 'raymond-w-ko/vim-lua-indent'
 " Plug 'ingydotnet/yaml-vim'
 " Plug 'hdima/python-syntax'
 " Plug 'hynek/vim-python-pep8-indent'
+Plug 'kompowiec/CBOT.vim'
 Plug 'sheerun/vim-polyglot'
 let g:polyglot_disabled = ['lua']
 
-Plug 'dkprice/vim-easygrep'
+" Plug 'dkprice/vim-easygrep'
+" let g:EasyGrepBinary=1
+" let g:EasyGrepIgnoreCase=0
+Plug 'brooth/far.vim'
+let g:far#preview_window_layout='right'
+let g:far#window_layout='tab'
+function! FarClear()
+  let n = bufnr('$')
+  while n > 0
+    if getbufvar(n, '&ft') == 'far_vim'
+      exe 'bd ' . n
+    endif
+    let n -= 1
+  endwhile
+endfun
 
+" only for 'sexy' multiline comments (<leader>cs)
+" and usual multiline (<lead>cm) + some automatic stuff
+Plug 'scrooloose/nerdcommenter'
+let g:NERDSpaceDelims = 1
+" For all the other comments
 Plug 'tyru/caw.vim'
 let g:caw_hatpos_skip_blank_line = 1
 let g:caw_wrap_skip_blank_line = 1
 
 Plug 'Yggdroot/indentLine'
 let g:indentLine_char = '┊'
+
+Plug 'henrik/vim-indexed-search'
+" Plug '907th/vim-auto-save'
+" let g:auto_save_silent = 1
+" Plug 'haya14busa/vim-asterisk'
 
 " Plug 'joonty/vdebug', { 'branch': 'v2-integration' }
 " if !exists('g:vdebug_options')
@@ -389,15 +495,25 @@ runtime macros/matchit.vim
 
 call plug#end()
 
+call denite#custom#var('file_rec', 'command',
+      \ ['ag',
+      \ '--follow', '--nocolor', '--nogroup', '-g', ''])
+
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
 """"""""""""""""""""""""""""""""""""""""
 
 " language (let it be in the beginning)
 set langmenu=none
-language messages en_US.utf8
+language en_US.utf8
 
 filetype plugin indent on
+
+" russian
+set keymap=russian-jcukenwin
+set iminsert=0
+set imsearch=-1
+set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
 " FIX lag in terminal vim
 set timeoutlen=1000
@@ -417,6 +533,8 @@ set cindent
 set cinoptions+=(0
 set expandtab
 autocmd FileType * setlocal expandtab
+autocmd FileType make setlocal noexpandtab
+autocmd FileType cbot setlocal noexpandtab
 " autocmd BufEnter * silent! lcd %:p:h
 
 " matchparen plugin (CARE it can slow vim TOO MUCH)
@@ -433,11 +551,15 @@ set laststatus=2        " always show status bar
 " highlight
 set showmatch           " highlight matching [{()}]
 set hlsearch
+set inccommand=nosplit
 " WARN cursorline might slow vim down A LOT
 set cursorline
 set colorcolumn=80
 autocmd BufEnter * :highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
 autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none ctermfg=0
+
+" filetype detect
+autocmd BufNewFile,BufRead *.cbot.txt,*.cb.txt :set filetype=cbot
 
 " folds
 set foldcolumn=1        " Add a bit extra margin to the left
@@ -497,6 +619,7 @@ setlocal shortmess+=I   " hide intro message on start
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.ropeproject/*
 set wildignore+=Session.vim,*.pyc
 set updatetime=2000
+set completeopt-=preview
 
 " gui
 if has('gui_running')
@@ -528,6 +651,8 @@ autocmd FileType python setlocal shiftwidth=4
 
 autocmd FileType javascript nmap <buffer> <leader>b Odebugger;<C-[>
 
+autocmd FileType c,cpp nmap <buffer> <leader>b Oraise(SIGTRAP);<C-[>
+
 autocmd FileType lua nmap <buffer>
       \ <leader>b Oif require("os").getenv("DISPLAY") ~= ":0.0"
       \ then require("debugger")() end<C-[>
@@ -538,7 +663,7 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
       \ exe "normal! g`\"" | endif
 
 " delete trailing spaces
-autocmd BufWrite * call DeleteTrailingWS()
+autocmd BufWritePre * call DeleteTrailingWS()
 
 """"""""""""""""""""""""""""""""""""""""
 " MAPPINGS, COMMANDS
@@ -588,10 +713,10 @@ command! Ss call SetupSplits()
 command! As autocmd CursorHold,CursorHoldI <buffer> update
 
 " split navigation without plugin
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+" nnoremap <C-J> <C-W><C-J>
+" nnoremap <C-K> <C-W><C-K>
+" nnoremap <C-L> <C-W><C-L>
+" nnoremap <C-H> <C-W><C-H>
 
 " disable highlighting
 nnoremap <leader>h :nohl<CR>
@@ -601,6 +726,9 @@ nnoremap <leader>oc :s/\([[:graph:]]\+\)[ ]\{2,\}/\1 /g<CR>
 
 " show linenumbers
 nnoremap <leader>n :set number!<CR>
+
+" replace last yanked string with ...
+nnoremap <leader>r :%s/<C-R>"//gc<Left><Left><Left>
 
 " leave insert mode in terminal
 tnoremap <Esc> <C-\><C-n>
