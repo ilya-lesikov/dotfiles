@@ -1,6 +1,16 @@
 """"""""""""""""""""""""""""""""""""""""
 " FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""
+" vimdiff auto diffupdate
+augroup AutoDiffUpdate
+  au!
+  autocmd InsertLeave * if &diff | diffupdate | let b:old_changedtick = b:changedtick | endif
+  autocmd TextChanged *
+        \ if &diff &&
+        \    (!exists('b:old_changedtick') || b:old_changedtick != b:changedtick) |
+        \   let b:old_changedtick = b:changedtick | diffupdate |
+        \ endif
+augroup END
 
 function! GetFileDirectory ()
   " get directory of opened file for statusline
@@ -163,18 +173,18 @@ call plug#begin(g:path#plug_man_dir)
 " Plug 'morhetz/gruvbox'
 Plug 'bititanb/gruvbox'
 "let g:gruvbox_contrast_dark='none'
-let g:gruvbox_italic=1
-Plug 'joshdick/onedark.vim'
-let g:onedark_terminal_italics = 1
-Plug 'rakr/vim-one'
-let g:one_allow_italics = 1
-Plug 'frankier/neovim-colors-solarized-truecolor-only'
-Plug 'KeitaNakamura/neodark.vim'
-let g:neodark#terminal_transparent = 1
-" Plug 'MaxSt/FlatColor'
-Plug 'icymind/NeoSolarized'
-let g:neosolarized_italic = 1
-Plug 'jacoborus/tender.vim'
+" let g:gruvbox_italic=1
+" Plug 'joshdick/onedark.vim'
+" let g:onedark_terminal_italics = 1
+" Plug 'rakr/vim-one'
+" let g:one_allow_italics = 1
+" Plug 'frankier/neovim-colors-solarized-truecolor-only'
+" Plug 'KeitaNakamura/neodark.vim'
+" let g:neodark#terminal_transparent = 1
+" " Plug 'MaxSt/FlatColor'
+" Plug 'icymind/NeoSolarized'
+" let g:neosolarized_italic = 1
+" Plug 'jacoborus/tender.vim'
 function! SetColorScheme(colors, ...)
   " first arg: gui, 256, or tty
   " second optional arg: background (default = dark)
@@ -235,94 +245,6 @@ endfunction
 " let g:syntastic_javascript_checkers = ['eslint']
 " let g:syntastic_spec_checkers = ['']
 
-Plug 'w0rp/ale'
-      " \ 'cpp'        : ['clangcheck', 'cppcheck', 'cpplint'],
-let g:ale_linters = {
-      \ 'cpp'        : ['clangtidy', 'cpplint'],
-      \ 'c'          : ['clangtidy'],
-      \ 'javascript' : ['eslint'],
-      \ 'python'     : ['pylint', 'flake8', 'autopep8'],
-      \ }
-let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
-let g:ale_cpp_clangtidy_options = '-std=c++11'
-" let g:ale_cpp_clangtidy_checks = []
-let g:ale_echo_msg_format = "%linter% %s"
-let g:ale_cpp_cpplint_options = '--linelength=120 --filter=-readability/todo,-whitespace/operators'
-autocmd BufEnter PKGBUILD,.env
-      \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
-" let g:ale_c_cppcheck_options = '--enable=style --suppress="unusedStructMember" --suppress="unreadVariable"'
-nmap <silent> <leader>lp <Plug>(ale_previous_wrap)
-nmap <silent> <leader>ln <Plug>(ale_next_wrap)
-
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-let g:UltiSnipsExpandTrigger = '<tab>'
-let g:UltiSnipsJumpForwardTrigger = '<tab>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
-
-Plug 'mileszs/ack.vim'
-let g:ackprg = 'ag --vimgrep'
-" let g:ack_qhandler = "botright copen 3"
-let g:ack_qhandler = "botright copen 10"
-let g:ackpreview = 1
-let g:ackhighlight = 1
-nnoremap <leader>s :Ack!<Space>''<Left>
-
-
-" Plug 'raimondi/delimitmate'
-" let delimitMate_matchpairs = '(:),[:],{:},<:>'
-" let delimitMate_nesting_quotes = ['"','`',"'"]
-" let delimitMate_expand_cr = 1
-" let delimitMate_expand_space = 1
-" let delimitMate_expand_inside_quotes = 1
-" let delimitMate_jump_expansion = 1
-" let delimitMate_balance_matchpairs = 1
-
-" Plug 'jiangmiao/auto-pairs'
-" let g:AutoPairsShortcutJump = '<s-tab>'
-" let g:AutoPairsFlyMode = 1
-Plug 'ervandew/matchem'
-
-Plug 'majutsushi/tagbar'
-let g:tagbar_compact = 1
-nnoremap <leader>E :TagbarToggle<CR>
-"autocmd FileType python nested :call tagbar#autoopen(0)
-
-if has('nvim')
-  Plug 'rbgrouleff/bclose.vim'
-endif
-" Plug 'Shougo/unite.vim'
-" nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
-Plug 'Shougo/denite.nvim'
-      " \ ['ag', "--ignore=/third_party/", "--ignore=/build/",
-nnoremap <C-P> :Denite -smartcase file_rec<CR>
-" -smartcase
-
-" Plug 'Shougo/vimfiler.vim'
-" let g:vimfiler_as_default_explorer = 1
-" let g:vimfiler_quick_look_command = 'gloobus-preview'
-" nnoremap <leader>e :VimFilerExplorer<CR>
-" call vimfiler#custom#profile('default', 'context', {
-"       \ 'safe' : 0,
-"       \ 'preview_action': 'switch',
-"       \ })
-
-" Plug 'airodactyl/neovim-ranger'
-" Plug 'rbgrouleff/bclose.vim'
-Plug 'bititanb/ranger.vim'
-let g:ranger_map_keys = 0
-" function! RangerOpen()
-"   execute 'tabnew'
-"   execute 'Ranger'
-" endfunction
-nmap <leader>e :Ranger<CR>
-
-Plug 'dhruvasagar/vim-table-mode'
-let g:table_mode_corner='|'
-
-"Plug 'sbdchd/neoformat'
-
-" Plug 'Valloric/YouCompleteMe', { 'do': './install.py --tern-completer --clang-completer' }
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_autoclose_preview_window_after_completion = 1
@@ -355,7 +277,177 @@ let g:ycm_filetype_specific_completion_to_disable = {
       \ 'lua' : 1
       \}
 
+Plug 'w0rp/ale'
+let g:ale_linters = {
+      \ 'cpp'        : ['clangtidy', 'cpplint'],
+      \ 'c'          : ['clangtidy'],
+      \ 'javascript' : ['eslint'],
+      \ 'python'     : ['pylint', 'flake8', 'autopep8'],
+      \ }
+let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
+let g:ale_cpp_clangtidy_options = '-std=c++11'
+" let g:ale_cpp_clangtidy_checks = []
+let g:ale_echo_msg_format = "%linter% %s"
+let g:ale_cpp_cpplint_options = '--linelength=120 --filter=-readability/todo,-whitespace/operators'
+autocmd BufEnter PKGBUILD,.env
+      \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
+" let g:ale_c_cppcheck_options = '--enable=style --suppress="unusedStructMember" --suppress="unreadVariable"'
+nmap <silent> <leader>lp <Plug>(ale_previous_wrap)
+nmap <silent> <leader>ln <Plug>(ale_next_wrap)
+
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
+
+Plug 'mileszs/ack.vim'
+let g:ackprg = 'ag --vimgrep'
+" let g:ack_qhandler = "botright copen 3"
+let g:ack_qhandler = "botright copen 10"
+let g:ackpreview = 1
+let g:ackhighlight = 1
+nnoremap <leader>s :Ack!<Space>''<Left>
+
+
+Plug 'yuttie/comfortable-motion.vim'
+let g:comfortable_motion_air_drag = 13
+let g:comfortable_motion_friction = 0.0
+let g:comfortable_motion_no_default_key_mappings = 1
+let g:comfortable_motion_impulse_multiplier = 3
+nnoremap <silent> <C-d> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
+nnoremap <silent> <C-u> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
+nnoremap <silent> <C-f> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 4)<CR>
+nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
+
+" autoclose quotes, parens, brackets..
+Plug 'ervandew/matchem'
+" git commands
+Plug 'tpope/vim-fugitive'
+" show docs
 Plug 'Shougo/echodoc.vim'
+" command mode readline bindings
+Plug 'vim-utils/vim-husk'
+" replace quotes, parens, brackets...
+Plug 'tpope/vim-surround'
+" :Bdelete command
+Plug 'moll/vim-bbye'
+Plug 'will133/vim-dirdiff'
+Plug 'roxma/vim-paste-easy'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'gioele/vim-autoswap'
+Plug 'raymond-w-ko/vim-lua-indent'
+" big collection of syntax files
+Plug 'sheerun/vim-polyglot'
+" show number of search matches
+Plug 'henrik/vim-indexed-search'
+
+" show changed lines for VCS
+Plug 'mhinz/vim-signify'
+let g:signify_realtime = 1
+
+Plug 'majutsushi/tagbar'
+let g:tagbar_compact = 1
+nnoremap <leader>E :TagbarToggle<CR>
+"autocmd FileType python nested :call tagbar#autoopen(0)
+
+Plug 'bititanb/ranger.vim'
+let g:ranger_map_keys = 0
+" function! RangerOpen()
+"   execute 'tabnew'
+"   execute 'Ranger'
+" endfunction
+nmap <leader>e :Ranger<CR>
+
+Plug 'Shougo/denite.nvim'
+      " \ ['ag', "--ignore=/third_party/", "--ignore=/build/",
+nnoremap <C-P> :Denite -smartcase file_rec<CR>
+
+Plug 'dhruvasagar/vim-table-mode'
+let g:table_mode_corner='|'
+
+let g:polyglot_disabled = ['lua']
+Plug 'brooth/far.vim'
+let g:far#preview_window_layout='right'
+let g:far#window_layout='tab'
+function! FarClear()
+  let n = bufnr('$')
+  while n > 0
+    if getbufvar(n, '&ft') == 'far_vim'
+      exe 'bd ' . n
+    endif
+    let n -= 1
+  endwhile
+endfun
+
+" only for 'sexy' multiline comments (<leader>cs)
+" and usual multiline (<lead>cm) + some automatic stuff
+Plug 'scrooloose/nerdcommenter'
+let g:NERDSpaceDelims = 1
+" For all the other comments
+Plug 'tyru/caw.vim'
+let g:caw_hatpos_skip_blank_line = 1
+let g:caw_wrap_skip_blank_line = 1
+
+Plug 'Yggdroot/indentLine'
+let g:indentLine_char = '┊'
+
+Plug 'roryokane/detectindent'
+augroup DetectIndent
+  autocmd!
+  autocmd BufReadPost *  DetectIndent
+augroup END
+
+Plug 'junegunn/vim-easy-align'
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+nmap <leader>a gaii
+
+" Plug 'raimondi/delimitmate'
+" let delimitMate_matchpairs = '(:),[:],{:},<:>'
+" let delimitMate_nesting_quotes = ['"','`',"'"]
+" let delimitMate_expand_cr = 1
+" let delimitMate_expand_space = 1
+" let delimitMate_expand_inside_quotes = 1
+" let delimitMate_jump_expansion = 1
+" let delimitMate_balance_matchpairs = 1
+
+" Plug 'jiangmiao/auto-pairs'
+" let g:AutoPairsShortcutJump = '<s-tab>'
+" let g:AutoPairsFlyMode = 1
+
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
+
+" Plug 'chrisbra/vim-diff-enhanced'
+" Plug 'lambdalisue/vim-unified-diff'
+" Plug 'sjl/splice.vim'
+" Plug 'rickhowe/diffchar.vim'
+" Plug 'lambdalisue/vim-improve-diff'
+" let g:improve_diff#enable_auto_diffupdate = 1
+" let g:improve_diff#enable_auto_diffoff = 1
+" Plug 'Shougo/unite.vim'
+" nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
+" -smartcase
+
+" Plug 'Shougo/vimfiler.vim'
+" let g:vimfiler_as_default_explorer = 1
+" let g:vimfiler_quick_look_command = 'gloobus-preview'
+" nnoremap <leader>e :VimFilerExplorer<CR>
+" call vimfiler#custom#profile('default', 'context', {
+"       \ 'safe' : 0,
+"       \ 'preview_action': 'switch',
+"       \ })
+
+" Plug 'airodactyl/neovim-ranger'
+" Plug 'rbgrouleff/bclose.vim'
+
+
+"Plug 'sbdchd/neoformat'
+
+
 
 " Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " let g:deoplete#enable_at_startup = 1
@@ -400,59 +492,26 @@ Plug 'Shougo/echodoc.vim'
 
 
 " readline bindings
-Plug 'vim-utils/vim-husk'
-Plug 'tpope/vim-surround'
-Plug 'moll/vim-bbye'
 " Plug 'tomtom/tcomment_vim'
-Plug 'will133/vim-dirdiff'
-Plug 'tpope/vim-eunuch'
 " Plug 'tbastos/vim-lua'
-Plug 'roxma/vim-paste-easy'
 " Plug 'Shougo/vimproc.vim', {'do' : 'make'}
-Plug 'andrewradev/splitjoin.vim'
-Plug 'michaeljsmith/vim-indent-object'
-Plug 'gioele/vim-autoswap'
 " Plug 'yuttie/comfortable-motion.vim'
 
-Plug 'raymond-w-ko/vim-lua-indent'
 " Plug 'hail2u/vim-css3-syntax'
 " Plug 'othree/html5.vim'
 " Plug 'ingydotnet/yaml-vim'
 " Plug 'hdima/python-syntax'
 " Plug 'hynek/vim-python-pep8-indent'
-Plug 'kompowiec/CBOT.vim'
-Plug 'sheerun/vim-polyglot'
-let g:polyglot_disabled = ['lua']
 
 " Plug 'dkprice/vim-easygrep'
 " let g:EasyGrepBinary=1
 " let g:EasyGrepIgnoreCase=0
-Plug 'brooth/far.vim'
-let g:far#preview_window_layout='right'
-let g:far#window_layout='tab'
-function! FarClear()
-  let n = bufnr('$')
-  while n > 0
-    if getbufvar(n, '&ft') == 'far_vim'
-      exe 'bd ' . n
-    endif
-    let n -= 1
-  endwhile
-endfun
 
-" only for 'sexy' multiline comments (<leader>cs)
-" and usual multiline (<lead>cm) + some automatic stuff
-Plug 'scrooloose/nerdcommenter'
-let g:NERDSpaceDelims = 1
-" For all the other comments
-Plug 'tyru/caw.vim'
-let g:caw_hatpos_skip_blank_line = 1
-let g:caw_wrap_skip_blank_line = 1
 
-Plug 'Yggdroot/indentLine'
-let g:indentLine_char = '┊'
 
-Plug 'henrik/vim-indexed-search'
+" Plug 'sickill/vim-pasta'
+
+" Plug 'foosoft/vim-argwrap'
 " Plug '907th/vim-auto-save'
 " let g:auto_save_silent = 1
 " Plug 'haya14busa/vim-asterisk'
@@ -466,13 +525,7 @@ Plug 'henrik/vim-indexed-search'
 " Plug 'idanarye/vim-vebugger'
 " let g:vebugger_leader='<Leader>z'
 
-" set shiftwidth automatically
 " Plug 'tpope/vim-sleuth'
-Plug 'roryokane/detectindent'
-augroup DetectIndent
-  autocmd!
-  autocmd BufReadPost *  DetectIndent
-augroup END
 
 " Plug 'ludovicchabant/vim-gutentags'
 
@@ -483,12 +536,6 @@ augroup END
 " let g:easytags_autorecurse = 1
 " let g:easytags_resolve_links = 1
 
-Plug 'junegunn/vim-easy-align'
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
-nmap <leader>a gaii
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -510,10 +557,10 @@ language en_US.utf8
 filetype plugin indent on
 
 " russian
-set keymap=russian-jcukenwin
-set iminsert=0
-set imsearch=-1
-set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+" set keymap=russian-jcukenwin
+" set iminsert=0
+" set imsearch=-1
+" set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
 " FIX lag in terminal vim
 set timeoutlen=1000
@@ -563,6 +610,10 @@ autocmd BufNewFile,BufRead *.cbot.txt,*.cb.txt :set filetype=cbot
 
 " folds
 set foldcolumn=1        " Add a bit extra margin to the left
+" HACK: disable folding in vimdiff
+if &diff
+  set diffopt=filler,context:1000000
+endif
 
 " colors
 " let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
