@@ -170,42 +170,12 @@ endif
 call plug#begin(g:path#plug_man_dir)
 
 " theme
-" Plug 'morhetz/gruvbox'
 Plug 'bititanb/gruvbox'
 "let g:gruvbox_contrast_dark='none'
 " let g:gruvbox_italic=1
-" Plug 'joshdick/onedark.vim'
-" let g:onedark_terminal_italics = 1
-" Plug 'rakr/vim-one'
-" let g:one_allow_italics = 1
-" Plug 'frankier/neovim-colors-solarized-truecolor-only'
-" Plug 'KeitaNakamura/neodark.vim'
-" let g:neodark#terminal_transparent = 1
-" " Plug 'MaxSt/FlatColor'
-" Plug 'icymind/NeoSolarized'
-" let g:neosolarized_italic = 1
-" Plug 'jacoborus/tender.vim'
 function! SetColorScheme(colors, ...)
   " first arg: gui, 256, or tty
   " second optional arg: background (default = dark)
-
-  " colors for :terminal must be set explicitly
-  " let g:terminal_color_0  = '#2e3436'
-  " let g:terminal_color_1  = '#cc0000'
-  " let g:terminal_color_2  = '#4e9a06'
-  " let g:terminal_color_3  = '#c4a000'
-  " let g:terminal_color_4  = '#3465a4'
-  " let g:terminal_color_5  = '#75507b'
-  " let g:terminal_color_6  = '#0b939b'
-  " let g:terminal_color_7  = '#d3d7cf'
-  " let g:terminal_color_8  = '#555753'
-  " let g:terminal_color_9  = '#ef2929'
-  " let g:terminal_color_10 = '#8ae234'
-  " let g:terminal_color_11 = '#fce94f'
-  " let g:terminal_color_12 = '#729fcf'
-  " let g:terminal_color_13 = '#ad7fa8'
-  " let g:terminal_color_14 = '#00f5e9'
-  " let g:terminal_color_15 = '#eeeeec'
 
   if a:colors == '256' || a:colors == 'gui'
     set t_8f=[38;2;%lu;%lu;%lum
@@ -225,25 +195,6 @@ function! SetColorScheme(colors, ...)
     set background=dark
   endif
 endfunction
-
-
-" Plug 'scrooloose/syntastic'
-" let g:ycm_show_diagnostics_ui = 0
-" let g:syntastic_aggregate_errors = 1
-" let g:syntastic_echo_current_error = 1
-" let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_jump = 0
-" " let g:syntastic_auto_loc_list = 1
-" " let g:syntastic_loc_list_height = 5
-" "let g:syntastic_python_checkers = ['python', 'pyflakes', 'pep8']
-" " let g:syntastic_python_checkers = ['python']
-" " let g:syntastic_vim_checkers = ['vint']
-" " let g:syntastic_sh_checkers = ['sh', 'shellcheck']
-" let g:syntastic_c_checkers = ['clang_check', 'clang_tidy']
-" let g:syntastic_cpp_checkers = ['clang_check', 'clang_tidy', 'cppcheck', 'cpplint',]
-" let g:syntastic_cpp_cpplint_exec = "cpplint"
-" let g:syntastic_javascript_checkers = ['eslint']
-" let g:syntastic_spec_checkers = ['']
 
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
 let g:ycm_confirm_extra_conf = 0
@@ -309,7 +260,6 @@ let g:ackpreview = 1
 let g:ackhighlight = 1
 nnoremap <leader>s :Ack!<Space>''<Left>
 
-
 Plug 'yuttie/comfortable-motion.vim'
 let g:comfortable_motion_air_drag = 13
 let g:comfortable_motion_friction = 0.0
@@ -319,28 +269,6 @@ nnoremap <silent> <C-d> :call comfortable_motion#flick(g:comfortable_motion_impu
 nnoremap <silent> <C-u> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
 nnoremap <silent> <C-f> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 4)<CR>
 nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
-
-" autoclose quotes, parens, brackets..
-Plug 'ervandew/matchem'
-" git commands
-Plug 'tpope/vim-fugitive'
-" show docs
-Plug 'Shougo/echodoc.vim'
-" command mode readline bindings
-Plug 'vim-utils/vim-husk'
-" replace quotes, parens, brackets...
-Plug 'tpope/vim-surround'
-" :Bdelete command
-Plug 'moll/vim-bbye'
-Plug 'will133/vim-dirdiff'
-Plug 'roxma/vim-paste-easy'
-Plug 'michaeljsmith/vim-indent-object'
-Plug 'gioele/vim-autoswap'
-Plug 'raymond-w-ko/vim-lua-indent'
-" big collection of syntax files
-Plug 'sheerun/vim-polyglot'
-" show number of search matches
-Plug 'henrik/vim-indexed-search'
 
 " show changed lines for VCS
 Plug 'mhinz/vim-signify'
@@ -366,7 +294,6 @@ nnoremap <C-P> :Denite -smartcase file_rec<CR>
 Plug 'dhruvasagar/vim-table-mode'
 let g:table_mode_corner='|'
 
-let g:polyglot_disabled = ['lua']
 Plug 'brooth/far.vim'
 let g:far#preview_window_layout='right'
 let g:far#window_layout='tab'
@@ -405,137 +332,29 @@ xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 nmap <leader>a gaii
 
-" Plug 'raimondi/delimitmate'
-" let delimitMate_matchpairs = '(:),[:],{:},<:>'
-" let delimitMate_nesting_quotes = ['"','`',"'"]
-" let delimitMate_expand_cr = 1
-" let delimitMate_expand_space = 1
-" let delimitMate_expand_inside_quotes = 1
-" let delimitMate_jump_expansion = 1
-" let delimitMate_balance_matchpairs = 1
+" big collection of syntax files
+Plug 'sheerun/vim-polyglot'
+let g:polyglot_disabled = ['lua']
 
-" Plug 'jiangmiao/auto-pairs'
-" let g:AutoPairsShortcutJump = '<s-tab>'
-" let g:AutoPairsFlyMode = 1
-
-" Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
-
-" Plug 'chrisbra/vim-diff-enhanced'
-" Plug 'lambdalisue/vim-unified-diff'
-" Plug 'sjl/splice.vim'
-" Plug 'rickhowe/diffchar.vim'
-" Plug 'lambdalisue/vim-improve-diff'
-" let g:improve_diff#enable_auto_diffupdate = 1
-" let g:improve_diff#enable_auto_diffoff = 1
-" Plug 'Shougo/unite.vim'
-" nnoremap <C-P> :Unite -start-insert -auto-resize buffer file_rec<CR>
-" -smartcase
-
-" Plug 'Shougo/vimfiler.vim'
-" let g:vimfiler_as_default_explorer = 1
-" let g:vimfiler_quick_look_command = 'gloobus-preview'
-" nnoremap <leader>e :VimFilerExplorer<CR>
-" call vimfiler#custom#profile('default', 'context', {
-"       \ 'safe' : 0,
-"       \ 'preview_action': 'switch',
-"       \ })
-
-" Plug 'airodactyl/neovim-ranger'
-" Plug 'rbgrouleff/bclose.vim'
-
-
-"Plug 'sbdchd/neoformat'
-
-
-
-" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" let g:deoplete#enable_at_startup = 1
-" autocmd CompleteDone * pclose!
-" inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
-" inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
-" <CR>: close popup and save indent.
-" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-" function! s:my_cr_function() abort
-"   return deoplete#close_popup() . "\<CR>"
-" endfunction
-" Plug 'Shougo/neco-vim'
-" Plug 'Shougo/neoinclude.vim'
-" Plug 'ujihisa/neco-look'
-" Plug 'zchee/deoplete-jedi'
-" Plug 'tweekmonster/deoplete-clang2'
-" Plug 'Shougo/context_filetype.vim'
-
-" Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
-
-" Plug 'Shougo/denite.nvim'
-" let g:LanguageClient_serverCommands = {
-"     \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-"     \ 'javascript': ['/opt/javascript-typescript-langserver/lib/language-server-stdio.js'],
-"     \ 'python': ['pyls'],
-"     \ }
-
-" " Automatically start language servers.
-" let g:LanguageClient_autoStart = 1
-
-" nnoremap <silent> K :call LanguageClient_textDocument_hover()<CR>
-" nnoremap <silent> gd :call LanguageClient_textDocument_definition()<CR>
-" nnoremap <silent> <F2> :call LanguageClient_textDocument_rename()<CR>
-
-"let g:deoplete#omni#input_patterns = {}
-"let g:deoplete#omni#input_patterns.python = '([^. \t]\.|^\s*@|^\s*from\s.+ import |^\s*from |^\s*import )\w*'
-" let g:deoplete#sources#jedi#show_docstring = 1
-" let g:deoplete#sources#jedi#enable_cache = 1
-
-" Plug 'carlitux/deoplete-ternjs'
-" Plug 'zchee/deoplete-jedi'
-
-
-" readline bindings
-" Plug 'tomtom/tcomment_vim'
-" Plug 'tbastos/vim-lua'
-" Plug 'Shougo/vimproc.vim', {'do' : 'make'}
-" Plug 'yuttie/comfortable-motion.vim'
-
-" Plug 'hail2u/vim-css3-syntax'
-" Plug 'othree/html5.vim'
-" Plug 'ingydotnet/yaml-vim'
-" Plug 'hdima/python-syntax'
-" Plug 'hynek/vim-python-pep8-indent'
-
-" Plug 'dkprice/vim-easygrep'
-" let g:EasyGrepBinary=1
-" let g:EasyGrepIgnoreCase=0
-
-
-
-" Plug 'sickill/vim-pasta'
-
-" Plug 'foosoft/vim-argwrap'
-" Plug '907th/vim-auto-save'
-" let g:auto_save_silent = 1
-" Plug 'haya14busa/vim-asterisk'
-
-" Plug 'joonty/vdebug', { 'branch': 'v2-integration' }
-" if !exists('g:vdebug_options')
-"   let g:vdebug_options = {}
-" endif
-" let g:vdebug_options.port = 8172
-
-" Plug 'idanarye/vim-vebugger'
-" let g:vebugger_leader='<Leader>z'
-
-" Plug 'tpope/vim-sleuth'
-
-" Plug 'ludovicchabant/vim-gutentags'
-
-" Plug 'xolox/vim-misc'
-" Plug 'Wraul/vim-easytags', { 'branch': 'fix-universal-detection' }
-" let g:easytags_async = 1
-" let g:easytags_file = '~/.vim/tags'
-" let g:easytags_autorecurse = 1
-" let g:easytags_resolve_links = 1
-
+" autoclose quotes, parens, brackets..
+Plug 'ervandew/matchem'
+" git commands
+Plug 'tpope/vim-fugitive'
+" show docs
+Plug 'Shougo/echodoc.vim'
+" command mode readline bindings
+Plug 'vim-utils/vim-husk'
+" replace quotes, parens, brackets...
+Plug 'tpope/vim-surround'
+" :Bdelete command
+Plug 'moll/vim-bbye'
+Plug 'will133/vim-dirdiff'
+Plug 'roxma/vim-paste-easy'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'gioele/vim-autoswap'
+Plug 'raymond-w-ko/vim-lua-indent'
+" show number of search matches
+Plug 'henrik/vim-indexed-search'
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -762,12 +581,6 @@ command! Ss call SetupSplits()
 
 " save current buffer automatically
 command! As autocmd CursorHold,CursorHoldI <buffer> update
-
-" split navigation without plugin
-" nnoremap <C-J> <C-W><C-J>
-" nnoremap <C-K> <C-W><C-K>
-" nnoremap <C-L> <C-W><C-L>
-" nnoremap <C-H> <C-W><C-H>
 
 " disable highlighting
 nnoremap <leader>h :nohl<CR>
