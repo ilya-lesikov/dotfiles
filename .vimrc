@@ -171,7 +171,7 @@ call plug#begin(g:path#plug_man_dir)
 
 " theme
 Plug 'bititanb/gruvbox'
-"let g:gruvbox_contrast_dark='none'
+let g:gruvbox_contrast_dark='none'
 " let g:gruvbox_italic=1
 function! SetColorScheme(colors, ...)
   " first arg: gui, 256, or tty
@@ -199,8 +199,8 @@ endfunction
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_autoclose_preview_window_after_completion = 1
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<S-TAB>', '<Up>']
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_max_num_candidates = 100
 let g:ycm_complete_in_comments = 1
@@ -210,27 +210,31 @@ nmap <leader>d :YcmCompleter GoTo<CR>
 nmap <leader>D :YcmCompleter GoToDefinition<CR>
 nmap <leader>* :YcmCompleter GoToReferences<CR>
 nmap <leader>k :YcmCompleter GetDoc<CR>
-nmap <leader>t :YcmCompleter GetType<CR>
+nmap <leader>K :YcmCompleter GetType<CR>
 let g:ycm_semantic_triggers =  {
-  \   'c'          : ['->', '.'],
-  \   'objc'       : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s', 're!\[.*\]\s'],
-  \   'ocaml'      : ['.', '#'],
-  \   'cpp,objcpp' : ['->', '.', '::'],
-  \   'perl'       : ['->'],
-  \   'php'        : ['->', '::'],
-  \   'ruby'       : ['.', '::'],
-  \   'lua'        : ['.', ':'],
-  \   'erlang'     : [':'],
-  \   'python'     : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
-  \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
+  \ 'css'        : [ 're!^\s{1,6}', 're!:\s+' ],
+  \ 'scss'       : [ 're!^\s{1,6}', 're!:\s+' ],
+  \ 'c'          : ['->', '.'],
+  \ 'objc'       : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s', 're!\[.*\]\s'],
+  \ 'ocaml'      : ['.', '#'],
+  \ 'cpp,objcpp' : ['->', '.', '::'],
+  \ 'perl'       : ['->'],
+  \ 'php'        : ['->', '::'],
+  \ 'ruby'       : ['.', '::'],
+  \ 'lua'        : ['.', ':'],
+  \ 'erlang'     : [':'],
+  \ 'python'     : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
+  \ 'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
   \ }
+autocmd FileType scss setlocal omnifunc=csscomplete#CompleteCSS
 let g:ycm_filetype_specific_completion_to_disable = {
-      \ 'lua' : 1
+      \ 'lua' : 1,
+      \ 'vimwiki' : 1
       \}
 
 Plug 'w0rp/ale'
+      " \ 'cpp'        : ['clangtidy', 'cpplint'],
 let g:ale_linters = {
-      \ 'cpp'        : ['clangtidy', 'cpplint'],
       \ 'c'          : ['clangtidy'],
       \ 'javascript' : ['eslint'],
       \ 'python'     : ['pylint', 'flake8', 'autopep8'],
@@ -246,11 +250,15 @@ autocmd BufEnter PKGBUILD,.env
 nmap <silent> <leader>lp <Plug>(ale_previous_wrap)
 nmap <silent> <leader>ln <Plug>(ale_next_wrap)
 
+" Plug 'neomake/neomake'
+" let g:neomake_vim_enabled_makers = []
+" let g:neomake_open_list = 2
+
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-let g:UltiSnipsExpandTrigger = '<tab>'
-let g:UltiSnipsJumpForwardTrigger = '<tab>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-tab>'
+let g:UltiSnipsExpandTrigger = '<c-s>'
+let g:UltiSnipsJumpForwardTrigger = '<c-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-m>'
 
 Plug 'mileszs/ack.vim'
 let g:ackprg = 'ag --vimgrep'
@@ -272,7 +280,8 @@ nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impu
 
 " show changed lines for VCS
 Plug 'mhinz/vim-signify'
-let g:signify_realtime = 1
+" let g:signify_realtime = 1
+let g:signify_realtime = 0
 
 Plug 'majutsushi/tagbar'
 let g:tagbar_compact = 1
@@ -287,6 +296,8 @@ let g:ranger_map_keys = 0
 " endfunction
 nmap <leader>e :Ranger<CR>
 
+" " advanced matcher for denite
+" Plug 'nixprime/cpsm', { 'do': 'PY3=ON ./install.sh' }
 Plug 'Shougo/denite.nvim'
       " \ ['ag', "--ignore=/third_party/", "--ignore=/build/",
 nnoremap <C-P> :Denite -smartcase file_rec<CR>
@@ -297,6 +308,7 @@ let g:table_mode_corner='|'
 Plug 'brooth/far.vim'
 let g:far#preview_window_layout='right'
 let g:far#window_layout='tab'
+let g:far#source="agnvim"
 function! FarClear()
   let n = bufnr('$')
   while n > 0
@@ -316,8 +328,18 @@ Plug 'tyru/caw.vim'
 let g:caw_hatpos_skip_blank_line = 1
 let g:caw_wrap_skip_blank_line = 1
 
-Plug 'Yggdroot/indentLine'
-let g:indentLine_char = '┊'
+" Plug 'Yggdroot/indentLine'
+" let g:indentLine_char = '┊'
+" let g:indentLine_concealcursor = ''
+" Plug 'thaerkh/vim-indentguides'
+Plug 'nathanaelkane/vim-indent-guides'
+let g:indent_guides_indent_levels = 12
+let g:indent_guides_guide_size = 1
+let g:indent_guides_auto_colors = 0
+autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesOdd  guibg=#303030 ctermbg=4
+autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 ctermbg=4
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_start_level = 2
 
 Plug 'roryokane/detectindent'
 augroup DetectIndent
@@ -325,12 +347,20 @@ augroup DetectIndent
   autocmd BufReadPost *  DetectIndent
 augroup END
 
+" build from vim
+" Plug 'tpope/vim-dispatch'
+" nnoremap <leader>m :w \| Make
+
+" Plug 'benmills/vimux'
+
 Plug 'junegunn/vim-easy-align'
 " Start interactive EasyAlign in visual mode (e.g. vipga)
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 nmap <leader>a gaii
+
+Plug 'lervag/vimtex'
 
 " big collection of syntax files
 Plug 'sheerun/vim-polyglot'
@@ -355,6 +385,65 @@ Plug 'gioele/vim-autoswap'
 Plug 'raymond-w-ko/vim-lua-indent'
 " show number of search matches
 Plug 'henrik/vim-indexed-search'
+" helpers for unix (:Gmove, ...)
+Plug 'tpope/vim-eunuch'
+
+Plug 'tpope/vim-repeat'
+
+" change filetype for range of lines
+Plug 'inkarkat/vim-ingo-library'
+Plug 'inkarkat/vim-SyntaxRange'
+
+" diff on blocks of code
+Plug 'AndrewRadev/linediff.vim'
+
+Plug 'lyokha/vim-xkbswitch'
+if $DISPLAY == ""
+	let g:XkbSwitchEnabled = 0
+else
+  set keymap=russian-jcukenwin
+  set iminsert=0
+  set imsearch=0
+  " set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+	let g:XkbSwitchEnabled = 1
+	" let g:XkbSwitchIMappings = ['ru']
+ "  let g:XkbSwitchNLayout = 'us'
+  " let g:XkbSwitchAssistNKeymap = 1    " for commands r and f
+  " let g:XkbSwitchAssistSKeymap = 1    " for search lines
+endif
+
+" Plug 'ierton/xkb-switch'
+
+" Plug 'reedes/vim-lexical'
+" augroup lexical
+"   autocmd!
+"   autocmd FileType *.md,markdown,mkd call lexical#init()
+"   autocmd FileType textile call lexical#init()
+"   autocmd FileType text call lexical#init()
+" augroup END
+" let g:lexical#spelllang = ['en_us','ru_ru',]
+
+" modify tab bar
+Plug 'gcmt/taboo.vim'
+let g:taboo_tab_format="  %p%m  "
+
+Plug 'elzr/vim-json'
+let g:vim_json_syntax_conceal=1
+
+" colorize hex codes in code
+Plug 'KabbAmine/vCoolor.vim'
+" Plug 'ap/vim-css-color'
+" Plug 'chrisbra/Colorizer'
+" let g:colorizer_auto_color = 1
+
+Plug 'tbabej/taskwiki'
+Plug 'blindFS/vim-taskwarrior'
+Plug 'powerman/vim-plugin-AnsiEsc'
+Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
+" let wiki = {}
+" let wiki.path = '~/my_wiki/'
+" let wiki.nested_syntaxes = {'python': 'python', 'c++': 'cpp'}
+" let g:vimwiki_list = [wiki]
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -364,6 +453,10 @@ call plug#end()
 call denite#custom#var('file_rec', 'command',
       \ ['ag',
       \ '--follow', '--nocolor', '--nogroup', '-g', ''])
+call denite#custom#source(
+      \ 'file_rec', 'matchers', ['matcher_substring'])
+
+" call neomake#configure#automake('rw', 1000)
 
 """"""""""""""""""""""""""""""""""""""
 " SETTINGS
@@ -405,13 +498,13 @@ autocmd FileType cbot setlocal noexpandtab
 
 " matchparen plugin (CARE it can slow vim TOO MUCH)
 " when loaded_matchparen = 1 then the plugin is disabled
-let g:loaded_matchparen = 1
+" let g:loaded_matchparen = 1
 " let g:matchparen_timeout = 200
 " let g:matchparen_insert_timeout = 200
 
 " statusline
 "set statusline=%t\ %<%m%H%W%q%=%{GetFileDirectory()}\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
-set statusline=%F\ %<%m%H%W%q%=\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
+set statusline=%F\ %<%m%H%W%q%=\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
 set laststatus=2        " always show status bar
 
 " highlight
@@ -500,7 +593,10 @@ if has('gui_running')
   set guioptions+=c  "no graphical popup dialogs
 endif
 
+autocmd FileType markdown,text,tex setlocal spell spelllang=en,ru
+
 autocmd FileType * syntax on
+" autocmd Filetype * setlocal conceallevel=0
 
 autocmd FileType * setlocal history=300
 
@@ -580,7 +676,10 @@ endfunction
 command! Ss call SetupSplits()
 
 " save current buffer automatically
-command! As autocmd CursorHold,CursorHoldI <buffer> update
+command! As autocmd TextChanged,InsertLeave <buffer> silent! update
+
+" autosave markdown
+autocmd TextChanged,InsertLeave *.md,markdown,tex silent! update
 
 " disable highlighting
 nnoremap <leader>h :nohl<CR>
@@ -603,6 +702,25 @@ function! LoadSession()
   execute 'source ' . l:pwd . '/Session.vim'
 endfunction
 command! Ls call LoadSession()
+
+nnoremap <leader>me :call TermMake('')<Left><Left>
+function! TermMake(build_command)
+  let l:command = expand(a:build_command . " && wmctrl -s 3 && xdotool key F5")
+  let g:TermMake_last_build_command = l:command
+  split
+  enew
+  call termopen(l:command)
+  startinsert
+endfunction
+
+nnoremap <leader>ml :call TermMakeLast()<CR>
+function! TermMakeLast()
+  split
+  enew
+  call termopen(g:TermMake_last_build_command)
+  startinsert
+endfunction
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MISC
