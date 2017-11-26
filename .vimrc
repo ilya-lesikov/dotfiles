@@ -388,6 +388,9 @@ Plug 'henrik/vim-indexed-search'
 " helpers for unix (:Gmove, ...)
 Plug 'tpope/vim-eunuch'
 
+" encryption support
+Plug 'jamessan/vim-gnupg'
+
 Plug 'tpope/vim-repeat'
 
 " change filetype for range of lines
@@ -436,14 +439,17 @@ Plug 'KabbAmine/vCoolor.vim'
 " Plug 'chrisbra/Colorizer'
 " let g:colorizer_auto_color = 1
 
-Plug 'tbabej/taskwiki'
-Plug 'blindFS/vim-taskwarrior'
-Plug 'powerman/vim-plugin-AnsiEsc'
+" Plug 'tbabej/taskwiki'
+" Plug 'blindFS/vim-taskwarrior'
+" Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
-" let wiki = {}
-" let wiki.path = '~/my_wiki/'
-" let wiki.nested_syntaxes = {'python': 'python', 'c++': 'cpp'}
-" let g:vimwiki_list = [wiki]
+let g:vimwiki_hl_cb_checked = 1
+" let g:taskwiki_sort_order='priority-,-status+,end+,due+,project+'
+" let g:taskwiki_sort_orders={"T": "priority-"}
+" " let wiki = {}
+" " let wiki.path = '~/my_wiki/'
+" " let wiki.nested_syntaxes = {'python': 'python', 'c++': 'cpp'}
+" " let g:vimwiki_list = [wiki]
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
@@ -583,6 +589,7 @@ set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.ropeproject/*
 set wildignore+=Session.vim,*.pyc
 set updatetime=2000
 set completeopt-=preview
+let maplocalleader='\'
 
 " gui
 if has('gui_running')
@@ -679,7 +686,7 @@ command! Ss call SetupSplits()
 command! As autocmd TextChanged,InsertLeave <buffer> silent! update
 
 " autosave markdown
-autocmd TextChanged,InsertLeave *.md,markdown,tex silent! update
+autocmd TextChanged,InsertLeave *.md,markdown,*.tex,tex silent! update
 
 " disable highlighting
 nnoremap <leader>h :nohl<CR>
@@ -705,7 +712,7 @@ command! Ls call LoadSession()
 
 nnoremap <leader>me :call TermMake('')<Left><Left>
 function! TermMake(build_command)
-  let l:command = expand(a:build_command . " && wmctrl -s 3 && xdotool key F5")
+  let l:command = expand(a:build_command . " && wmctrl -s 3 && sleep 0.2 && xdotool key F5")
   let g:TermMake_last_build_command = l:command
   split
   enew
