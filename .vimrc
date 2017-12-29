@@ -309,6 +309,7 @@ Plug 'brooth/far.vim'
 let g:far#preview_window_layout='right'
 let g:far#window_layout='tab'
 let g:far#source="agnvim"
+" let g:far#debug = 1
 function! FarClear()
   let n = bufnr('$')
   while n > 0
@@ -396,6 +397,9 @@ Plug 'tpope/vim-repeat'
 " change filetype for range of lines
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-SyntaxRange'
+
+" chef autofiletype
+" Plug 'dougireton/vim-chef'
 
 " diff on blocks of code
 Plug 'AndrewRadev/linediff.vim'
@@ -728,6 +732,15 @@ function! TermMakeLast()
   startinsert
 endfunction
 
+" for chef
+augroup chefftdetect
+    au BufNewFile,BufRead */recipes/*.rb set filetype=ruby.chef
+    au BufNewFile,BufRead */cookbooks/*.rb set filetype=ruby.chef
+    au BufNewFile,BufRead */attributes/*.rb set filetype=ruby.chef
+    au BufNewFile,BufRead */resources/*.rb set filetype=ruby.chef
+    au BufNewFile,BufRead */test/*.rb set filetype=ruby.chef
+    au BufNewFile,BufRead */spec/*.rb set filetype=ruby.chef
+augroup end
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " MISC
