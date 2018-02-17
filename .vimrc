@@ -204,7 +204,7 @@ let g:ycm_key_list_previous_completion = ['<S-TAB>', '<Up>']
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_max_num_candidates = 100
 let g:ycm_complete_in_comments = 1
-let g:ycm_python_binary_path = 'python2'
+let g:ycm_python_binary_path = 'python3'
 " nmap <leader>d :YcmCompleter GoToDeclaration<CR>
 nmap <leader>d :YcmCompleter GoTo<CR>
 nmap <leader>D :YcmCompleter GoToDefinition<CR>
@@ -237,9 +237,10 @@ Plug 'w0rp/ale'
 let g:ale_linters = {
       \ 'c'          : ['clangtidy'],
       \ 'javascript' : ['eslint'],
-      \ 'python'     : ['pylint', 'flake8', 'autopep8'],
       \ 'chef'       : [''],
       \ }
+let g:ale_python_pylint_options = '-d C0103,C0111,C0321'
+let g:ale_python_flake8_options =  '--ignore=E121,E123,E126,E226,E24,E704,W503,W504,E702,E501'
 let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
 let g:ale_cpp_clangtidy_options = '-std=c++11'
 " let g:ale_cpp_clangtidy_checks = []
