@@ -531,6 +531,7 @@ autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none cte
 
 " filetype detect
 autocmd BufNewFile,BufRead *.cbot.txt,*.cb.txt :set filetype=cbot
+autocmd BufNewFile,BufRead Dockerfile* :set filetype=dockerfile
 
 " folds
 set foldcolumn=1        " Add a bit extra margin to the left
@@ -631,6 +632,7 @@ autocmd FileType python setlocal shiftwidth=4
 autocmd FileType javascript nmap <buffer> <leader>b Odebugger;<C-[>
 
 autocmd FileType c,cpp nmap <buffer> <leader>b Oraise(SIGTRAP);<C-[>
+autocmd FileType php nmap <buffer> <leader>b Orequire('/bin/psysh'); eval(\Psy\sh());<C-[>
 
 autocmd FileType lua nmap <buffer>
       \ <leader>b Oif require("os").getenv("DISPLAY") ~= ":0.0"
