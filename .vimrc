@@ -237,7 +237,8 @@ Plug 'w0rp/ale'
 let g:ale_linters = {
       \ 'c'          : ['clangtidy'],
       \ 'javascript' : ['eslint'],
-      \ 'python'     : ['pylint', 'autopep8'],
+      \ 'python'     : ['pylint', 'flake8', 'autopep8'],
+      \ 'chef'       : [''],
       \ }
 let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
 let g:ale_cpp_clangtidy_options = '-std=c++11'
