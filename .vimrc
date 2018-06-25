@@ -306,6 +306,8 @@ let g:ale_linters = {
       \ 'python'     : ['flake8'],
       \ 'chef'       : [''],
       \ }
+let g:ale_python_pylint_options = '-d C0103,C0111,C0321'
+let g:ale_python_flake8_options =  '--ignore=E121,E123,E126,E226,E24,E704,W503,W504,E702,E501'
 let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
 let g:ale_cpp_clangtidy_options = '-std=c++11'
 " let g:ale_cpp_clangtidy_checks = []
