@@ -131,6 +131,31 @@ function! PromptExecute(cmd)
   endif
 endfunction
 
+"function! SetCompletion(completer)
+"  if a:complete ==? 'ycm'
+"    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+"    " Or map each action separately
+"    nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+"    nnoremap <silent> gd <CR>
+"    nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+"    autocmd FileType           nnoremap <buffer> <C-]> :YcmCompleter GoTo<CR>
+"    autocmd FileType javascript nnoremap <buffer> <C-]> :TernDef<CR>
+"    " nmap <leader>d :YcmCompleter GoToDeclaration<CR>
+"    nnoremap <buffer> <leader>d :YcmCompleter GoTo<CR>
+"    nnoremap <buffer> <leader>D :YcmCompleter GoToDefinition<CR>
+"    nnoremap <buffer> <leader>* :YcmCompleter GoToReferences<CR>
+"    nnoremap <buffer> <leader>k :YcmCompleter GetDoc<CR>
+"    nnoremap <buffer> <leader>K :YcmCompleter GetType<CR>
+"  elseif a:complete ==? 'deoplete'
+"    nnoremap <buffer> <leader>d :YcmCompleter GoTo<CR>
+"    nnoremap <buffer> <leader>D :call LanguageClient#textDocument_definition()<CR>
+"    nnoremap <buffer> <leader>* :YcmCompleter GoToReferences<CR>
+"    nnoremap <buffer> <leader>k :YcmCompleter GetDoc<CR>
+"    nnoremap <buffer> <leader>K :YcmCompleter GetType<CR>
+"  endif
+"endfunction
+
+
 """"""""""""""""""""""""""""""""""""""""
 " VARS
 """"""""""""""""""""""""""""""""""""""""
@@ -196,21 +221,35 @@ function! SetColorScheme(colors, ...)
   endif
 endfunction
 
+"Plug 'autozimu/LanguageClient-neovim', {
+"    \ 'branch': 'next',
+"    \ 'do': 'bash install.sh',
+"    \ }
+"" (Optional) Multi-entry selection UI.
+"Plug 'junegunn/fzf'
+"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+"let g:deoplete#custom_blacklist = ['ruby']
+"autocmd BufWritePre * if index(g:deoplete#custom_blacklist, &ft) < 0 |
+"      \ call deoplete#custom#buffer_option('auto_complete', v:false)
+"let g:LanguageClient_serverCommands = {
+"    \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+"    \ 'javascript': ['javascript-typescript-stdio'],
+"    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
+"    \ }
+
+" Plug 'osyo-manga/vim-monster'
+" let g:monster#completion#backend = 'solargraph'
+
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
 let g:ycm_confirm_extra_conf = 0
-let g:ycm_autoclose_preview_window_after_completion = 1
+" let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<S-TAB>', '<Up>']
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_max_num_candidates = 100
 let g:ycm_complete_in_comments = 1
-let g:ycm_python_binary_path = 'python2'
-" nmap <leader>d :YcmCompleter GoToDeclaration<CR>
-nmap <leader>d :YcmCompleter GoTo<CR>
-nmap <leader>D :YcmCompleter GoToDefinition<CR>
-nmap <leader>* :YcmCompleter GoToReferences<CR>
-nmap <leader>k :YcmCompleter GetDoc<CR>
-nmap <leader>K :YcmCompleter GetType<CR>
+let g:ycm_python_binary_path = 'python3'
+let g:ycm_add_preview_to_completeopt = 1
 let g:ycm_semantic_triggers =  {
   \ 'css'        : [ 're!^\s{1,6}', 're!:\s+' ],
   \ 'scss'       : [ 're!^\s{1,6}', 're!:\s+' ],
@@ -224,27 +263,60 @@ let g:ycm_semantic_triggers =  {
   \ 'lua'        : ['.', ':'],
   \ 'erlang'     : [':'],
   \ 'python'     : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
-  \ 'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
+  \ 'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go,groovy' : ['.'],
   \ }
 autocmd FileType scss setlocal omnifunc=csscomplete#CompleteCSS
 let g:ycm_filetype_specific_completion_to_disable = {
       \ 'lua' : 1,
-      \ 'vimwiki' : 1
+      \ 'vimwiki' : 1,
+      \ 'groovy' : 1,
       \}
+" let g:ycm_filetype_whitelist = {
+" 			\ "c":1,
+" 			\ "cpp":1,
+" 			\ "objc":1,
+" 			\ "sh":1,
+" 			\ "zsh":1,
+" 			\ "zimbu":1,
+" 			\ "python":1,
+" 			\ }
+nnoremap <leader>d :YcmCompleter GoTo<CR>
+nnoremap <leader>D :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>* :YcmCompleter GoToReferences<CR>
+nnoremap <leader>k :YcmCompleter GetDoc<CR>
+nnoremap <leader>K :YcmCompleter GetType<CR>
+"let g:ycm_filetype_blacklist = { 'ruby': 1 }
+
+" Plug 'artur-shaik/vim-javacomplete2'
+" autocmd FileType groovy setlocal omnifunc=javacomplete#Complete
+
+"Plug 'autozimu/LanguageClient-neovim', {
+"    \ 'branch': 'next',
+"    \ 'do': 'bash install.sh',
+"    \ }
+"" (Optional) Multi-entry selection UI.
+"Plug 'junegunn/fzf'
+"autocmd Filetype ruby set completefunc=LanguageClient#complete
 
 Plug 'w0rp/ale'
       " \ 'cpp'        : ['clangtidy', 'cpplint'],
 let g:ale_linters = {
       \ 'c'          : ['clangtidy'],
       \ 'javascript' : ['eslint'],
-      \ 'python'     : ['pylint', 'flake8', 'autopep8'],
+      \ 'python'     : ['flake8'],
       \ 'chef'       : [''],
       \ }
 let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
 let g:ale_cpp_clangtidy_options = '-std=c++11'
 " let g:ale_cpp_clangtidy_checks = []
-let g:ale_echo_msg_format = "%linter% %s"
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '%s       %severity% | %linter% | %code%'
+" let g:ale_echo_msg_format = "%linter% %s"
 let g:ale_cpp_cpplint_options = '--linelength=120 --filter=-readability/todo,-whitespace/operators'
+let g:ale_python_flake8_options = '--ignore=E303,E121,E123,E126,E226,E24,E704,W503,W504,E501 --max-line-length=120'
+let g:ale_ruby_rubocop_options = '--except Layout/AlignParameters,Style/Documentation,Metrics/MethodLength,Style/GuardClause,Metrics/AbcSize,Naming/AccessorMethodName,Layout/MultilineMethodCallIndentation,Metrics/LineLength'
+let g:ale_sh_shellcheck_exclusions = 'SC1090'
 autocmd BufEnter PKGBUILD,.env
       \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
 " let g:ale_c_cppcheck_options = '--enable=style --suppress="unusedStructMember" --suppress="unreadVariable"'
@@ -395,9 +467,13 @@ Plug 'jamessan/vim-gnupg'
 
 Plug 'tpope/vim-repeat'
 
+Plug 'modille/groovy.vim'
+
 " change filetype for range of lines
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-SyntaxRange'
+
+Plug 'zainin/vim-mikrotik'
 
 " chef autofiletype
 " Plug 'dougireton/vim-chef'
@@ -523,7 +599,7 @@ set showmatch           " highlight matching [{()}]
 set hlsearch
 set inccommand=nosplit
 " WARN cursorline might slow vim down A LOT
-set cursorline
+"set cursorline
 set colorcolumn=80
 autocmd BufEnter * :highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
 autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none ctermfg=0
@@ -533,7 +609,7 @@ autocmd BufNewFile,BufRead *.cbot.txt,*.cb.txt :set filetype=cbot
 autocmd BufNewFile,BufRead Dockerfile* :set filetype=dockerfile
 
 " folds
-set foldcolumn=1        " Add a bit extra margin to the left
+" set foldcolumn=1        " Add a bit extra margin to the left
 " HACK: disable folding in vimdiff
 if &diff
   set diffopt=filler,context:1000000
@@ -594,7 +670,7 @@ setlocal shortmess+=I   " hide intro message on start
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.ropeproject/*
 set wildignore+=Session.vim,*.pyc
 set updatetime=2000
-set completeopt-=preview
+"set completeopt-=preview
 let maplocalleader='\'
 
 " gui
@@ -619,14 +695,18 @@ autocmd FileType * setlocal formatoptions-=r
 
 " python
 let python_highlight_all = 1
-autocmd Filetype python setlocal foldmethod=indent
-autocmd Filetype python setlocal foldlevel=1
-autocmd Filetype python setlocal foldminlines=15
-autocmd Filetype python setlocal foldnestmax=2
-autocmd FileType python nmap <buffer> <leader>b Oimport pudb; pudb.set_trace()<C-[>
+" autocmd Filetype python setlocal foldmethod=indent
+" autocmd Filetype python setlocal foldlevel=1
+" autocmd Filetype python setlocal foldminlines=15
+" autocmd Filetype python setlocal foldnestmax=2
+autocmd FileType python nmap <buffer> <leader>B Oimport pudb; pudb.set_trace()<C-[>
+autocmd FileType python nmap <buffer> <leader>b Ofrom IPython.terminal import debugger; debugger.set_trace()<C-[>
 autocmd FileType python setlocal tabstop=4
 autocmd FileType python setlocal softtabstop=4
 autocmd FileType python setlocal shiftwidth=4
+
+" ruby
+autocmd FileType ruby nmap <buffer> <leader>b Orequire 'pry-byebug'; binding.pry<C-[>
 
 autocmd FileType javascript nmap <buffer> <leader>b Odebugger;<C-[>
 
