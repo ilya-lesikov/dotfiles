@@ -131,6 +131,16 @@ function! PromptExecute(cmd)
   endif
 endfunction
 
+" function! s:WipeBuffersWithoutFiles()
+"     let bufs=filter(range(1, bufnr('$')), 'bufexists(v:val) && '.
+"                                           \'empty(getbufvar(v:val, "&buftype")) && '.
+"                                           \'!filereadable(bufname(v:val))')
+"     if !empty(bufs)
+"         execute 'bwipeout' join(bufs)
+"     endif
+" endfunction
+" command! BufClean call s:WipeBuffersWithoutFiles()
+
 "function! SetCompletion(completer)
 "  if a:complete ==? 'ycm'
 "    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
@@ -219,6 +229,21 @@ function! SetColorScheme(colors, ...)
   else
     set background=dark
   endif
+endfunction
+
+au FileType qf call AdjustWindowHeight(3, 10)
+function! AdjustWindowHeight(minheight, maxheight)
+    let l = 1
+    let n_lines = 0
+    let w_width = winwidth(0)
+    while l <= line('$')
+        " number to float for division
+        let l_len = strlen(getline(l)) + 0.0
+        let line_width = l_len/w_width
+        let n_lines += float2nr(ceil(line_width))
+        let l += 1
+    endw
+    exe max([min([n_lines, a:maxheight]), a:minheight]) . "wincmd _"
 endfunction
 
 "Plug 'autozimu/LanguageClient-neovim', {
@@ -375,7 +400,8 @@ nmap <leader>e :Ranger<CR>
 " Plug 'nixprime/cpsm', { 'do': 'PY3=ON ./install.sh' }
 Plug 'Shougo/denite.nvim'
       " \ ['ag', "--ignore=/third_party/", "--ignore=/build/",
-nnoremap <C-P> :Denite -smartcase file_rec<CR>
+nnoremap <C-P> :ccl<CR>:Denite -smartcase file_rec<CR>
+nnoremap <leader>p :ccl<CR>:Denite -smartcase buffer<CR>
 
 Plug 'dhruvasagar/vim-table-mode'
 let g:table_mode_corner='|'
@@ -383,9 +409,9 @@ let g:table_mode_corner='|'
 Plug 'brooth/far.vim'
 let g:far#preview_window_layout='right'
 let g:far#window_layout='tab'
-let g:far#source="agnvim"
+" let g:far#source="agnvim"
 " let g:far#debug = 1
-function! FarClear()
+function! s:FarClear()
   let n = bufnr('$')
   while n > 0
     if getbufvar(n, '&ft') == 'far_vim'
@@ -394,6 +420,7 @@ function! FarClear()
     let n -= 1
   endwhile
 endfun
+command! FarClear call s:FarClear()
 
 " only for 'sexy' multiline comments (<leader>cs)
 " and usual multiline (<lead>cm) + some automatic stuff
@@ -423,6 +450,9 @@ augroup DetectIndent
   autocmd BufReadPost *  DetectIndent
 augroup END
 
+" quickfix window options
+" Plug 'blueyed/vim-qf_resize'
+
 " build from vim
 " Plug 'tpope/vim-dispatch'
 " nnoremap <leader>m :w \| Make
@@ -437,6 +467,9 @@ nmap ga <Plug>(EasyAlign)
 nmap <leader>a gaii
 
 Plug 'lervag/vimtex'
+
+" sudo
+Plug 'lambdalisue/suda.vim'
 
 " big collection of syntax files
 Plug 'sheerun/vim-polyglot'
@@ -476,6 +509,11 @@ Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-SyntaxRange'
 
 Plug 'zainin/vim-mikrotik'
+
+" Plug 'pseewald/vim-anyfold'
+" let g:anyfold_activate=1
+" let g:anyfold_fold_display=1
+" let g:anyfold_fold_toplevel=1
 
 " chef autofiletype
 " Plug 'dougireton/vim-chef'
@@ -539,11 +577,17 @@ runtime macros/matchit.vim
 
 call plug#end()
 
-call denite#custom#var('file_rec', 'command',
-      \ ['ag',
-      \ '--follow', '--nocolor', '--nogroup', '-g', ''])
+" call denite#custom#var('file_rec', 'command',
+"       \ ['ag',
+"       \ '--follow', '--nocolor', '--nogroup', '-g', ''])
 call denite#custom#source(
       \ 'file_rec', 'matchers', ['matcher_substring'])
+call denite#custom#source(
+      \ 'buffer', 'matchers', ['matcher_substring'])
+
+" call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
+" call denite#custom#option('_', 'highlight_matched_range', 'None')
+" call denite#custom#option('_', 'highlight_matched_char', 'None')
 
 " call neomake#configure#automake('rw', 1000)
 
@@ -612,10 +656,17 @@ autocmd BufNewFile,BufRead Dockerfile* :set filetype=dockerfile
 
 " folds
 " set foldcolumn=1        " Add a bit extra margin to the left
+" set foldopen-=block
+" set foldlevelstart=999
+set foldlevel=1
+set foldmethod=indent
+set foldnestmax=2
+set foldminlines=0
 " HACK: disable folding in vimdiff
 if &diff
   set diffopt=filler,context:1000000
 endif
+autocmd Filetype * setlocal nofoldenable
 
 " colors
 " let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
@@ -662,7 +713,7 @@ set showfulltag
 set hidden
 set nocompatible
 set confirm
-set viminfo='50,<100,s100,:1000,/1000,@1000,f1,h
+set viminfo='50,<100,s100,:30000,/1000,@1000,f1,h
 set sessionoptions-=blank
 set sessionoptions-=options
 set shiftround          " round indentation
@@ -688,9 +739,7 @@ autocmd FileType markdown,text,tex setlocal spell spelllang=en,ru
 
 autocmd FileType * syntax on
 " autocmd Filetype * setlocal conceallevel=0
-
 autocmd FileType * setlocal history=300
-
 autocmd FileType * setlocal formatoptions-=t
 autocmd FileType * setlocal formatoptions-=o
 autocmd FileType * setlocal formatoptions-=r
@@ -732,12 +781,12 @@ autocmd BufWritePre * call DeleteTrailingWS()
 """"""""""""""""""""""""""""""""""""""""
 
 " :W save the file as root
-function! SudoSaveFile() abort
-  execute (has('gui_running') ? '' : 'silent') 'write !env SUDO_EDITOR=tee sudo -e % >/dev/null'
-  let &modified = v:shell_error
-endfunction
-cnoremap w!!! call SudoSaveFile()<CR>
-cnoremap W!!! w !sudo tee % > /dev/null
+" function! SudoSaveFile() abort
+"   execute (has('gui_running') ? '' : 'silent') 'write !env SUDO_EDITOR=tee sudo -e % >/dev/null'
+"   let &modified = v:shell_error
+" endfunction
+" cnoremap w!!! call SudoSaveFile()<CR>
+" cnoremap W!!! w !sudo tee % > /dev/null
 
 " edit config files
 command! Rv execute 'source ' . g:path#vimrc
@@ -791,6 +840,9 @@ nnoremap <leader>r :%s/<C-R>"//gc<Left><Left><Left>
 
 " leave insert mode in terminal
 tnoremap <Esc> <C-\><C-n>
+
+" " toggle folding for file
+" nnoremap <leader>f :set foldenable!<CR>
 
 " fast load session from current dir
 function! LoadSession()
