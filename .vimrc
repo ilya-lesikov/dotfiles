@@ -265,52 +265,164 @@ endfunction
 " Plug 'osyo-manga/vim-monster'
 " let g:monster#completion#backend = 'solargraph'
 
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
-let g:ycm_confirm_extra_conf = 0
-" let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<S-TAB>', '<Up>']
-let g:ycm_show_diagnostics_ui = 0
-let g:ycm_max_num_candidates = 100
-let g:ycm_complete_in_comments = 1
-let g:ycm_python_binary_path = 'python3'
-let g:ycm_add_preview_to_completeopt = 1
-let g:ycm_semantic_triggers =  {
-  \ 'css'        : [ 're!^\s{1,6}', 're!:\s+' ],
-  \ 'scss'       : [ 're!^\s{1,6}', 're!:\s+' ],
-  \ 'c'          : ['->', '.'],
-  \ 'objc'       : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s', 're!\[.*\]\s'],
-  \ 'ocaml'      : ['.', '#'],
-  \ 'cpp,objcpp' : ['->', '.', '::'],
-  \ 'perl'       : ['->'],
-  \ 'php'        : ['->', '::'],
-  \ 'ruby'       : ['.', '::'],
-  \ 'lua'        : ['.', ':'],
-  \ 'erlang'     : [':'],
-  \ 'python'     : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
-  \ 'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go,groovy' : ['.'],
-  \ }
-autocmd FileType scss setlocal omnifunc=csscomplete#CompleteCSS
-let g:ycm_filetype_specific_completion_to_disable = {
-      \ 'lua' : 1,
-      \ 'vimwiki' : 1,
-      \ 'groovy' : 1,
-      \}
-" let g:ycm_filetype_whitelist = {
-" 			\ "c":1,
-" 			\ "cpp":1,
-" 			\ "objc":1,
-" 			\ "sh":1,
-" 			\ "zsh":1,
-" 			\ "zimbu":1,
-" 			\ "python":1,
-" 			\ }
-nnoremap <leader>d :YcmCompleter GoTo<CR>
-nnoremap <leader>D :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>* :YcmCompleter GoToReferences<CR>
-nnoremap <leader>k :YcmCompleter GetDoc<CR>
-nnoremap <leader>K :YcmCompleter GetType<CR>
-"let g:ycm_filetype_blacklist = { 'ruby': 1 }
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+" Coc only does snippet and additional edit on confirm.
+" inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" Or use `complete_info` if your vim support it, like:
+" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+xmap <leader>aa  <Plug>(coc-codeaction-selected)
+nmap <leader>aa  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Create mappings for function text object, requires document symbols feature of languageserver.
+xmap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap if <Plug>(coc-funcobj-i)
+omap af <Plug>(coc-funcobj-a)
+
+" Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
+nmap <silent> <C-d> <Plug>(coc-range-select)
+xmap <silent> <C-d> <Plug>(coc-range-select)
+
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Add status line support, for integration with other plugin, checkout `:h coc-status`
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" Using CocList
+" Show all diagnostics
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+" Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
+" let g:ycm_confirm_extra_conf = 0
+" " let g:ycm_autoclose_preview_window_after_insertion = 1
+" let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
+" let g:ycm_key_list_previous_completion = ['<S-TAB>', '<Up>']
+" let g:ycm_show_diagnostics_ui = 0
+" let g:ycm_max_num_candidates = 100
+" let g:ycm_complete_in_comments = 1
+" let g:ycm_python_binary_path = 'python3'
+" let g:ycm_add_preview_to_completeopt = 1
+" let g:ycm_semantic_triggers =  {
+"  \ 'css'        : [ 're!^\s{1,6}', 're!:\s+' ],
+"  \ 'scss'       : [ 're!^\s{1,6}', 're!:\s+' ],
+"  \ 'c'          : ['->', '.'],
+"  \ 'objc'       : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s', 're!\[.*\]\s'],
+"  \ 'ocaml'      : ['.', '#'],
+"  \ 'cpp,objcpp' : ['->', '.', '::'],
+"  \ 'perl'       : ['->'],
+"  \ 'php'        : ['->', '::'],
+"  \ 'ruby'       : ['.', '::'],
+"  \ 'lua'        : ['.', ':'],
+"  \ 'erlang'     : [':'],
+"  \ 'python'     : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
+"  \ 'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go,groovy' : ['.'],
+"  \ }
+" autocmd FileType scss setlocal omnifunc=csscomplete#CompleteCSS
+" let g:ycm_filetype_specific_completion_to_disable = {
+"      \ 'lua' : 1,
+"      \ 'vimwiki' : 1,
+"      \ 'groovy' : 1,
+"      \}
+" " let g:ycm_filetype_whitelist = {
+" " 			\ "c":1,
+" " 			\ "cpp":1,
+" " 			\ "objc":1,
+" " 			\ "sh":1,
+" " 			\ "zsh":1,
+" " 			\ "zimbu":1,
+" " 			\ "python":1,
+" " 			\ }
+" nnoremap <leader>d :YcmCompleter GoTo<CR>
+" nnoremap <leader>D :YcmCompleter GoToDefinition<CR>
+" nnoremap <leader>* :YcmCompleter GoToReferences<CR>
+" nnoremap <leader>k :YcmCompleter GetDoc<CR>
+" nnoremap <leader>K :YcmCompleter GetType<CR>
+" command! YcmSwitchPython3Completion execute 'let g:ycm_python_binary_path="/usr/bin/python3" | YcmRestartServer'
+" command! YcmSwitchPython2Completion execute 'let g:ycm_python_binary_path="/usr/bin/python2" | YcmRestartServer'
+" "let g:ycm_filetype_blacklist = { 'ruby': 1 }
 
 " Plug 'artur-shaik/vim-javacomplete2'
 " autocmd FileType groovy setlocal omnifunc=javacomplete#Complete
@@ -326,11 +438,11 @@ nnoremap <leader>K :YcmCompleter GetType<CR>
 Plug 'w0rp/ale'
       " \ 'cpp'        : ['clangtidy', 'cpplint'],
 let g:ale_linters = {
-      \ 'c'          : ['clangtidy'],
-      \ 'javascript' : ['eslint'],
-      \ 'python'     : ['flake8'],
-      \ 'chef'       : [''],
-      \ }
+     \ 'c'          : ['clangtidy'],
+     \ 'javascript' : ['eslint'],
+     \ 'python'     : ['flake8'],
+     \ 'chef'       : [''],
+     \ }
 let g:ale_python_pylint_options = '-d C0103,C0111,C0321'
 let g:ale_python_flake8_options =  '--ignore=E121,E123,E126,E226,E24,E704,W503,W504,E702,E501'
 let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
@@ -345,10 +457,12 @@ let g:ale_python_flake8_options = '--ignore=E303,E121,E123,E126,E226,E24,E704,W5
 let g:ale_ruby_rubocop_options = '--except Layout/AlignParameters,Style/Documentation,Metrics/MethodLength,Style/GuardClause,Metrics/AbcSize,Naming/AccessorMethodName,Layout/MultilineMethodCallIndentation,Metrics/LineLength'
 let g:ale_sh_shellcheck_exclusions = 'SC1090'
 autocmd BufEnter PKGBUILD,.env
-      \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
+     \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
 " let g:ale_c_cppcheck_options = '--enable=style --suppress="unusedStructMember" --suppress="unreadVariable"'
 nmap <silent> <leader>lp <Plug>(ale_previous_wrap)
 nmap <silent> <leader>ln <Plug>(ale_next_wrap)
+" let g:ale_set_signs = 0
+" let g:ale_virtualtext_cursor = 1
 
 " Plug 'neomake/neomake'
 " let g:neomake_vim_enabled_makers = []
@@ -399,9 +513,49 @@ nmap <leader>e :Ranger<CR>
 " " advanced matcher for denite
 " Plug 'nixprime/cpsm', { 'do': 'PY3=ON ./install.sh' }
 Plug 'Shougo/denite.nvim'
-      " \ ['ag', "--ignore=/third_party/", "--ignore=/build/",
-nnoremap <C-P> :ccl<CR>:Denite -smartcase file_rec<CR>
-nnoremap <leader>p :ccl<CR>:Denite -smartcase buffer<CR>
+      " \ ['ag', '--ignore=/third_party/', '--ignore=/build/',
+nnoremap <C-P> :ccl<CR>:Denite file/rec<CR>
+nnoremap <leader>p :ccl<CR>:Denite buffer<CR>
+
+autocmd FileType denite call s:denite_my_settings()
+function! s:denite_my_settings() abort
+    nnoremap <silent><buffer><expr> <CR>
+                \ denite#do_map('do_action')
+    " nnoremap <silent><buffer><expr> d
+    "            \ denite#do_map('do_action', 'delete')
+    " nnoremap <silent><buffer><expr> <c-t>
+    "            \ denite#do_map('do_action', 'tabopen')
+    " nnoremap <silent><buffer><expr> <c-v>
+    "            \ denite#do_map('do_action', 'vsplit')
+    " nnoremap <silent><buffer><expr> <c-x>
+    "            \ denite#do_map('do_action', 'split')
+    " nnoremap <silent><buffer><expr> p
+    "            \ denite#do_map('do_action', 'preview')
+    " nnoremap <silent><buffer><expr> q
+    "            \ denite#do_map('quit')
+    " nnoremap <silent><buffer><expr> i
+    "            \ denite#do_map('open_filter_buffer')
+    " nnoremap <silent><buffer><expr> V
+    "            \ denite#do_map('toggle_select').'j'
+endfunction
+
+autocmd FileType denite-filter call s:denite_filter_my_settings()
+function! s:denite_filter_my_settings() abort
+    " imap <silent><buffer> <tab> <Plug>(denite_filter_quit)
+    inoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
+    " inoremap <silent><buffer><expr> <c-t>
+    "            \ denite#do_map('do_action', 'tabopen')
+    " inoremap <silent><buffer><expr> <c-v>
+    "            \ denite#do_map('do_action', 'vsplit')
+    " inoremap <silent><buffer><expr> <c-x>
+    "            \ denite#do_map('do_action', 'split')
+    inoremap <silent><buffer><expr> <esc>
+                \ denite#do_map('quit')
+    inoremap <silent><buffer> <C-j>
+                \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
+    inoremap <silent><buffer> <C-k>
+                \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
+endfunction
 
 Plug 'dhruvasagar/vim-table-mode'
 let g:table_mode_corner='|'
@@ -464,12 +618,9 @@ Plug 'junegunn/vim-easy-align'
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
-nmap <leader>a gaii
+nmap <leader>ag gaii
 
 Plug 'lervag/vimtex'
-
-" sudo
-Plug 'lambdalisue/suda.vim'
 
 " big collection of syntax files
 Plug 'sheerun/vim-polyglot'
@@ -494,8 +645,10 @@ Plug 'gioele/vim-autoswap'
 Plug 'raymond-w-ko/vim-lua-indent'
 " show number of search matches
 Plug 'henrik/vim-indexed-search'
-" helpers for unix (:Gmove, ...)
+" helpers for unix (:Gmove, ...), sudo write support
 Plug 'tpope/vim-eunuch'
+
+Plug 'rasjani/robotframework-vim'
 
 " encryption support
 Plug 'jamessan/vim-gnupg'
@@ -577,13 +730,43 @@ runtime macros/matchit.vim
 
 call plug#end()
 
-" call denite#custom#var('file_rec', 'command',
+" call denite#custom#var('file/rec', 'command',
 "       \ ['ag',
 "       \ '--follow', '--nocolor', '--nogroup', '-g', ''])
 call denite#custom#source(
-      \ 'file_rec', 'matchers', ['matcher_substring'])
+     \ 'file/rec', 'matchers', ['matcher/hide_hidden_files', 'matcher/project_files', 'matcher/substring'])
 call denite#custom#source(
-      \ 'buffer', 'matchers', ['matcher_substring'])
+     \ 'buffer', 'matchers', ['matcher/substring'])
+
+" " Change matchers.
+" call denite#custom#source(
+"\ 'file_mru', 'matchers', ['matcher/fuzzy', 'matcher/project_files'])
+
+" call denite#custom#source('tag', 'matchers', ['matcher/substring'])
+
+" call denite#custom#source('file/old', 'converters',
+"      \ ['converter/relative_word'])
+" " Change sorters.
+" call denite#custom#source(
+"\ 'file/rec', 'sorters', ['sorter/sublime'])
+
+" Change ignore_globs
+" call denite#custom#filter('matcher/ignore_globs', 'ignore_globs',
+"      \ [ '.*', '_*', '__*'])
+
+let s:denite_options = {
+      \ 'prompt' : '>',
+      \ 'split': 'floating',
+      \ 'start_filter': 1,
+      \ 'smartcase': 1,
+      \ 'auto_resize': 1,
+      \ 'source_names': 'short',
+      \ 'direction': 'botright',
+      \ 'highlight_filter_background': 'CursorLine',
+      \ 'highlight_matched_char': 'Type',
+      \ }
+
+call denite#custom#option('default', s:denite_options)
 
 " call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
 " call denite#custom#option('_', 'highlight_matched_range', 'None')
@@ -613,7 +796,10 @@ set ttimeoutlen=50
 
 " backup, swap, undo
 set undofile
-set backup
+" disable backups, could conflict with Coc.nvim
+" set backup
+set nobackup
+set nowritebackup
 
 " tabs, indent
 set tabstop=2
@@ -637,7 +823,11 @@ autocmd FileType cbot setlocal noexpandtab
 
 " statusline
 "set statusline=%t\ %<%m%H%W%q%=%{GetFileDirectory()}\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
-set statusline=%F\ %<%m%H%W%q%=\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
+" Add status line support, for integration with other plugin, checkout `:h coc-status`
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+" set statusline=%m%H%W%q\ %t\ %<%=\ %{coc#status()}\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
+" set statusline=%m%H%W%q\ %{expand('%:~')}%<%=\ %{coc#status()}\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
+set statusline=%m%H%W%q\ %{expand('%:~')}%<%=\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
 set laststatus=2        " always show status bar
 
 " highlight
@@ -722,9 +912,11 @@ set omnifunc=syntaxcomplete#Complete
 setlocal shortmess+=I   " hide intro message on start
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.ropeproject/*
 set wildignore+=Session.vim,*.pyc
-set updatetime=2000
+set updatetime=300
 "set completeopt-=preview
 let maplocalleader='\'
+" don't change inode of saved file, helps with docker mounts not detecting file changes
+set backupcopy=yes
 
 " gui
 if has('gui_running')
@@ -737,7 +929,8 @@ endif
 
 autocmd FileType markdown,text,tex setlocal spell spelllang=en,ru
 
-autocmd FileType * syntax on
+syntax on
+"autocmd FileType * syntax on
 " autocmd Filetype * setlocal conceallevel=0
 autocmd FileType * setlocal history=300
 autocmd FileType * setlocal formatoptions-=t
@@ -765,13 +958,13 @@ autocmd FileType c,cpp nmap <buffer> <leader>b Oraise(SIGTRAP);<C-[>
 autocmd FileType php nmap <buffer> <leader>b Orequire('/bin/psysh'); eval(\Psy\sh());<C-[>
 
 autocmd FileType lua nmap <buffer>
-      \ <leader>b Oif require("os").getenv("DISPLAY") ~= ":0.0"
-      \ then require("debugger")() end<C-[>
+     \ <leader>b Oif require("os").getenv("DISPLAY") ~= ":0.0"
+     \ then require("debugger")() end<C-[>
       " \ then require("mobdebug").start() end<C-[>
 
 " restore cursor position on file open
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
-      \ exe "normal! g`\"" | endif
+     \ exe "normal! g`\"" | endif
 
 " delete trailing spaces
 autocmd BufWritePre * call DeleteTrailingWS()
@@ -780,13 +973,7 @@ autocmd BufWritePre * call DeleteTrailingWS()
 " MAPPINGS, COMMANDS
 """"""""""""""""""""""""""""""""""""""""
 
-" :W save the file as root
-" function! SudoSaveFile() abort
-"   execute (has('gui_running') ? '' : 'silent') 'write !env SUDO_EDITOR=tee sudo -e % >/dev/null'
-"   let &modified = v:shell_error
-" endfunction
-" cnoremap w!!! call SudoSaveFile()<CR>
-" cnoremap W!!! w !sudo tee % > /dev/null
+command! W execute ':SudoWrite'
 
 " edit config files
 command! Rv execute 'source ' . g:path#vimrc
@@ -797,12 +984,10 @@ command! Eb execute 'edit ' . "~/.bashrc"
 command! Ep execute 'edit ' . "~/.profile"
 command! Ex execute 'edit ' . "~/.Xresources"
 command! Et execute 'edit ' . "~/.config/alacritty/alacritty.yml"
-command! Es execute 'edit ' . "~/git/linux-utils/wmctrl-session-autostart.sh"
-command! Est execute 'edit ' . "~/git/linux-utils/wmctrl-session-tmux.sh"
+command! Es execute 'edit ' . "~/git/utils-linux/wmctrl-session-autostart.sh"
+command! Est execute 'edit ' . "~/git/utils-linux/wmctrl-session-tmux.sh"
 command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
 command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
-command! Ea execute 'edit ' . "~/.config/awesome/rc.lua"
-command! Eat execute 'edit ' . "~/.config/awesome/themes/copland/theme.lua"
 
 " fast fullscreen split/revert back
 nnoremap \| <C-W>\|<C-W>_
@@ -836,7 +1021,7 @@ nnoremap <leader>oc :s/\([[:graph:]]\+\)[ ]\{2,\}/\1 /g<CR>
 nnoremap <leader>n :set number!<CR>
 
 " replace last yanked string with ...
-nnoremap <leader>r :%s/<C-R>"//gc<Left><Left><Left>
+nnoremap <leader>rr :%s/<C-R>"//gc<Left><Left><Left>
 
 " leave insert mode in terminal
 tnoremap <Esc> <C-\><C-n>

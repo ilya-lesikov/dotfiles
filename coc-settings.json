@@ -1,0 +1,7 @@
+{
+  "coc.preferences.diagnostic.displayByAle": true,
+  "list.insertMappings": {
+    "<C-j>": "do:next",
+    "<C-k>": "do:previous"
+  }
+}
