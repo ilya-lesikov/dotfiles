@@ -1,33 +1,28 @@
-""""""""""""""""""""""""""""""""""""""""
-" FUNCTIONS
-""""""""""""""""""""""""""""""""""""""""
-" vimdiff auto diffupdate
-augroup AutoDiffUpdate
-  au!
-  autocmd InsertLeave * if &diff | diffupdate | let b:old_changedtick = b:changedtick | endif
-  autocmd TextChanged *
-        \ if &diff &&
-        \    (!exists('b:old_changedtick') || b:old_changedtick != b:changedtick) |
-        \   let b:old_changedtick = b:changedtick | diffupdate |
-        \ endif
-augroup END
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" VARIABLES
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! GetFileDirectory ()
-  " get directory of opened file for statusline
-  let fileDirectory = expand('%:p:h')
-  return fileDirectory
-endfunction
+let g:text_filetypes = "markdown,text,tex,rst"
 
-function! DeleteTrailingWS()
-  " delete trailing spaces on save
-  if &ft =~ 'markdown'
-    return
-  endif
+if has('nvim')
+  let g:path#vim_user_dir = expand('~/.config/nvim')
+  let g:path#vimrc = expand('~/.config/nvim/init.vim')
+else
+  let g:path#vim_user_dir = expand('~/.vim')
+  let g:path#vimrc = expand('~/.vimrc')
+endif
 
-  execute 'normal mz'
-  %s/\s\+$//ge
-  execute 'normal `z'
-endfunction
+let g:path#autoload = expand(g:path#vim_user_dir . '/autoload')
+let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
+let g:path#plug_man_dir = expand(g:path#vim_user_dir . '/plugged')
+
+let &undodir = expand(g:path#vim_user_dir . '/misc')
+let &backupdir = expand(g:path#vim_user_dir . '/misc')
+let &directory = expand(g:path#vim_user_dir . '/misc')
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" HELPER FUNCTIONS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let g:unavail#msg#list = []
 function! AddUnavailMsg(name)
@@ -48,23 +43,14 @@ function! IsTerm256Colors()
 endfunction
 
 function! SendMessages()
-  " WORKAROUND with autocmd for gvim popping up dialog box
   if g:unavail#msg#list != []
     let g:unavail#msg = join(g:unavail#msg#list)
-    autocmd VimEnter * echomsg g:unavail#msg
+    echomsg g:unavail#msg
   endif
   if g:msg#list != []
     let g:msg = join(g:msg#list)
-    autocmd VimEnter * echomsg g:msg
+    echomsg g:msg
   endif
-endfunction
-
-function! IsFeatAvail(feature, msg)
-  if has(a:feature)
-    return 1
-  endif
-
-  call AddUnavailMsg(a:msg)
 endfunction
 
 function! IsPlugManInst()
@@ -95,33 +81,9 @@ function! GetPlugMan()
   endif
 endfunction
 
-function! DelNewLines(text)
-  let g:delnewlines#result = substitute(a:text, "\n", "", "g")
-  return g:delnewlines#result
-endfunction
-
 function! EnsureDirExist(dir)
   if !isdirectory(a:dir)
     call mkdir(a:dir, 'p')
-  endif
-endfunction
-
-function! IsPipInstalled()
-  call system('pip --version')
-  if v:shell_error ==? 0
-    return 1
-  endif
-
-  call AddUnavailMsg('Pip-dependent plugins')
-endfunction
-
-function! GetSyntasticCheckers(info)
-  if a:info.status ==? 'installed' || a:info.status ==? 'updated' ||
-        \ a:info.force
-
-    call system('pip install --user pyflakes')
-    call system('pip install --user pep8')
-    call system('pip install --user vim-vint')
   endif
 endfunction
 
@@ -131,175 +93,40 @@ function! PromptExecute(cmd)
   endif
 endfunction
 
-" function! s:WipeBuffersWithoutFiles()
-"     let bufs=filter(range(1, bufnr('$')), 'bufexists(v:val) && '.
-"                                           \'empty(getbufvar(v:val, "&buftype")) && '.
-"                                           \'!filereadable(bufname(v:val))')
-"     if !empty(bufs)
-"         execute 'bwipeout' join(bufs)
-"     endif
-" endfunction
-" command! BufClean call s:WipeBuffersWithoutFiles()
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" PREPARE
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-"function! SetCompletion(completer)
-"  if a:complete ==? 'ycm'
-"    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
-"    " Or map each action separately
-"    nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
-"    nnoremap <silent> gd <CR>
-"    nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-"    autocmd FileType           nnoremap <buffer> <C-]> :YcmCompleter GoTo<CR>
-"    autocmd FileType javascript nnoremap <buffer> <C-]> :TernDef<CR>
-"    " nmap <leader>d :YcmCompleter GoToDeclaration<CR>
-"    nnoremap <buffer> <leader>d :YcmCompleter GoTo<CR>
-"    nnoremap <buffer> <leader>D :YcmCompleter GoToDefinition<CR>
-"    nnoremap <buffer> <leader>* :YcmCompleter GoToReferences<CR>
-"    nnoremap <buffer> <leader>k :YcmCompleter GetDoc<CR>
-"    nnoremap <buffer> <leader>K :YcmCompleter GetType<CR>
-"  elseif a:complete ==? 'deoplete'
-"    nnoremap <buffer> <leader>d :YcmCompleter GoTo<CR>
-"    nnoremap <buffer> <leader>D :call LanguageClient#textDocument_definition()<CR>
-"    nnoremap <buffer> <leader>* :YcmCompleter GoToReferences<CR>
-"    nnoremap <buffer> <leader>k :YcmCompleter GetDoc<CR>
-"    nnoremap <buffer> <leader>K :YcmCompleter GetType<CR>
-"  endif
-"endfunction
-
-
-""""""""""""""""""""""""""""""""""""""""
-" VARS
-""""""""""""""""""""""""""""""""""""""""
-
-if has('nvim')
-  let g:path#vim_user_dir = expand('~/.config/nvim')
-  let g:path#vimrc = expand('~/.config/nvim/init.vim')
-else
-  let g:path#vim_user_dir = expand('~/.vim')
-  let g:path#vimrc = expand('~/.vimrc')
-endif
-
-
-let g:path#autoload = expand(g:path#vim_user_dir . '/autoload')
-let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
-let g:path#plug_man_dir = expand(g:path#vim_user_dir . '/plugged')
-
-" let &rtp .= ','.expand(g:path#vim_user_dir . '/ftplugin')
-" let &rtp .= ','.expand(g:path#vim_user_dir . '/indent')
-" let &rtp .= ','.expand(g:path#vim_user_dir . '/syntax')
-let &undodir = expand(g:path#vim_user_dir . '/misc')
-let &backupdir = expand(g:path#vim_user_dir . '/misc')
-let &directory = expand(g:path#vim_user_dir . '/misc')
-
-for dir in [g:path#vim_user_dir, g:path#plug_man_dir, &undodir, &backupdir, &directory]
+" create vim-related directories if they do not exist
+for dir in [
+      \ g:path#vim_user_dir, g:path#plug_man_dir, &undodir, &backupdir, &directory
+      \ ]
   call EnsureDirExist(dir)
 endfor
 
-""""""""""""""""""""""""""""""""""""""""
-" PLUGINS
-""""""""""""""""""""""""""""""""""""""""
-
+"
 if !IsPlugManInst()
   call GetPlugMan()
 endif
 
+" Initialize plugin manager and define plugins after this line
 call plug#begin(g:path#plug_man_dir)
 
-" theme
-Plug 'bititanb/gruvbox'
-let g:gruvbox_contrast_dark='none'
-" let g:gruvbox_italic=1
-function! SetColorScheme(colors, ...)
-  " first arg: gui, 256, or tty
-  " second optional arg: background (default = dark)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" FEATUREFUL PLUGINS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-  if a:colors == '256' || a:colors == 'gui'
-    set t_8f=[38;2;%lu;%lu;%lum
-    set t_8b=[48;2;%lu;%lu;%lum
-    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-    set termguicolors
-
-    execute 'colorscheme gruvbox'
-    " autocmd BufEnter * highlight Normal guibg=0
-  elseif a:colors == 'tty'
-    execute 'colorscheme desert'
-  endif
-
-  if exists('a:1')
-    let &background = a:1
-  else
-    set background=dark
-  endif
-endfunction
-
-au FileType qf call AdjustWindowHeight(3, 10)
-function! AdjustWindowHeight(minheight, maxheight)
-    let l = 1
-    let n_lines = 0
-    let w_width = winwidth(0)
-    while l <= line('$')
-        " number to float for division
-        let l_len = strlen(getline(l)) + 0.0
-        let line_width = l_len/w_width
-        let n_lines += float2nr(ceil(line_width))
-        let l += 1
-    endw
-    exe max([min([n_lines, a:maxheight]), a:minheight]) . "wincmd _"
-endfunction
-
-"Plug 'autozimu/LanguageClient-neovim', {
-"    \ 'branch': 'next',
-"    \ 'do': 'bash install.sh',
-"    \ }
-"" (Optional) Multi-entry selection UI.
-"Plug 'junegunn/fzf'
-"Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-"let g:deoplete#custom_blacklist = ['ruby']
-"autocmd BufWritePre * if index(g:deoplete#custom_blacklist, &ft) < 0 |
-"      \ call deoplete#custom#buffer_option('auto_complete', v:false)
-"let g:LanguageClient_serverCommands = {
-"    \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-"    \ 'javascript': ['javascript-typescript-stdio'],
-"    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
-"    \ }
-
-" Plug 'osyo-manga/vim-monster'
-" let g:monster#completion#backend = 'solargraph'
-
+" autocompletion, refactoring, LSP/VSCode extensions
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
 " Use <c-space> to trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-" inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-" Or use `complete_info` if your vim support it, like:
-" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" Use `[g` and `]g` to navigate diagnostics
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-
 " Use K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
-
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
@@ -307,220 +134,68 @@ function! s:show_documentation()
     call CocAction('doHover')
   endif
 endfunction
-
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
 " Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
-
+nmap <leader>gn <Plug>(coc-rename)
 " Remap for format selected region
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>gg <Plug>(coc-format-selected)
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+xmap <leader>gr <Plug>(coc-codeaction-selected)
+" Remap for do codeAction of current line
+nmap <leader>gl <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>gf <Plug>(coc-fix-current)
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
-augroup mygroup
+augroup CocGroup1
   autocmd!
   " Setup formatexpr specified filetype(s).
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
   " Update signature help on jump placeholder
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-xmap <leader>aa  <Plug>(coc-codeaction-selected)
-nmap <leader>aa  <Plug>(coc-codeaction-selected)
-
-" Remap for do codeAction of current line
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Create mappings for function text object, requires document symbols feature of languageserver.
-xmap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap if <Plug>(coc-funcobj-i)
-omap af <Plug>(coc-funcobj-a)
-
-" Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
-nmap <silent> <C-d> <Plug>(coc-range-select)
-xmap <silent> <C-d> <Plug>(coc-range-select)
-
-" Use `:Format` to format current buffer
-command! -nargs=0 Format :call CocAction('format')
-
-" Use `:Fold` to fold current buffer
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" use `:OR` for organize import of current buffer
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-" Add status line support, for integration with other plugin, checkout `:h coc-status`
-" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-" Using CocList
-" Show all diagnostics
-nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
-" Manage extensions
-nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
-" Show commands
-nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
-" Find symbol of current document
-nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
-" Search workspace symbols
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
-
-" Plug 'Valloric/YouCompleteMe', { 'do': './install.py --all' }
-" let g:ycm_confirm_extra_conf = 0
-" " let g:ycm_autoclose_preview_window_after_insertion = 1
-" let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
-" let g:ycm_key_list_previous_completion = ['<S-TAB>', '<Up>']
-" let g:ycm_show_diagnostics_ui = 0
-" let g:ycm_max_num_candidates = 100
-" let g:ycm_complete_in_comments = 1
-" let g:ycm_python_binary_path = 'python3'
-" let g:ycm_add_preview_to_completeopt = 1
-" let g:ycm_semantic_triggers =  {
-"  \ 'css'        : [ 're!^\s{1,6}', 're!:\s+' ],
-"  \ 'scss'       : [ 're!^\s{1,6}', 're!:\s+' ],
-"  \ 'c'          : ['->', '.'],
-"  \ 'objc'       : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s', 're!\[.*\]\s'],
-"  \ 'ocaml'      : ['.', '#'],
-"  \ 'cpp,objcpp' : ['->', '.', '::'],
-"  \ 'perl'       : ['->'],
-"  \ 'php'        : ['->', '::'],
-"  \ 'ruby'       : ['.', '::'],
-"  \ 'lua'        : ['.', ':'],
-"  \ 'erlang'     : [':'],
-"  \ 'python'     : ['re!(import\s+|from\s+(\w+\s+(import\s+(\w+,\s+)*)?)?)'],
-"  \ 'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go,groovy' : ['.'],
-"  \ }
-" autocmd FileType scss setlocal omnifunc=csscomplete#CompleteCSS
-" let g:ycm_filetype_specific_completion_to_disable = {
-"      \ 'lua' : 1,
-"      \ 'vimwiki' : 1,
-"      \ 'groovy' : 1,
-"      \}
-" " let g:ycm_filetype_whitelist = {
-" " 			\ "c":1,
-" " 			\ "cpp":1,
-" " 			\ "objc":1,
-" " 			\ "sh":1,
-" " 			\ "zsh":1,
-" " 			\ "zimbu":1,
-" " 			\ "python":1,
-" " 			\ }
-" nnoremap <leader>d :YcmCompleter GoTo<CR>
-" nnoremap <leader>D :YcmCompleter GoToDefinition<CR>
-" nnoremap <leader>* :YcmCompleter GoToReferences<CR>
-" nnoremap <leader>k :YcmCompleter GetDoc<CR>
-" nnoremap <leader>K :YcmCompleter GetType<CR>
-" command! YcmSwitchPython3Completion execute 'let g:ycm_python_binary_path="/usr/bin/python3" | YcmRestartServer'
-" command! YcmSwitchPython2Completion execute 'let g:ycm_python_binary_path="/usr/bin/python2" | YcmRestartServer'
-" "let g:ycm_filetype_blacklist = { 'ruby': 1 }
-
-" Plug 'artur-shaik/vim-javacomplete2'
-" autocmd FileType groovy setlocal omnifunc=javacomplete#Complete
-
-"Plug 'autozimu/LanguageClient-neovim', {
-"    \ 'branch': 'next',
-"    \ 'do': 'bash install.sh',
-"    \ }
-"" (Optional) Multi-entry selection UI.
-"Plug 'junegunn/fzf'
-"autocmd Filetype ruby set completefunc=LanguageClient#complete
-
+" async on-the-fly linting
 Plug 'w0rp/ale'
-      " \ 'cpp'        : ['clangtidy', 'cpplint'],
 let g:ale_linters = {
-     \ 'c'          : ['clangtidy'],
-     \ 'javascript' : ['eslint'],
-     \ 'python'     : ['flake8'],
-     \ 'chef'       : [''],
-     \ }
+    \ 'c'          : ['clangtidy'],
+    \ 'javascript' : ['eslint'],
+    \ 'python'     : ['flake8'],
+    \ 'chef'       : [''],
+    \ }
+      " \ 'cpp'        : ['clangtidy', 'cpplint'],
 let g:ale_python_pylint_options = '-d C0103,C0111,C0321'
 let g:ale_python_flake8_options =  '--ignore=E121,E123,E126,E226,E24,E704,W503,W504,E702,E501'
 let g:ale_cpp_clangcheck_options = '-extra-arg="-std=c++11"'
 let g:ale_cpp_clangtidy_options = '-std=c++11'
-" let g:ale_cpp_clangtidy_checks = []
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '%s       %severity% | %linter% | %code%'
-" let g:ale_echo_msg_format = "%linter% %s"
 let g:ale_cpp_cpplint_options = '--linelength=120 --filter=-readability/todo,-whitespace/operators'
 let g:ale_python_flake8_options = '--ignore=E303,E121,E123,E126,E226,E24,E704,W503,W504,E501 --max-line-length=120'
 let g:ale_ruby_rubocop_options = '--except Layout/AlignParameters,Style/Documentation,Metrics/MethodLength,Style/GuardClause,Metrics/AbcSize,Naming/AccessorMethodName,Layout/MultilineMethodCallIndentation,Metrics/LineLength'
 let g:ale_sh_shellcheck_exclusions = 'SC1090'
+let g:ale_echo_delay = 200
 autocmd BufEnter PKGBUILD,.env
-     \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
-" let g:ale_c_cppcheck_options = '--enable=style --suppress="unusedStructMember" --suppress="unreadVariable"'
+    \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
 nmap <silent> <leader>lp <Plug>(ale_previous_wrap)
 nmap <silent> <leader>ln <Plug>(ale_next_wrap)
-" let g:ale_set_signs = 0
-" let g:ale_virtualtext_cursor = 1
 
-" Plug 'neomake/neomake'
-" let g:neomake_vim_enabled_makers = []
-" let g:neomake_open_list = 2
-
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-let g:UltiSnipsExpandTrigger = '<c-s>'
-let g:UltiSnipsJumpForwardTrigger = '<c-j>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-m>'
-
-Plug 'mileszs/ack.vim'
-let g:ackprg = 'ag --vimgrep'
-" let g:ack_qhandler = "botright copen 3"
-let g:ack_qhandler = "botright copen 10"
-let g:ackpreview = 1
-let g:ackhighlight = 1
-nnoremap <leader>s :Ack!<Space>''<Left>
-
-Plug 'yuttie/comfortable-motion.vim'
-let g:comfortable_motion_air_drag = 13
-let g:comfortable_motion_friction = 0.0
-let g:comfortable_motion_no_default_key_mappings = 1
-let g:comfortable_motion_impulse_multiplier = 3
-nnoremap <silent> <C-d> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
-nnoremap <silent> <C-u> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
-nnoremap <silent> <C-f> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 4)<CR>
-nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
-
-" show changed lines for VCS
-Plug 'mhinz/vim-signify'
-" let g:signify_realtime = 1
-let g:signify_realtime = 0
-
-Plug 'majutsushi/tagbar'
-let g:tagbar_compact = 1
-nnoremap <leader>E :TagbarToggle<CR>
-"autocmd FileType python nested :call tagbar#autoopen(0)
-
-Plug 'bititanb/ranger.vim'
-let g:ranger_map_keys = 0
-" function! RangerOpen()
-"   execute 'tabnew'
-"   execute 'Ranger'
-" endfunction
-nmap <leader>e :Ranger<CR>
-
-" " advanced matcher for denite
-" Plug 'nixprime/cpsm', { 'do': 'PY3=ON ./install.sh' }
+" fast file search + help, history, registers search and more
 Plug 'Shougo/denite.nvim'
-      " \ ['ag', '--ignore=/third_party/', '--ignore=/build/',
 nnoremap <C-P> :ccl<CR>:Denite file/rec<CR>
 nnoremap <leader>p :ccl<CR>:Denite buffer<CR>
 
 autocmd FileType denite call s:denite_my_settings()
 function! s:denite_my_settings() abort
     nnoremap <silent><buffer><expr> <CR>
-                \ denite#do_map('do_action')
+               \ denite#do_map('do_action')
     " nnoremap <silent><buffer><expr> d
     "            \ denite#do_map('do_action', 'delete')
     " nnoremap <silent><buffer><expr> <c-t>
@@ -538,33 +213,37 @@ function! s:denite_my_settings() abort
     " nnoremap <silent><buffer><expr> V
     "            \ denite#do_map('toggle_select').'j'
 endfunction
-
 autocmd FileType denite-filter call s:denite_filter_my_settings()
 function! s:denite_filter_my_settings() abort
-    " imap <silent><buffer> <tab> <Plug>(denite_filter_quit)
     inoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
-    " inoremap <silent><buffer><expr> <c-t>
-    "            \ denite#do_map('do_action', 'tabopen')
-    " inoremap <silent><buffer><expr> <c-v>
-    "            \ denite#do_map('do_action', 'vsplit')
-    " inoremap <silent><buffer><expr> <c-x>
-    "            \ denite#do_map('do_action', 'split')
+    " imap <silent><buffer> <tab> <Plug>(denite_filter_quit)
     inoremap <silent><buffer><expr> <esc>
-                \ denite#do_map('quit')
+               \ denite#do_map('quit')
     inoremap <silent><buffer> <C-j>
-                \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
+               \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
     inoremap <silent><buffer> <C-k>
-                \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
+               \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
 endfunction
 
-Plug 'dhruvasagar/vim-table-mode'
-let g:table_mode_corner='|'
+" snippets
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+let g:UltiSnipsExpandTrigger = '<c-s>'
+let g:UltiSnipsJumpForwardTrigger = '<c-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<c-m>'
 
+" faster grep alternative integration
+Plug 'mileszs/ack.vim'
+let g:ackprg = 'rg --vimgrep'
+let g:ack_qhandler = "botright copen 10"
+let g:ackpreview = 1
+let g:ackhighlight = 1
+nnoremap <leader>s :Ack!<Space>''<Left>
+
+" search and replace recursively with rollback
 Plug 'brooth/far.vim'
 let g:far#preview_window_layout='right'
 let g:far#window_layout='tab'
-" let g:far#source="agnvim"
-" let g:far#debug = 1
 function! s:FarClear()
   let n = bufnr('$')
   while n > 0
@@ -576,6 +255,31 @@ function! s:FarClear()
 endfun
 command! FarClear call s:FarClear()
 
+" git commands
+Plug 'tpope/vim-fugitive'
+" show changed lines in git
+Plug 'mhinz/vim-signify'
+" don't run on cursorhold, it slows down vim
+autocmd User SignifySetup autocmd! signify CursorHold,CursorHoldI
+
+" file explorer/manager/viewer
+Plug 'bititanb/ranger.vim'
+let g:ranger_map_keys = 0
+nmap <leader>e :Ranger<CR>
+
+" text alignment
+Plug 'junegunn/vim-easy-align'
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+nmap <leader>ag gaii
+
+" make tables (no table-like alignments, only fully formatted tables created)
+Plug 'dhruvasagar/vim-table-mode'
+let g:table_mode_corner='|'
+let g:table_mode_map_prefix = '<Leader>t'
+
 " only for 'sexy' multiline comments (<leader>cs)
 " and usual multiline (<lead>cm) + some automatic stuff
 Plug 'scrooloose/nerdcommenter'
@@ -585,95 +289,99 @@ Plug 'tyru/caw.vim'
 let g:caw_hatpos_skip_blank_line = 1
 let g:caw_wrap_skip_blank_line = 1
 
-" Plug 'Yggdroot/indentLine'
-" let g:indentLine_char = '┊'
-" let g:indentLine_concealcursor = ''
-" Plug 'thaerkh/vim-indentguides'
+" autoclose quotes, parentheses, brackets..
+Plug 'ervandew/matchem'
+" replace quotes, parens, brackets...
+Plug 'tpope/vim-surround'
+
+" diff whole directories
+Plug 'will133/vim-dirdiff'
+" diff on blocks of code
+Plug 'AndrewRadev/linediff.vim'
+
+" gnupg encryption and transparent decryption support
+Plug 'jamessan/vim-gnupg'
+
+" vim wiki, previously used for task tracking
+" Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
+" let g:vimwiki_hl_cb_checked = 1
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" EYE-CANDY PLUGINS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" colorscheme/theme
+Plug 'gruvbox-community/gruvbox'
+
+" colorize hex codes in css and like
+Plug 'KabbAmine/vCoolor.vim'
+
+" show number of search matches
+Plug 'henrik/vim-indexed-search'
+
+" modify tab bar
+Plug 'gcmt/taboo.vim'
+let g:taboo_tab_format="  %p%m  "
+
+" smooth scrolling
+Plug 'yuttie/comfortable-motion.vim'
+let g:comfortable_motion_air_drag = 13
+let g:comfortable_motion_friction = 0.0
+let g:comfortable_motion_no_default_key_mappings = 1
+let g:comfortable_motion_impulse_multiplier = 3
+nnoremap <silent> <C-d> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
+nnoremap <silent> <C-u> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
+nnoremap <silent> <C-f> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 4)<CR>
+nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
+
+" colorized indentation
 Plug 'nathanaelkane/vim-indent-guides'
 let g:indent_guides_indent_levels = 12
-let g:indent_guides_guide_size = 1
+let g:indent_guides_guide_size = 2
 let g:indent_guides_auto_colors = 0
-autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesOdd  guibg=#303030 ctermbg=4
-autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 ctermbg=4
 let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_start_level = 2
+let g:indent_guides_start_level = 1
+autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesOdd  guibg=NONE ctermbg=NONE
+autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 ctermbg=4
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" SMALL PLUGINS TO FIX SHITTY OUT-OF-THE-BOX VIM EXPERIENCE
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" faster folding via not updating the folds too often
+Plug 'Konfekt/FastFold'
+" fastfold required:
+set sessionoptions-=folds
+
+" command mode readline bindings
+Plug 'vim-utils/vim-husk'
+
+" adds vim objects based on indentation level (very useful for yaml and like)
+Plug 'michaeljsmith/vim-indent-object'
+
+" helpers for unix (:Gmove, ...), sudo write support
+Plug 'tpope/vim-eunuch'
+
+" :Bd[elete] command
+Plug 'moll/vim-bbye'
+
+" change between paste and editing modes automatically
+Plug 'roxma/vim-paste-easy'
+
+" hide annoying swap dialogues
+Plug 'gioele/vim-autoswap'
+
+" repeat more things with .
+Plug 'tpope/vim-repeat'
+
+" use automatically detected indentation of opened file
 Plug 'roryokane/detectindent'
 augroup DetectIndent
   autocmd!
   autocmd BufReadPost *  DetectIndent
 augroup END
 
-" quickfix window options
-" Plug 'blueyed/vim-qf_resize'
-
-" build from vim
-" Plug 'tpope/vim-dispatch'
-" nnoremap <leader>m :w \| Make
-
-" Plug 'benmills/vimux'
-
-Plug 'junegunn/vim-easy-align'
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
-nmap <leader>ag gaii
-
-Plug 'lervag/vimtex'
-
-" big collection of syntax files
-Plug 'sheerun/vim-polyglot'
-let g:polyglot_disabled = ['lua']
-
-" autoclose quotes, parens, brackets..
-Plug 'ervandew/matchem'
-" git commands
-Plug 'tpope/vim-fugitive'
-" show docs
-Plug 'Shougo/echodoc.vim'
-" command mode readline bindings
-Plug 'vim-utils/vim-husk'
-" replace quotes, parens, brackets...
-Plug 'tpope/vim-surround'
-" :Bdelete command
-Plug 'moll/vim-bbye'
-Plug 'will133/vim-dirdiff'
-Plug 'roxma/vim-paste-easy'
-Plug 'michaeljsmith/vim-indent-object'
-Plug 'gioele/vim-autoswap'
-Plug 'raymond-w-ko/vim-lua-indent'
-" show number of search matches
-Plug 'henrik/vim-indexed-search'
-" helpers for unix (:Gmove, ...), sudo write support
-Plug 'tpope/vim-eunuch'
-
-Plug 'rasjani/robotframework-vim'
-
-" encryption support
-Plug 'jamessan/vim-gnupg'
-
-Plug 'tpope/vim-repeat'
-
-Plug 'modille/groovy.vim'
-
-" change filetype for range of lines
-Plug 'inkarkat/vim-ingo-library'
-Plug 'inkarkat/vim-SyntaxRange'
-
-Plug 'zainin/vim-mikrotik'
-
-" Plug 'pseewald/vim-anyfold'
-" let g:anyfold_activate=1
-" let g:anyfold_fold_display=1
-" let g:anyfold_fold_toplevel=1
-
-" chef autofiletype
-" Plug 'dougireton/vim-chef'
-
-" diff on blocks of code
-Plug 'AndrewRadev/linediff.vim'
-
+" cyrillic localization hacks [russian language]
 Plug 'lyokha/vim-xkbswitch'
 if $DISPLAY == ""
 	let g:XkbSwitchEnabled = 0
@@ -681,380 +389,248 @@ else
   set keymap=russian-jcukenwin
   set iminsert=0
   set imsearch=0
-  " set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 	let g:XkbSwitchEnabled = 1
+  " set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 	" let g:XkbSwitchIMappings = ['ru']
- "  let g:XkbSwitchNLayout = 'us'
+  " let g:XkbSwitchNLayout = 'us'
   " let g:XkbSwitchAssistNKeymap = 1    " for commands r and f
   " let g:XkbSwitchAssistSKeymap = 1    " for search lines
 endif
 
-" Plug 'ierton/xkb-switch'
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" SYNTAX/INDENT/FOLDING PLUGINS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Plug 'reedes/vim-lexical'
-" augroup lexical
-"   autocmd!
-"   autocmd FileType *.md,markdown,mkd call lexical#init()
-"   autocmd FileType textile call lexical#init()
-"   autocmd FileType text call lexical#init()
-" augroup END
-" let g:lexical#spelllang = ['en_us','ru_ru',]
+" big collection of syntax files
+Plug 'sheerun/vim-polyglot'
+let g:polyglot_disabled = ['lua']
 
-" modify tab bar
-Plug 'gcmt/taboo.vim'
-let g:taboo_tab_format="  %p%m  "
+" latex editing package
+Plug 'lervag/vimtex'
 
+" lua
+Plug 'raymond-w-ko/vim-lua-indent'
+
+" groovy
+Plug 'modille/groovy.vim'
+
+" json
 Plug 'elzr/vim-json'
 let g:vim_json_syntax_conceal=1
 
-" colorize hex codes in code
-Plug 'KabbAmine/vCoolor.vim'
-" Plug 'ap/vim-css-color'
-" Plug 'chrisbra/Colorizer'
-" let g:colorizer_auto_color = 1
+" python folding
+Plug 'tmhedberg/SimpylFold'
 
-" Plug 'tbabej/taskwiki'
-" Plug 'blindFS/vim-taskwarrior'
-" Plug 'powerman/vim-plugin-AnsiEsc'
-Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
-let g:vimwiki_hl_cb_checked = 1
-" let g:taskwiki_sort_order='priority-,-status+,end+,due+,project+'
-" let g:taskwiki_sort_orders={"T": "priority-"}
-" " let wiki = {}
-" " let wiki.path = '~/my_wiki/'
-" " let wiki.nested_syntaxes = {'python': 'python', 'c++': 'cpp'}
-" " let g:vimwiki_list = [wiki]
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" POST-PLUGIN TASKS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" now after defining plugins let plugin manager do the job
+call plug#end()
 
 " jumping with % for xml tags
 runtime macros/matchit.vim
 
-call plug#end()
-
-" call denite#custom#var('file/rec', 'command',
-"       \ ['ag',
-"       \ '--follow', '--nocolor', '--nogroup', '-g', ''])
-call denite#custom#source(
-     \ 'file/rec', 'matchers', ['matcher/hide_hidden_files', 'matcher/project_files', 'matcher/substring'])
-call denite#custom#source(
-     \ 'buffer', 'matchers', ['matcher/substring'])
-
-" " Change matchers.
-" call denite#custom#source(
-"\ 'file_mru', 'matchers', ['matcher/fuzzy', 'matcher/project_files'])
-
-" call denite#custom#source('tag', 'matchers', ['matcher/substring'])
-
-" call denite#custom#source('file/old', 'converters',
-"      \ ['converter/relative_word'])
-" " Change sorters.
-" call denite#custom#source(
-"\ 'file/rec', 'sorters', ['sorter/sublime'])
-
-" Change ignore_globs
-" call denite#custom#filter('matcher/ignore_globs', 'ignore_globs',
-"      \ [ '.*', '_*', '__*'])
-
+" more denite configuration
+call denite#custom#var('file/rec', 'command', ['rg', '--files'])
+call denite#custom#source('file/rec', 'matchers', ['matcher/substring',
+      \ 'matcher/ignore_current_buffer'])
+call denite#custom#source('buffer', 'matchers', ['matcher/substring'])
+" Change ignore_globs (they have to be enabled in matchers still)
 let s:denite_options = {
-      \ 'prompt' : '>',
-      \ 'split': 'floating',
-      \ 'start_filter': 1,
-      \ 'smartcase': 1,
-      \ 'auto_resize': 1,
-      \ 'source_names': 'short',
-      \ 'direction': 'botright',
-      \ 'highlight_filter_background': 'CursorLine',
-      \ 'highlight_matched_char': 'Type',
-      \ }
-
+     \ 'prompt' : '>',
+     \ 'split': 'floating',
+     \ 'start_filter': 1,
+     \ 'smartcase': 1,
+     \ 'auto_resize': 1,
+     \ 'source_names': 'short',
+     \ 'highlight_filter_background': 'CursorLine',
+     \ 'highlight_matched_char': 'Question',
+     \ }
 call denite#custom#option('default', s:denite_options)
 
-" call denite#custom#option('_', 'highlight_mode_insert', 'CursorLine')
-" call denite#custom#option('_', 'highlight_matched_range', 'None')
-" call denite#custom#option('_', 'highlight_matched_char', 'None')
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" COLORSCHEME SETUP
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" call neomake#configure#automake('rw', 1000)
+" detect terminal capabilities and set colorscheme
+function! SetColorScheme(colors, ...)
+  " first arg: gui, 256, or tty
+  " second optional arg: background (default = dark)
+  if a:colors == '256' || a:colors == 'gui'
+    " set t_8f=[38;2;%lu;%lu;%lum
+    " set t_8b=[48;2;%lu;%lu;%lum
+    " let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+    set termguicolors
+    execute 'colorscheme gruvbox'
+  elseif a:colors == 'tty'
+    execute 'colorscheme desert'
+  endif
 
-""""""""""""""""""""""""""""""""""""""
-" SETTINGS
-""""""""""""""""""""""""""""""""""""""""
+  if exists('a:1')
+    let &background = a:1
+  else
+    set background=dark
+  endif
+endfunction
+
+if IsTerm256Colors()
+  try
+    call SetColorScheme('256')
+  catch
+    call AddUnavailMsg('Terminal colorscheme')
+    call SetColorScheme('tty')
+  endtry
+else
+  call SetColorScheme('tty')
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" GENERAL SETTINGS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " language (let it be in the beginning)
-set langmenu=none
 language en_US.utf8
+set langmenu=none
+set encoding=utf-8
 
 filetype plugin indent on
+syntax on
+set hidden
 
-" russian
+" redraw only when we need to
+set lazyredraw
+" coc.nvim requires lower value of this to show diagnostics faster on cursorhold
+set updatetime=300
+
+" cursor always in the center
+set scrolloff=999
+
+" indentation
+set expandtab
+set tabstop=2
+set shiftwidth=2
+" round indentation to 'shiftwidth'
+set shiftround
+" Simple indentation method: continue from the same indent as previous line.
+" Should not interfere with filetype-based indentation, unlike other methods
+set autoindent
+" set cindent
+" set cinoptions+=(0
+
+set ignorecase
+set smartcase
+
+" show a dialog (y/n) instead of failing on some actions
+set confirm
+" hide intro message on start
+set shortmess+=I
+
+set undofile
+" make backup on :w, needed to avoid possible lose of data if vim crashes on :w
+set backup
+" don't change inode on save, helps with docker mounts not detecting file changes
+set backupcopy=yes
+" configure how much of history, marks, registers, etc can be remembered
+set shada=!,'100,<200,s100,h
+" don't same some things in :mksession
+set sessionoptions-=blank,options
+
+" cyrillic localization hacks [russian language]
 " set keymap=russian-jcukenwin
 " set iminsert=0
 " set imsearch=-1
 " set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
 
-" FIX lag in terminal vim
-set timeoutlen=1000
-set ttimeoutlen=50
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" EYE-CANDY SETTINGS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" backup, swap, undo
-set undofile
-" disable backups, could conflict with Coc.nvim
-" set backup
-set nobackup
-set nowritebackup
+" show effects of some commands (e.g. substitute) in real-time
+set inccommand=nosplit
 
-" tabs, indent
-set tabstop=2
-set softtabstop=2
-set shiftwidth=2
-" set smarttab
-" set autoindent
-set cindent
-set cinoptions+=(0
-set expandtab
-autocmd FileType * setlocal expandtab
-autocmd FileType make setlocal noexpandtab
-autocmd FileType cbot setlocal noexpandtab
-" autocmd BufEnter * silent! lcd %:p:h
-
-" matchparen plugin (CARE it can slow vim TOO MUCH)
-" when loaded_matchparen = 1 then the plugin is disabled
-" let g:loaded_matchparen = 1
-" let g:matchparen_timeout = 200
-" let g:matchparen_insert_timeout = 200
+" highlight matching [{()}]
+set showmatch
 
 " statusline
-"set statusline=%t\ %<%m%H%W%q%=%{GetFileDirectory()}\ [%{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %l-%L\ %p%%
-" Add status line support, for integration with other plugin, checkout `:h coc-status`
-" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-" set statusline=%m%H%W%q\ %t\ %<%=\ %{coc#status()}\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
-" set statusline=%m%H%W%q\ %{expand('%:~')}%<%=\ %{coc#status()}\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
 set statusline=%m%H%W%q\ %{expand('%:~')}%<%=\ [%{&ft},\ %{&ff},\ %{strlen(&fenc)?&fenc:'none'}]\ %p%%\ %l-%L
-set laststatus=2        " always show status bar
+" always show status bar
+set laststatus=2
 
-" highlight
-set showmatch           " highlight matching [{()}]
-set hlsearch
-set inccommand=nosplit
-" WARN cursorline might slow vim down A LOT
-"set cursorline
-set colorcolumn=80
-autocmd BufEnter * :highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
-autocmd BufEnter * :highlight StatusLineNC cterm=none term=none ctermbg=none ctermfg=0
+" highlight columns
+set colorcolumn=80,120
+autocmd BufWinEnter * highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
 
-" filetype detect
-autocmd BufNewFile,BufRead *.cbot.txt,*.cb.txt :set filetype=cbot
-autocmd BufNewFile,BufRead Dockerfile* :set filetype=dockerfile
+" highlight trailing white space
+autocmd BufWinEnter * highlight default link TrailingWhiteSpace Tabline
+autocmd BufWinEnter * match TrailingWhiteSpace /\s\+$/
+" don't highlight trailing whitespace in Insert mode
+autocmd InsertEnter * match TrailingWhiteSpace /\s\+\%#\@<!$/
+autocmd InsertLeave * match TrailingWhiteSpace /\s\+$/
 
-" folds
-" set foldcolumn=1        " Add a bit extra margin to the left
-" set foldopen-=block
-" set foldlevelstart=999
-set foldlevel=1
-set foldmethod=indent
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" FOLDING SETTINGS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+set foldmethod=syntax
+" default folding for opened files
+set foldlevelstart=1
+" (absolute) maximum folding level, should be > foldlevel to actually show anything
 set foldnestmax=2
-set foldminlines=0
-" HACK: disable folding in vimdiff
-if &diff
-  set diffopt=filler,context:1000000
-endif
-autocmd Filetype * setlocal nofoldenable
+" don't fold if method/class has only that many lines
+set foldminlines=1
+" don't open folds on {} moves
+set foldopen-=block
 
-" colors
-" let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-" let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-if has('gui_running')
-  try
-    call SetColorScheme('gui')
-  catch
-    call AddUnavailMsg('Gui colorscheme')
-    call SetColorScheme('tty')
-  endtry
+" prettier folding (custom function)
+function! MyFoldText() " {{{
+    let line = getline(v:foldstart)
 
-  try
-    set guifont=monospace\ 12
-  catch
-    call AddUnavailMsg('Guifont')
-    set guifont=DejaVu\ Sans\ Mono\ 12
-  endtry
-else
-  if IsTerm256Colors()
-    try
-      call SetColorScheme('256')
-    catch
-      call AddUnavailMsg('Terminal colorscheme')
-      call SetColorScheme('tty')
-    endtry
-  else
-    call SetColorScheme('tty')
-  endif
-endif
+    let nucolwidth = &fdc + &number * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 3
+    let foldedlinecount = v:foldend - v:foldstart
 
-" misc
-" set iskeyword+=:,::,.
-set encoding=utf-8
-set ignorecase
-set smartcase
-set incsearch
-set scrolloff=999
-set autoread            " autoreload buffer if changes
-set lazyredraw          " redraw only when we need to.
-set showcmd             " show command in bottom bar
-set wildmenu            " visual autocomplete for command menu
-set showfulltag
-set hidden
-set nocompatible
-set confirm
-set viminfo='50,<100,s100,:30000,/1000,@1000,f1,h
-set sessionoptions-=blank
-set sessionoptions-=options
-set shiftround          " round indentation
-set backspace=indent,eol,start
-set omnifunc=syntaxcomplete#Complete
-setlocal shortmess+=I   " hide intro message on start
-set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.ropeproject/*
-set wildignore+=Session.vim,*.pyc
-set updatetime=300
-"set completeopt-=preview
-let maplocalleader='\'
-" don't change inode of saved file, helps with docker mounts not detecting file changes
-set backupcopy=yes
+    " expand tabs into spaces
+    let onetab = strpart('          ', 0, &tabstop)
+    let line = substitute(line, '\t', onetab, 'g')
 
-" gui
-if has('gui_running')
-  set guioptions-=m  "remove menu bar
-  set guioptions-=T  "remove toolbar
-  set guioptions-=r  "remove right-hand scroll bar
-  set guioptions-=L  "remove left-hand scroll bar
-  set guioptions+=c  "no graphical popup dialogs
-endif
+    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+    return line.'… ['.foldedlinecount.']'.repeat(" ",fillcharcount)
+endfunction " }}}
+set foldtext=MyFoldText()
 
-autocmd FileType markdown,text,tex setlocal spell spelllang=en,ru
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" LANGUAGE-SPECIFIC SETTINGS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-syntax on
-"autocmd FileType * syntax on
-" autocmd Filetype * setlocal conceallevel=0
-autocmd FileType * setlocal history=300
-autocmd FileType * setlocal formatoptions-=t
-autocmd FileType * setlocal formatoptions-=o
-autocmd FileType * setlocal formatoptions-=r
+" text files always autosave
+autocmd TextChanged,InsertLeave g:text_filetypes silent! update
+" enable spelling for text files
+autocmd FileType g:text_filetypes setlocal spell spelllang=en,ru
 
 " python
+" standard syntax highlightin configuration
 let python_highlight_all = 1
-" autocmd Filetype python setlocal foldmethod=indent
-" autocmd Filetype python setlocal foldlevel=1
-" autocmd Filetype python setlocal foldminlines=15
-" autocmd Filetype python setlocal foldnestmax=2
-autocmd FileType python nmap <buffer> <leader>B Oimport pudb; pudb.set_trace()<C-[>
-autocmd FileType python nmap <buffer> <leader>b Ofrom IPython.terminal import debugger; debugger.set_trace()<C-[>
 autocmd FileType python setlocal tabstop=4
-autocmd FileType python setlocal softtabstop=4
 autocmd FileType python setlocal shiftwidth=4
+" python debuggers
+autocmd FileType python nmap <buffer> <leader>b Ofrom IPython.terminal import debugger; debugger.set_trace()<C-[>
+autocmd FileType python nmap <buffer> <leader>B Oimport pudb; pudb.set_trace()<C-[>
 
-" ruby
+" ruby debugger
 autocmd FileType ruby nmap <buffer> <leader>b Orequire 'pry-byebug'; binding.pry<C-[>
 
+" js debugger
 autocmd FileType javascript nmap <buffer> <leader>b Odebugger;<C-[>
 
+" c/cpp debugger
 autocmd FileType c,cpp nmap <buffer> <leader>b Oraise(SIGTRAP);<C-[>
+
+" php debugger
 autocmd FileType php nmap <buffer> <leader>b Orequire('/bin/psysh'); eval(\Psy\sh());<C-[>
 
-autocmd FileType lua nmap <buffer>
-     \ <leader>b Oif require("os").getenv("DISPLAY") ~= ":0.0"
-     \ then require("debugger")() end<C-[>
-      " \ then require("mobdebug").start() end<C-[>
-
-" restore cursor position on file open
-autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
-     \ exe "normal! g`\"" | endif
-
-" delete trailing spaces
-autocmd BufWritePre * call DeleteTrailingWS()
-
-""""""""""""""""""""""""""""""""""""""""
-" MAPPINGS, COMMANDS
-""""""""""""""""""""""""""""""""""""""""
-
-command! W execute ':SudoWrite'
-
-" edit config files
-command! Rv execute 'source ' . g:path#vimrc
-command! Ev execute 'edit ' . g:path#vimrc
-command! Em execute 'edit ' . "~/.tmux.conf"
-command! Ems execute 'edit ' . "~/.tmuxinator/default.yml"
-command! Eb execute 'edit ' . "~/.bashrc"
-command! Ep execute 'edit ' . "~/.profile"
-command! Ex execute 'edit ' . "~/.Xresources"
-command! Et execute 'edit ' . "~/.config/alacritty/alacritty.yml"
-command! Es execute 'edit ' . "~/git/utils-linux/wmctrl-session-autostart.sh"
-command! Est execute 'edit ' . "~/git/utils-linux/wmctrl-session-tmux.sh"
-command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
-command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
-
-" fast fullscreen split/revert back
-nnoremap \| <C-W>\|<C-W>_
-nnoremap + <C-W>=
-
-" open 4 splits side by side
-function! SetupSplits()
-  execute 'silent! e /tmp/blank'
-  execute 'only'
-  execute 'split'
-  execute 'vsplit'
-  execute 'wincmd j'
-  execute 'vsplit'
-  execute 'wincmd k'
-endfunction
-command! Ss call SetupSplits()
-
-" save current buffer automatically
-command! As autocmd TextChanged,InsertLeave <buffer> silent! update
-
-" autosave markdown
-autocmd TextChanged,InsertLeave *.md,markdown,*.tex,tex silent! update
-
-" disable highlighting
-nnoremap <leader>h :nohl<CR>
-
-" remove unneeded spaces
-nnoremap <leader>oc :s/\([[:graph:]]\+\)[ ]\{2,\}/\1 /g<CR>
-
-" show linenumbers
-nnoremap <leader>n :set number!<CR>
-
-" replace last yanked string with ...
-nnoremap <leader>rr :%s/<C-R>"//gc<Left><Left><Left>
-
-" leave insert mode in terminal
-tnoremap <Esc> <C-\><C-n>
-
-" " toggle folding for file
-" nnoremap <leader>f :set foldenable!<CR>
-
-" fast load session from current dir
-function! LoadSession()
-  let l:pwd = getcwd()
-  execute 'source ' . l:pwd . '/Session.vim'
-endfunction
-command! Ls call LoadSession()
-
-nnoremap <leader>me :call TermMake('')<Left><Left>
-function! TermMake(build_command)
-  let l:command = expand(a:build_command . " && wmctrl -s 3 && sleep 0.2 && xdotool key F5")
-  let g:TermMake_last_build_command = l:command
-  split
-  enew
-  call termopen(l:command)
-  startinsert
-endfunction
-
-nnoremap <leader>ml :call TermMakeLast()<CR>
-function! TermMakeLast()
-  split
-  enew
-  call termopen(g:TermMake_last_build_command)
-  startinsert
-endfunction
-
-" for chef
+" chef filetype detection
 augroup chefftdetect
     au BufNewFile,BufRead */recipes/*.rb set filetype=ruby.chef
     au BufNewFile,BufRead */cookbooks/*.rb set filetype=ruby.chef
@@ -1064,7 +640,112 @@ augroup chefftdetect
     au BufNewFile,BufRead */spec/*.rb set filetype=ruby.chef
 augroup end
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" MISC
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CUSTOM AUTOCOMMANDS, UNRELATED TO EVERYTHING ELSE
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" restore cursor position on file open
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") |
+    \ exe "normal! g`\"" | endif
+
+" vimdiff auto diffupdate
+augroup AutoDiffUpdate
+  au!
+  autocmd InsertLeave * if &diff | diffupdate | let b:old_changedtick = b:changedtick | endif
+  autocmd TextChanged *
+        \ if &diff &&
+        \    (!exists('b:old_changedtick') || b:old_changedtick != b:changedtick) |
+        \   let b:old_changedtick = b:changedtick | diffupdate |
+        \ endif
+augroup END
+
+" autoadjust quickfix window size
+au FileType qf call AdjustWindowHeight(3, 10)
+function! AdjustWindowHeight(minheight, maxheight)
+    let l = 1
+    let n_lines = 0
+    let w_width = winwidth(0)
+    while l <= line('$')
+        " number to float for division
+        let l_len = strlen(getline(l)) + 0.0
+        let line_width = l_len/w_width
+        let n_lines += float2nr(ceil(line_width))
+        let l += 1
+    endw
+    exe max([min([n_lines, a:maxheight]), a:minheight]) . "wincmd _"
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CUSTOM COMMANDS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" save with sudo
+command! W execute ':SudoWrite'
+
+" edit config files
+command! Rv execute 'source ' . g:path#vimrc
+command! Ev execute 'edit ' . g:path#vimrc
+command! Et execute 'edit ' . "~/.tmux.conf"
+command! Ets execute 'edit ' . "~/.tmuxinator/default.yml"
+command! Eb execute 'edit ' . "~/.bashrc"
+command! Ep execute 'edit ' . "~/.profile"
+command! Ea execute 'edit ' . "~/.config/alacritty/alacritty.yml"
+command! Es execute 'edit ' . "~/.local/bin/wmctrl-session-autostart.sh"
+command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
+command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
+
+" enable autosaving of current file
+command! EnableAutosave autocmd TextChanged,InsertLeave <buffer> silent! update
+
+" remove unneeded spaces
+command! RemoveTrailingSpaces silent! %s/\s\+$//g
+
+" easy loading of Session.vim in current dir
+command! LoadSession call LoadSession()
+function! LoadSession()
+  let l:pwd = getcwd()
+  execute 'source ' . l:pwd . '/Session.vim'
+endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CUSTOM MAPS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" expand split to full screen
+nnoremap \| <C-W>\|<C-W>_
+" restore split size
+nnoremap + <C-W>=
+
+" clear highlighting
+nnoremap <leader>h :nohl<CR>
+
+" replace last yanked string with ...
+nnoremap <leader>rr :%s/<C-R>"//gc<Left><Left><Left>
+
+" workaround to leave insert mode in terminal on ESC
+tnoremap <Esc> <C-\><C-n>
+
+" nnoremap <leader>me :call TermMake('')<Left><Left>
+" function! TermMake(build_command)
+"   let l:command = expand(a:build_command . " && wmctrl -s 3 && sleep 0.2 && xdotool key F5")
+"   let g:TermMake_last_build_command = l:command
+"   split
+"   enew
+"   call termopen(l:command)
+"   startinsert
+" endfunction
+
+" nnoremap <leader>ml :call TermMakeLast()<CR>
+" function! TermMakeLast()
+"   split
+"   enew
+"   call termopen(g:TermMake_last_build_command)
+"   startinsert
+" endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" POST-EVERYTHING
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" print all collected user messages from this script (see HELPER FUNCTIONS)
 call SendMessages()
