@@ -2,8 +2,6 @@
 " VARIABLES
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let g:text_filetypes = "markdown,text,tex,rst"
-
 if has('nvim')
   let g:path#vim_user_dir = expand('~/.config/nvim')
   let g:path#vimrc = expand('~/.config/nvim/init.vim')
@@ -179,8 +177,9 @@ let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '%s       %severity% | %linter% | %code%'
 let g:ale_cpp_cpplint_options = '--linelength=120 --filter=-readability/todo,-whitespace/operators'
 let g:ale_python_flake8_options = '--ignore=E303,E121,E123,E126,E226,E24,E704,W503,W504,E501 --max-line-length=120'
-let g:ale_ruby_rubocop_options = '--except Layout/AlignParameters,Style/Documentation,Metrics/MethodLength,Style/GuardClause,Metrics/AbcSize,Naming/AccessorMethodName,Layout/MultilineMethodCallIndentation,Metrics/LineLength'
+let g:ale_ruby_rubocop_options = '--except Layout/AlignParameters,Style/Documentation,Metrics/MethodLength,Style/GuardClause,Metrics/AbcSize,Naming/AccessorMethodName,Layout/MultilineMethodCallIndentation,Metrics/LineLength,Metrics/BlockLength'
 let g:ale_sh_shellcheck_exclusions = 'SC1090'
+let g:ale_yaml_yamllint_options = '-d "{extends: default, rules: {line-length: {max: 120}, indentation: {indent-sequences: consistent}, document-start: disable}}"'
 let g:ale_echo_delay = 200
 autocmd BufEnter PKGBUILD,.env
     \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
@@ -188,8 +187,9 @@ nmap <silent> <leader>lp <Plug>(ale_previous_wrap)
 nmap <silent> <leader>ln <Plug>(ale_next_wrap)
 
 " fast file search + help, history, registers search and more
-Plug 'Shougo/denite.nvim'
-nnoremap <C-P> :ccl<CR>:Denite file/rec<CR>
+Plug 'Shougo/denite.nvim', {'do': ':UpdateRemotePlugins'}
+nnoremap <C-p> :ccl<CR>:Denite file/rec<CR>
+nnoremap <C-A-p> :ccl<CR>:Denite file/rec/hidden<CR>
 nnoremap <leader>p :ccl<CR>:Denite buffer<CR>
 
 autocmd FileType denite call s:denite_my_settings()
@@ -241,31 +241,39 @@ let g:ackhighlight = 1
 nnoremap <leader>s :Ack!<Space>''<Left>
 
 " search and replace recursively with rollback
-Plug 'brooth/far.vim'
-let g:far#preview_window_layout='right'
-let g:far#window_layout='tab'
-function! s:FarClear()
-  let n = bufnr('$')
-  while n > 0
-    if getbufvar(n, '&ft') == 'far_vim'
-      exe 'bd ' . n
-    endif
-    let n -= 1
-  endwhile
-endfun
-command! FarClear call s:FarClear()
+" Plug 'brooth/far.vim'
+" let g:far#preview_window_layout='right'
+" let g:far#window_layout='tab'
+" function! s:FarClear()
+"   let n = bufnr('$')
+"   while n > 0
+"     if getbufvar(n, '&ft') == 'far'
+"       exe 'bd ' . n
+"     endif
+"     let n -= 1
+"   endwhile
+" endfun
+" command! FarClear call s:FarClear()
+
+" search and replace recursively
+Plug 'dyng/ctrlsf.vim'
+" let g:ctrlsf_default_view_mode = 'compact'
+let g:ctrlsf_ackprg = "rg"
+nnoremap <leader>rr :CtrlSF<Space>
+nnoremap <leader>rc :CtrlSFClose<CR>
 
 " git commands
 Plug 'tpope/vim-fugitive'
+
 " show changed lines in git
 Plug 'mhinz/vim-signify'
 " don't run on cursorhold, it slows down vim
 autocmd User SignifySetup autocmd! signify CursorHold,CursorHoldI
 
 " file explorer/manager/viewer
-Plug 'bititanb/ranger.vim'
+Plug 'ilya-lesikov/ranger.vim'
 let g:ranger_map_keys = 0
-nmap <leader>e :Ranger<CR>
+nmap <leader>e :RangerWorkingDirectory<CR>
 
 " text alignment
 Plug 'junegunn/vim-easy-align'
@@ -284,6 +292,7 @@ let g:table_mode_map_prefix = '<Leader>t'
 " and usual multiline (<lead>cm) + some automatic stuff
 Plug 'scrooloose/nerdcommenter'
 let g:NERDSpaceDelims = 1
+let g:NERDCompactSexyComs = 1
 " For all the other comments
 Plug 'tyru/caw.vim'
 let g:caw_hatpos_skip_blank_line = 1
@@ -302,6 +311,9 @@ Plug 'AndrewRadev/linediff.vim'
 " gnupg encryption and transparent decryption support
 Plug 'jamessan/vim-gnupg'
 
+" ansible vault files decryption support
+Plug 'thiagoalmeidasa/vim-ansible-vault'
+
 " vim wiki, previously used for task tracking
 " Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
 " let g:vimwiki_hl_cb_checked = 1
@@ -313,7 +325,7 @@ Plug 'jamessan/vim-gnupg'
 " colorscheme/theme
 Plug 'gruvbox-community/gruvbox'
 
-" colorize hex codes in css and like
+" run colorpicker
 Plug 'KabbAmine/vCoolor.vim'
 
 " show number of search matches
@@ -323,26 +335,27 @@ Plug 'henrik/vim-indexed-search'
 Plug 'gcmt/taboo.vim'
 let g:taboo_tab_format="  %p%m  "
 
+" TODO: there were some performance problems with this (e.g. in python files)
 " smooth scrolling
-Plug 'yuttie/comfortable-motion.vim'
-let g:comfortable_motion_air_drag = 13
-let g:comfortable_motion_friction = 0.0
-let g:comfortable_motion_no_default_key_mappings = 1
-let g:comfortable_motion_impulse_multiplier = 3
-nnoremap <silent> <C-d> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
-nnoremap <silent> <C-u> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
-nnoremap <silent> <C-f> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 4)<CR>
-nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
+" Plug 'yuttie/comfortable-motion.vim'
+" let g:comfortable_motion_air_drag = 13
+" let g:comfortable_motion_friction = 0.0
+" let g:comfortable_motion_no_default_key_mappings = 1
+" let g:comfortable_motion_impulse_multiplier = 3
+" nnoremap <silent> <C-d> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
+" nnoremap <silent> <C-u> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
+" nnoremap <silent> <C-f> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 4)<CR>
+" nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
 
 " colorized indentation
-Plug 'nathanaelkane/vim-indent-guides'
-let g:indent_guides_indent_levels = 12
-let g:indent_guides_guide_size = 2
-let g:indent_guides_auto_colors = 0
-let g:indent_guides_enable_on_vim_startup = 1
-let g:indent_guides_start_level = 1
-autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesOdd  guibg=NONE ctermbg=NONE
-autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 ctermbg=4
+" Plug 'nathanaelkane/vim-indent-guides'
+" let g:indent_guides_indent_levels = 12
+" let g:indent_guides_guide_size = 2
+" let g:indent_guides_auto_colors = 0
+" let g:indent_guides_enable_on_vim_startup = 1
+" let g:indent_guides_start_level = 1
+" autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesOdd  guibg=NONE ctermbg=NONE
+" autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 ctermbg=4
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SMALL PLUGINS TO FIX SHITTY OUT-OF-THE-BOX VIM EXPERIENCE
@@ -354,13 +367,16 @@ Plug 'Konfekt/FastFold'
 set sessionoptions-=folds
 
 " command mode readline bindings
-Plug 'vim-utils/vim-husk'
+" Plug 'vim-utils/vim-husk'
 
 " adds vim objects based on indentation level (very useful for yaml and like)
 Plug 'michaeljsmith/vim-indent-object'
 
-" helpers for unix (:Gmove, ...), sudo write support
+" helpers for unix (:Gmove, ...)
 Plug 'tpope/vim-eunuch'
+
+" sudo write support
+Plug 'lambdalisue/suda.vim'
 
 " :Bd[elete] command
 Plug 'moll/vim-bbye'
@@ -401,25 +417,35 @@ endif
 " SYNTAX/INDENT/FOLDING PLUGINS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" NOTE: Blacklist in polyglot overriden with specific plugins languages
 " big collection of syntax files
+
 Plug 'sheerun/vim-polyglot'
-let g:polyglot_disabled = ['lua']
+let g:polyglot_disabled = []
+" changing filetype to yaml.ansible breaks coc-yaml
+let g:polyglot_disabled += ['ansible']
 
 " latex editing package
 Plug 'lervag/vimtex'
+let g:polyglot_disabled += ['latex']
 
-" lua
+" better lua indentation/syntax (at least it was in ~2015?)
 Plug 'raymond-w-ko/vim-lua-indent'
+let g:polyglot_disabled += ['lua']
 
-" groovy
-Plug 'modille/groovy.vim'
-
-" json
+" json package
 Plug 'elzr/vim-json'
 let g:vim_json_syntax_conceal=1
+let g:polyglot_disabled += ['json']
 
+" python indentation
+Plug 'Vimjas/vim-python-pep8-indent'
 " python folding
 Plug 'tmhedberg/SimpylFold'
+" python 3 better syntax highlightning + refactoring capabilities
+" does not support python 2 or python < 3.5
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
+let g:polyglot_disabled += ['python']
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " POST-PLUGIN TASKS
@@ -435,6 +461,12 @@ runtime macros/matchit.vim
 call denite#custom#var('file/rec', 'command', ['rg', '--files'])
 call denite#custom#source('file/rec', 'matchers', ['matcher/substring',
       \ 'matcher/ignore_current_buffer'])
+
+call denite#custom#alias('source', 'file/rec/hidden', 'file/rec')
+call denite#custom#var('file/rec/hidden', 'command', ['rg', '--files', '-uu'])
+call denite#custom#source('file/rec/hidden', 'matchers', ['matcher/substring',
+      \ 'matcher/ignore_current_buffer'])
+
 call denite#custom#source('buffer', 'matchers', ['matcher/substring'])
 " Change ignore_globs (they have to be enabled in matchers still)
 let s:denite_options = {
@@ -558,7 +590,7 @@ set statusline=%m%H%W%q\ %{expand('%:~')}%<%=\ [%{&ft},\ %{&ff},\ %{strlen(&fenc
 set laststatus=2
 
 " highlight columns
-set colorcolumn=80,120
+set colorcolumn=80
 autocmd BufWinEnter * highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
 
 " highlight trailing white space
@@ -574,7 +606,8 @@ autocmd InsertLeave * match TrailingWhiteSpace /\s\+$/
 
 set foldmethod=syntax
 " default folding for opened files
-set foldlevelstart=1
+" set foldlevelstart=1
+autocmd FileType * setlocal foldlevel=1
 " (absolute) maximum folding level, should be > foldlevel to actually show anything
 set foldnestmax=2
 " don't fold if method/class has only that many lines
@@ -604,10 +637,22 @@ set foldtext=MyFoldText()
 " LANGUAGE-SPECIFIC SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" text files always autosave
-autocmd TextChanged,InsertLeave g:text_filetypes silent! update
+" data files
+autocmd FileType json,xml setlocal foldnestmax=20
+
+" DSLs
+autocmd FileType terraform,yaml,ansible setlocal foldnestmax=20
+autocmd FileType terraform,yaml,ansible setlocal foldlevel=20
+
+" text
+autocmd FileType markdown,text,tex,rst setlocal foldnestmax=20
+autocmd FileType markdown,text,tex,rst setlocal foldlevel=20
 " enable spelling for text files
-autocmd FileType g:text_filetypes setlocal spell spelllang=en,ru
+autocmd FileType markdown,text,tex,rst setlocal spell spelllang=en,ru
+" text files always autowrap
+" autocmd FileType markdown,text,tex,rst setlocal textwidth=80
+" text files always autosave
+autocmd TextChanged,InsertLeave markdown,text,tex,rst silent! update
 
 " python
 " standard syntax highlightin configuration
@@ -680,7 +725,9 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " save with sudo
-command! W execute ':SudoWrite'
+command! W execute ':w suda://%'
+" open with sudo
+command! E execute ':e suda://%'
 
 " edit config files
 command! Rv execute 'source ' . g:path#vimrc
@@ -688,11 +735,15 @@ command! Ev execute 'edit ' . g:path#vimrc
 command! Et execute 'edit ' . "~/.tmux.conf"
 command! Ets execute 'edit ' . "~/.tmuxinator/default.yml"
 command! Eb execute 'edit ' . "~/.bashrc"
+command! Ez execute 'edit ' . "~/.zshrc"
+command! Ezp execute 'edit ' . "~/.zprofile"
+command! Ezpr execute 'edit ' . "~/.zpreztorc"
 command! Ep execute 'edit ' . "~/.profile"
 command! Ea execute 'edit ' . "~/.config/alacritty/alacritty.yml"
-command! Es execute 'edit ' . "~/.local/bin/wmctrl-session-autostart.sh"
+command! Es execute 'edit ' . "~/.bin/wmctrl-session-autostart.sh"
 command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
 command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
+command! Eg execute 'edit ' . "~/.gitignore"
 
 " enable autosaving of current file
 command! EnableAutosave autocmd TextChanged,InsertLeave <buffer> silent! update
@@ -720,7 +771,7 @@ nnoremap + <C-W>=
 nnoremap <leader>h :nohl<CR>
 
 " replace last yanked string with ...
-nnoremap <leader>rr :%s/<C-R>"//gc<Left><Left><Left>
+nnoremap <leader>rf :%s/<C-R>"//gc<Left><Left><Left>
 
 " workaround to leave insert mode in terminal on ESC
 tnoremap <Esc> <C-\><C-n>

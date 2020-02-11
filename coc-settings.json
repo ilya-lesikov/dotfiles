@@ -3,5 +3,25 @@
   "list.insertMappings": {
     "<C-j>": "do:next",
     "<C-k>": "do:previous"
+  },
+  "yaml.validate": false,
+  "coc.source.ultisnips.priority": 5,
+  "coc.source.around.priority": 15,
+  "coc.source.around.shortcut": "AR",
+  "coc.source.buffer.priority": 10,
+  "coc.source.buffer.shortcut": "BU",
+  "coc.source.file.priority": 20,
+  "coc.source.file.shortcut": "PA",
+  "suggest.languageSourcePriority": 99,
+  "yaml.schemas": {
+    "http://json.schemastore.org/ansible-stable-2.7": "tasks/*.yml",
+    "http://json.schemastore.org/ansible-stable-2.7": "tasks/*.yaml"
+  },
+  "languageserver": {
+    "terraform": {
+      "command": "terraform-lsp",
+      "filetypes": ["terraform"],
+      "initializationOptions": {}
+    }
   }
 }
