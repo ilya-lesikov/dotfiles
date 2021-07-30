@@ -262,6 +262,9 @@ let g:ctrlsf_ackprg = "rg"
 nnoremap <leader>rr :CtrlSF<Space>
 nnoremap <leader>rc :CtrlSFClose<CR>
 
+" search and replace with preserving case
+Plug 'tpope/vim-abolish'
+
 " git commands
 Plug 'tpope/vim-fugitive'
 
@@ -643,6 +646,7 @@ autocmd FileType json,xml setlocal foldnestmax=20
 " DSLs
 autocmd FileType terraform,yaml,ansible setlocal foldnestmax=20
 autocmd FileType terraform,yaml,ansible setlocal foldlevel=20
+autocmd FileType terraform,yaml,ansible setlocal indentexpr=""
 
 " text
 autocmd FileType markdown,text,tex,rst setlocal foldnestmax=20
