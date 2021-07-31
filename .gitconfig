@@ -1,0 +1,13 @@
+[user]
+	email = ilya@lesikov.com
+	name = Ilya Lesikov
+[push]
+	default = simple
+[merge]
+	tool = vimdiff
+[mergetool "vimdiff"]
+	path = nvim
+#[core]
+#	pager = diff-so-fancy | less --tabs=4 -RFX
+#[interactive]
+#	diffFilter = diff-so-fancy --patch

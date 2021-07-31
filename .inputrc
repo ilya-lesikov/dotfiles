@@ -1,0 +1,15 @@
+$include /etc/inputrc
+
+# disable audio bell
+set bell-style visible
+# completions in color
+set colored-stats on
+# menu completion display similar part before cycling
+set menu-complete-display-prefix on
+# no need for extra tabs on completion
+set show-all-if-ambiguous on
+# no need for extra tabs on completion
+set show-all-if-unmodified on
+# arrow up/down search typed symbols from the beginning of strings
+"\e[A":history-search-backward
+"\e[B":history-search-forward
