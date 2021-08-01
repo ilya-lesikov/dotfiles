@@ -149,7 +149,7 @@ export NVM_DIR="$([[ -z "${XDG_CONFIG_HOME-}" ]] && printf %s "$HOME/.nvm" || pr
 # export PATH="$PATH:$HOME/.rvm/bin"
 
 # multiwerf
-source <(multiwerf use 1.1 ea)
+source <(multiwerf use 1.2 ea)
 
 # pyenv
 eval "$(pyenv init -)"

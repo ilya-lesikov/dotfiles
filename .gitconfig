@@ -15,3 +15,5 @@
 	instructionFormat = (%an <%ae>) %s
 [merge "ours"]
 	driver = true
+[interactive]
+	diffFilter = diff-so-fancy --patch
