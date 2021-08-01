@@ -135,8 +135,8 @@ fi
 
 # flant ssh keys
 eval $( keychain --eval -q )
-/usr/bin/keychain --inherit any --confirm $HOME/.ssh/id_rsa
-/usr/bin/keychain --inherit any --confirm $HOME/.ssh/tfadm-id-rsa
+/usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/id_rsa
+/usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/tfadm-id-rsa
 
 # ruby version manager
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
@@ -149,7 +149,7 @@ export NVM_DIR="$([[ -z "${XDG_CONFIG_HOME-}" ]] && printf %s "$HOME/.nvm" || pr
 # export PATH="$PATH:$HOME/.rvm/bin"
 
 # multiwerf
-source <(multiwerf use 1.2 ea)
+source <(multiwerf use 1.2 ea 1>/dev/null)
 
 # pyenv
 eval "$(pyenv init -)"
