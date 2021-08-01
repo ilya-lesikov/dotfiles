@@ -1,11 +1,11 @@
+#!/bin/zsh
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block, everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-
-#!/bin/zsh
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
@@ -15,9 +15,6 @@ fi
 ################################################################################
 # ALIASES
 ################################################################################
-
-#alias git='hub'
-alias dockernu='DOCKER_HOST=unix:///var/run/docker-no-userns.sock docker'
 
 # Decode strings: `strace -f echo asdf | format-strace`
 alias FormatStrace='grep --line-buffered -o '\''".\+[^"]"'\'' | grep --line-buffered -o '\''[^"]*[^"]'\'' | while read -r line; do printf "%b" $line; done | tr "\r\n" "\275\276" | tr -d "[:cntrl:]" | tr "\275\276" "\r\n"'
@@ -31,7 +28,7 @@ alias Pip3Upgrade='pip3 freeze --user | cut -d'=' -f1 | xargs pip3 install --use
 # gitignore.io
 Gitignore() { curl -L -s https://www.gitignore.io/api/$@ ; }
 
-# use like `sleep 10 && nt` to show notification that the task is done
+# use like `sleep 10 && Notify` to show notification that the task is done
 Notify() {
   cur_desktop="$(wmctrl -d | grep ' \* ' | cut -d' ' -f1)"
   notify-send -i /usr/share/icons/breeze/emotes/22/face-smile.svg \
@@ -42,7 +39,7 @@ PassGen() {
   tr -dc a-zA-Z0-9 </dev/urandom | head -c$1 ; echo
 }
 
-gitals() {
+Gitals() {
   gita ll "$1" | awk '{print $1}' | xargs -l gita ls
 }
 
@@ -133,11 +130,6 @@ fi
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# flant ssh keys
-eval $( keychain --eval -q )
-/usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/id_rsa
-/usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/tfadm-id-rsa
-
 # ruby version manager
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
 
@@ -145,11 +137,15 @@ eval $( keychain --eval -q )
 export NVM_DIR="$([[ -z "${XDG_CONFIG_HOME-}" ]] && printf %s "$HOME/.nvm" || printf %s "$XDG_CONFIG_HOME/nvm")"
 [[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
 
-# # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-# export PATH="$PATH:$HOME/.rvm/bin"
-
-# multiwerf
-source <(multiwerf use 1.2 ea 1>/dev/null)
-
 # pyenv
-eval "$(pyenv init -)"
+command -v pyenv 1>/dev/null && eval "$(pyenv init -)"
+
+if [[ "$PLACE" == "work-flant" ]]; then
+  # flant ssh keys
+  eval $( keychain --eval -q )
+  /usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/id_rsa
+  /usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/tfadm-id-rsa
+
+  # multiwerf
+  source <(multiwerf use 1.2 ea 1>/dev/null)
+fi

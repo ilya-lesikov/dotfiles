@@ -1,5 +1,4 @@
-# Secure umask
-umask 027
+test -e /etc/profile && . /etc/profile
 
 ################################################################################
 # CUSTOM VARIABLES
@@ -8,33 +7,26 @@ umask 027
 # $PAGER needed for some programs
 export EDITOR="nvim"
 export FILE_MANAGER="ranger"
-export GUI_EDITOR="gnvim"
+export GUI_EDITOR="kate"
 export GUI_FILE_MANAGER="$TERM_EXEC -e $FILE_MANAGER"
 export PAGER="less"
 export TERM_EXEC="alacritty"
 export VISUAL="$EDITOR"
-export WEB_BROWSER="firefox"
+export WEB_BROWSER="brave"
 
 # password to access vaulted encrypted data
 export ANSIBLE_VAULT_PASSWORD_FILE="$HOME/.vault_password"
-export GOOGLE_CLOUD_KEYFILE_JSON="$HOME/.config/gcloud/application_default_credentials.json"
 export GOPATH="$HOME/.go"
-# export GOROOT="$HOME/.go"
 export PYENV_ROOT="$HOME/.pyenv"
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
-# export NPM_CONFIG_PREFIX="$HOME/.node_modules" # not compatible with NVM
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
-# skaffold (tool for gcloud) update check disable
-export SKAFFOLD_UPDATE_CHECK=false
-# needed for .XCompose to be read
-export GTK_IM_MODULE=xim
 # for vim-gnupg
 export GPG_TTY='tty'
-# stupid virsh connect to a user qemu instance instead of system qemu by default
+# stupid virsh connects to a user qemu instance instead of system qemu by default
 export LIBVIRT_DEFAULT_URI=qemu:///system
 export WERF_STAGES_STORAGE=':local'
 
@@ -81,9 +73,6 @@ export PATH="$(find ~/.gem/ruby/ -maxdepth 2 -mindepth 2 -name bin -type d 2>/de
 
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
-
-# chef
-#export PATH="$(find ~/.chefdk/gem/ruby/ -maxdepth 2 -mindepth 2 -name bin -type d 2>/dev/null | tac | xargs printf '%s:')$PATH"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"

@@ -2,13 +2,8 @@
 " VARIABLES
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-if has('nvim')
-  let g:path#vim_user_dir = expand('~/.config/nvim')
-  let g:path#vimrc = expand('~/.config/nvim/init.vim')
-else
-  let g:path#vim_user_dir = expand('~/.vim')
-  let g:path#vimrc = expand('~/.vimrc')
-endif
+let g:path#vim_user_dir = expand('~/.config/nvim')
+let g:path#vimrc = expand('~/.config/nvim/init.vim')
 
 let g:path#autoload = expand(g:path#vim_user_dir . '/autoload')
 let g:path#plug_man_exec = expand(g:path#vim_user_dir . '/autoload/plug.vim')
@@ -51,43 +46,9 @@ function! SendMessages()
   endif
 endfunction
 
-function! IsPlugManInst()
-  if filereadable(g:path#plug_man_exec)
-    return 1
-  endif
-
-  call AddUnavailMsg('Plugin manager')
-endfunction
-
-function! DownloadFile(url, path)
-  silent! execute '!curl -fLo "' . a:path . '" --create-dirs "' . a:url . '"'
-
-  if filereadable(a:path)
-    return 1
-  endif
-endfunction
-
-function! GetPlugMan()
-  call EnsureDirExist(g:path#autoload)
-  let g:uri#plug_man = 'https://raw.githubusercontent.com/junegunn/
-        \vim-plug/master/plug.vim'
-  if DownloadFile(g:uri#plug_man, g:path#plug_man_exec)
-    call AddMsg('Plugin manager installed.')
-    autocmd VimEnter * call PromptExecute('PlugInstall')
-  else
-    call AddMsg('Plugin manager failed to install.')
-  endif
-endfunction
-
 function! EnsureDirExist(dir)
   if !isdirectory(a:dir)
     call mkdir(a:dir, 'p')
-  endif
-endfunction
-
-function! PromptExecute(cmd)
-  if input('Execute ' . a:cmd . ' ? Type y or n.   ') ==? 'y'
-    execute a:cmd
   endif
 endfunction
 
@@ -103,10 +64,6 @@ for dir in [
 endfor
 
 "
-if !IsPlugManInst()
-  call GetPlugMan()
-endif
-
 " Initialize plugin manager and define plugins after this line
 call plug#begin(g:path#plug_man_dir)
 
@@ -208,22 +165,6 @@ autocmd FileType denite call s:denite_my_settings()
 function! s:denite_my_settings() abort
     nnoremap <silent><buffer><expr> <CR>
                \ denite#do_map('do_action')
-    " nnoremap <silent><buffer><expr> d
-    "            \ denite#do_map('do_action', 'delete')
-    " nnoremap <silent><buffer><expr> <c-t>
-    "            \ denite#do_map('do_action', 'tabopen')
-    " nnoremap <silent><buffer><expr> <c-v>
-    "            \ denite#do_map('do_action', 'vsplit')
-    " nnoremap <silent><buffer><expr> <c-x>
-    "            \ denite#do_map('do_action', 'split')
-    " nnoremap <silent><buffer><expr> p
-    "            \ denite#do_map('do_action', 'preview')
-    " nnoremap <silent><buffer><expr> q
-    "            \ denite#do_map('quit')
-    " nnoremap <silent><buffer><expr> i
-    "            \ denite#do_map('open_filter_buffer')
-    " nnoremap <silent><buffer><expr> V
-    "            \ denite#do_map('toggle_select').'j'
 endfunction
 autocmd FileType denite-filter call s:denite_filter_my_settings()
 function! s:denite_filter_my_settings() abort
@@ -237,14 +178,6 @@ function! s:denite_filter_my_settings() abort
                \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
 endfunction
 
-" FIXME: hangs vim
-" snippets
-"Plug 'SirVer/ultisnips'
-"Plug 'honza/vim-snippets'
-"let g:UltiSnipsExpandTrigger = '<c-s>'
-"let g:UltiSnipsJumpForwardTrigger = '<c-j>'
-"let g:UltiSnipsJumpBackwardTrigger = '<c-m>'
-
 " faster grep alternative integration
 Plug 'mileszs/ack.vim'
 let g:ackprg = 'rg --vimgrep --hidden'
@@ -252,21 +185,6 @@ let g:ack_qhandler = "botright copen 10"
 let g:ackpreview = 1
 let g:ackhighlight = 1
 nnoremap <leader>s :Ack!<Space>'
-
-" search and replace recursively with rollback
-" Plug 'brooth/far.vim'
-" let g:far#preview_window_layout='right'
-" let g:far#window_layout='tab'
-" function! s:FarClear()
-"   let n = bufnr('$')
-"   while n > 0
-"     if getbufvar(n, '&ft') == 'far'
-"       exe 'bd ' . n
-"     endif
-"     let n -= 1
-"   endwhile
-" endfun
-" command! FarClear call s:FarClear()
 
 " search and replace recursively
 Plug 'dyng/ctrlsf.vim'
@@ -289,18 +207,10 @@ function! g:CtrlSFAfterMainWindowInit()
     setl wrap
 endfunction
 
-" git commands
-Plug 'tpope/vim-fugitive'
-
 " show changed lines in git
 Plug 'mhinz/vim-signify'
 " don't run on cursorhold, it slows down vim
 autocmd User SignifyAutocmds autocmd! signify CursorHold,CursorHoldI
-
-" file explorer/manager/viewer
-Plug 'ilya-lesikov/ranger.vim'
-let g:ranger_map_keys = 0
-nmap <leader>e :RangerWorkingDirectory<CR>
 
 " text alignment
 Plug 'junegunn/vim-easy-align'
@@ -341,10 +251,6 @@ Plug 'jamessan/vim-gnupg'
 " ansible vault files decryption support
 Plug 'thiagoalmeidasa/vim-ansible-vault'
 
-" vim wiki, previously used for task tracking
-" Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
-" let g:vimwiki_hl_cb_checked = 1
-
 " case-preserving search and replace
 Plug 'tpope/vim-abolish'
 
@@ -355,27 +261,12 @@ Plug 'tpope/vim-abolish'
 " colorscheme/theme
 Plug 'gruvbox-community/gruvbox'
 
-" run colorpicker
-Plug 'KabbAmine/vCoolor.vim'
-
 " show number of search matches
 Plug 'henrik/vim-indexed-search'
 
 " modify tab bar
 Plug 'gcmt/taboo.vim'
 let g:taboo_tab_format="  %f  "
-
-" TODO: there were some performance problems with this (e.g. in python files)
-" smooth scrolling
-" Plug 'yuttie/comfortable-motion.vim'
-" let g:comfortable_motion_air_drag = 13
-" let g:comfortable_motion_friction = 0.0
-" let g:comfortable_motion_no_default_key_mappings = 1
-" let g:comfortable_motion_impulse_multiplier = 3
-" nnoremap <silent> <C-d> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 2)<CR>
-" nnoremap <silent> <C-u> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -2)<CR>
-" nnoremap <silent> <C-f> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * 4)<CR>
-" nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
 
 " colorized indentation
 Plug 'nathanaelkane/vim-indent-guides'
@@ -395,12 +286,6 @@ autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 cterm
 Plug 'Konfekt/FastFold'
 " fastfold required:
 set sessionoptions-=folds
-
-" command mode readline bindings
-" Plug 'vim-utils/vim-husk'
-
-" adds vim objects based on indentation level (very useful for yaml and like)
-Plug 'michaeljsmith/vim-indent-object'
 
 " helpers for unix (:Gmove, ...)
 Plug 'tpope/vim-eunuch'
@@ -451,27 +336,34 @@ endif
 " NOTE: Blacklist in polyglot overriden with specific plugins languages
 " big collection of syntax files
 
-Plug 'sheerun/vim-polyglot'
 let g:polyglot_disabled = []
-" changing filetype to yaml.ansible breaks coc-yaml
-let g:polyglot_disabled += ['ansible']
+if has('nvim-0.5.1')
+  " experimental syntax highlighting
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+else
+  Plug 'sheerun/vim-polyglot'
+  " changing filetype to yaml.ansible breaks coc-yaml
+  let g:polyglot_disabled += ['ansible']
+
+  " better lua indentation/syntax (at least it was in ~2015?)
+  Plug 'raymond-w-ko/vim-lua-indent'
+  let g:polyglot_disabled += ['lua']
+
+  " python indentation
+  Plug 'Vimjas/vim-python-pep8-indent'
+  let g:polyglot_disabled += ['python']
+endif
 
 " latex editing package
 Plug 'lervag/vimtex'
 let g:tex_flavor = 'latex'
 let g:polyglot_disabled += ['latex']
 
-" better lua indentation/syntax (at least it was in ~2015?)
-Plug 'raymond-w-ko/vim-lua-indent'
-let g:polyglot_disabled += ['lua']
-
 " json package
 Plug 'elzr/vim-json'
 let g:vim_json_syntax_conceal=1
 let g:polyglot_disabled += ['json']
 
-" python indentation
-Plug 'Vimjas/vim-python-pep8-indent'
 " python folding
 Plug 'tmhedberg/SimpylFold'
 " python 3 better syntax highlightning + refactoring capabilities
@@ -481,9 +373,6 @@ let g:polyglot_disabled += ['python']
 
 " .editorconfig integration
 Plug 'editorconfig/editorconfig-vim'
-
-" experimental syntax highlighting
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " POST-PLUGIN TASKS
@@ -520,6 +409,7 @@ let s:denite_options = {
 call denite#custom#option('default', s:denite_options)
 
 " treesitter
+if has('nvim-0.5.1')
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "all",
@@ -528,6 +418,7 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 EOF
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COLORSCHEME SETUP
@@ -651,64 +542,22 @@ autocmd BufWinEnter * match TrailingWhiteSpace /\s\+$/
 autocmd InsertEnter * match TrailingWhiteSpace /\s\+\%#\@<!$/
 autocmd InsertLeave * match TrailingWhiteSpace /\s\+$/
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" FOLDING SETTINGS
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-set foldmethod=syntax
-" default folding for opened files
-" set foldlevelstart=1
-autocmd FileType * setlocal foldlevel=1
-" (absolute) maximum folding level, should be > foldlevel to actually show anything
-set foldnestmax=2
-" don't fold if method/class has only that many lines
-set foldminlines=1
-" don't open folds on {} moves
-set foldopen-=block
-
-" prettier folding (custom function)
-function! MyFoldText() " {{{
-    let line = getline(v:foldstart)
-
-    let nucolwidth = &fdc + &number * &numberwidth
-    let windowwidth = winwidth(0) - nucolwidth - 3
-    let foldedlinecount = v:foldend - v:foldstart
-
-    " expand tabs into spaces
-    let onetab = strpart('          ', 0, &tabstop)
-    let line = substitute(line, '\t', onetab, 'g')
-
-    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
-    return line.'… ['.foldedlinecount.']'.repeat(" ",fillcharcount)
-endfunction " }}}
-set foldtext=MyFoldText()
+set foldmethod=manual
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " LANGUAGE-SPECIFIC SETTINGS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" data files
-autocmd FileType json,xml setlocal foldnestmax=20
-
 " DSLs
-autocmd FileType terraform,yaml,ansible setlocal foldnestmax=20
-autocmd FileType terraform,yaml,ansible setlocal foldlevel=20
 autocmd FileType yaml setlocal indentexpr=""
 autocmd FileType make setlocal noexpandtab softtabstop=0
 
 " text
-autocmd FileType markdown,text,tex,rst setlocal foldnestmax=20
-autocmd FileType markdown,text,tex,rst setlocal foldlevel=20
 " enable spelling for text files
 autocmd FileType markdown,text,tex,rst setlocal spell spelllang=en,ru
-" text files always autowrap
-" autocmd FileType markdown,text,tex,rst setlocal textwidth=80
-" text files always autosave
-autocmd TextChanged,InsertLeave markdown,text,tex,rst silent! update
 
 " python
-" standard syntax highlightin configuration
+" standard syntax highlighting configuration
 let python_highlight_all = 1
 autocmd FileType python setlocal tabstop=2
 autocmd FileType python setlocal shiftwidth=2
@@ -729,24 +578,10 @@ autocmd FileType c,cpp nmap <buffer> <leader>b Oraise(SIGTRAP);<C-[>
 autocmd FileType php nmap <buffer> <leader>b Orequire('/bin/psysh'); eval(\Psy\sh());<C-[>
 
 " go
-" folding
-autocmd FileType go setlocal foldlevel=1
-autocmd FileType go setlocal foldnestmax=1
-autocmd FileType go setlocal foldmethod=indent
 " debugger
 autocmd FileType go nmap <buffer> <leader>b Oruntime.Breakpoint()<C-[>
 " autoimports
 autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
-
-" chef filetype detection
-augroup chefftdetect
-    au BufNewFile,BufRead */recipes/*.rb set filetype=ruby.chef
-    au BufNewFile,BufRead */cookbooks/*.rb set filetype=ruby.chef
-    au BufNewFile,BufRead */attributes/*.rb set filetype=ruby.chef
-    au BufNewFile,BufRead */resources/*.rb set filetype=ruby.chef
-    au BufNewFile,BufRead */test/*.rb set filetype=ruby.chef
-    au BufNewFile,BufRead */spec/*.rb set filetype=ruby.chef
-augroup end
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CUSTOM AUTOCOMMANDS, UNRELATED TO EVERYTHING ELSE
@@ -795,18 +630,6 @@ command! E execute ':e suda://%'
 " edit config files
 command! Rv execute 'source ' . g:path#vimrc
 command! Ev execute 'edit ' . g:path#vimrc
-command! Et execute 'edit ' . "~/.tmux.conf"
-command! Ets execute 'edit ' . "~/.tmuxinator/default.yml"
-command! Eb execute 'edit ' . "~/.bashrc"
-command! Ez execute 'edit ' . "~/.zshrc"
-command! Ezp execute 'edit ' . "~/.zprofile"
-command! Ezpr execute 'edit ' . "~/.zpreztorc"
-command! Ep execute 'edit ' . "~/.profile"
-command! Ea execute 'edit ' . "~/.config/alacritty/alacritty.yml"
-command! Es execute 'edit ' . "~/.bin/wmctrl-session-autostart.sh"
-command! Er execute 'edit ' . "~/.config/ranger/rc.conf"
-command! Err execute 'edit ' . "~/.config/ranger/rifle.conf"
-command! Eg execute 'edit ' . "~/.gitignore"
 
 " enable autosaving of current file
 command! EnableAutosave autocmd TextChanged,InsertLeave <buffer> silent! update
@@ -838,24 +661,6 @@ nnoremap <leader>rf :%s/<C-R>"//gc<Left><Left><Left>
 
 " workaround to leave insert mode in terminal on ESC
 tnoremap <Esc> <C-\><C-n>
-
-" nnoremap <leader>me :call TermMake('')<Left><Left>
-" function! TermMake(build_command)
-"   let l:command = expand(a:build_command . " && wmctrl -s 3 && sleep 0.2 && xdotool key F5")
-"   let g:TermMake_last_build_command = l:command
-"   split
-"   enew
-"   call termopen(l:command)
-"   startinsert
-" endfunction
-
-" nnoremap <leader>ml :call TermMakeLast()<CR>
-" function! TermMakeLast()
-"   split
-"   enew
-"   call termopen(g:TermMake_last_build_command)
-"   startinsert
-" endfunction
 
 function! DeleteHiddenBuffers()
   let tpbl=[]
