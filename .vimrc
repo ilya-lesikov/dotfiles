@@ -116,13 +116,19 @@ call plug#begin(g:path#plug_man_dir)
 
 " autocompletion, refactoring, LSP/VSCode extensions
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_filetype_map = {
+      \ 'helm': 'yaml',
+      \ }
 " Use <c-space> to trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gh :CocDiagnostics<CR>
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gr <Plug>(coc-references-used)
+nmap <leader>gs :CocList symbols<CR>
+nmap <leader>go :CocList outline<CR>
 " Use K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 function! s:show_documentation()
@@ -148,6 +154,9 @@ command! -nargs=0 Format :call CocAction('format')
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 " use `:OR` for organize import of current buffer
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+" disable autopreview feature (doesn't work for me now)
+let g:coc_enable_locationlist = 0
+autocmd User CocLocationsChange CocList --normal location
 
 augroup CocGroup1
   autocmd!
@@ -166,6 +175,7 @@ let g:ale_linters = {
     \ 'javascript' : ['eslint'],
     \ 'python'     : ['flake8'],
     \ 'chef'       : [''],
+    \ 'go'         : ['golangci-lint'],
     \ }
       " \ 'cpp'        : ['clangtidy', 'cpplint'],
 let g:ale_python_pylint_options = '-d C0103,C0111,C0321'
@@ -180,6 +190,8 @@ let g:ale_python_flake8_options = '--ignore=E303,E121,E123,E126,E226,E24,E704,W5
 let g:ale_ruby_rubocop_options = '--except Layout/AlignParameters,Style/Documentation,Metrics/MethodLength,Style/GuardClause,Metrics/AbcSize,Naming/AccessorMethodName,Layout/MultilineMethodCallIndentation,Metrics/LineLength,Metrics/BlockLength'
 let g:ale_sh_shellcheck_exclusions = 'SC1090'
 let g:ale_yaml_yamllint_options = '-d "{extends: default, rules: {line-length: {max: 120}, indentation: {indent-sequences: consistent}, document-start: disable}}"'
+let g:ale_go_golangci_lint_options = '-p bugs,error,unused -D wrapcheck,goerr113,ineffassign,errorlint'
+let g:ale_go_golangci_lint_package = 1
 let g:ale_echo_delay = 200
 autocmd BufEnter PKGBUILD,.env
     \   let b:ale_sh_shellcheck_exclusions = 'SC2034,SC2154,SC2164'
@@ -225,20 +237,21 @@ function! s:denite_filter_my_settings() abort
                \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
 endfunction
 
+" FIXME: hangs vim
 " snippets
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-let g:UltiSnipsExpandTrigger = '<c-s>'
-let g:UltiSnipsJumpForwardTrigger = '<c-j>'
-let g:UltiSnipsJumpBackwardTrigger = '<c-m>'
+"Plug 'SirVer/ultisnips'
+"Plug 'honza/vim-snippets'
+"let g:UltiSnipsExpandTrigger = '<c-s>'
+"let g:UltiSnipsJumpForwardTrigger = '<c-j>'
+"let g:UltiSnipsJumpBackwardTrigger = '<c-m>'
 
 " faster grep alternative integration
 Plug 'mileszs/ack.vim'
-let g:ackprg = 'rg --vimgrep'
+let g:ackprg = 'rg --vimgrep --hidden'
 let g:ack_qhandler = "botright copen 10"
 let g:ackpreview = 1
 let g:ackhighlight = 1
-nnoremap <leader>s :Ack!<Space>''<Left>
+nnoremap <leader>s :Ack!<Space>'
 
 " search and replace recursively with rollback
 " Plug 'brooth/far.vim'
@@ -258,12 +271,23 @@ nnoremap <leader>s :Ack!<Space>''<Left>
 " search and replace recursively
 Plug 'dyng/ctrlsf.vim'
 " let g:ctrlsf_default_view_mode = 'compact'
+let g:ctrlsf_follow_symlinks = 0
 let g:ctrlsf_ackprg = "rg"
-nnoremap <leader>rr :CtrlSF<Space>
+let g:ctrlsf_mapping = {
+     \ "quit"    : "",
+     \ "pquit"   : "",
+     \ "popen"   : "",
+     \ "popenf"  : "",
+     \ "tab"     : "",
+     \ "tabb"    : "",
+     \ "open"    : "o",
+     \ "openb"   : "O",
+     \ }
+nnoremap <leader>rr :CtrlSF -hidden<Space>
 nnoremap <leader>rc :CtrlSFClose<CR>
-
-" search and replace with preserving case
-Plug 'tpope/vim-abolish'
+function! g:CtrlSFAfterMainWindowInit()
+    setl wrap
+endfunction
 
 " git commands
 Plug 'tpope/vim-fugitive'
@@ -271,7 +295,7 @@ Plug 'tpope/vim-fugitive'
 " show changed lines in git
 Plug 'mhinz/vim-signify'
 " don't run on cursorhold, it slows down vim
-autocmd User SignifySetup autocmd! signify CursorHold,CursorHoldI
+autocmd User SignifyAutocmds autocmd! signify CursorHold,CursorHoldI
 
 " file explorer/manager/viewer
 Plug 'ilya-lesikov/ranger.vim'
@@ -321,6 +345,9 @@ Plug 'thiagoalmeidasa/vim-ansible-vault'
 " Plug 'vimwiki/vimwiki', { 'branch': 'dev' }
 " let g:vimwiki_hl_cb_checked = 1
 
+" case-preserving search and replace
+Plug 'tpope/vim-abolish'
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " EYE-CANDY PLUGINS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -336,7 +363,7 @@ Plug 'henrik/vim-indexed-search'
 
 " modify tab bar
 Plug 'gcmt/taboo.vim'
-let g:taboo_tab_format="  %p%m  "
+let g:taboo_tab_format="  %f  "
 
 " TODO: there were some performance problems with this (e.g. in python files)
 " smooth scrolling
@@ -351,14 +378,14 @@ let g:taboo_tab_format="  %p%m  "
 " nnoremap <silent> <C-b> :call comfortable_motion#flick(g:comfortable_motion_impulse_multiplier * winheight(0) * -4)<CR>
 
 " colorized indentation
-" Plug 'nathanaelkane/vim-indent-guides'
-" let g:indent_guides_indent_levels = 12
-" let g:indent_guides_guide_size = 2
-" let g:indent_guides_auto_colors = 0
-" let g:indent_guides_enable_on_vim_startup = 1
-" let g:indent_guides_start_level = 1
-" autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesOdd  guibg=NONE ctermbg=NONE
-" autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 ctermbg=4
+Plug 'nathanaelkane/vim-indent-guides'
+let g:indent_guides_indent_levels = 12
+let g:indent_guides_guide_size = 2
+let g:indent_guides_auto_colors = 0
+let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_start_level = 1
+autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesOdd  guibg=NONE ctermbg=NONE
+autocmd VimEnter,Colorscheme,BufEnter * :hi IndentGuidesEven guibg=#303030 ctermbg=4
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " SMALL PLUGINS TO FIX SHITTY OUT-OF-THE-BOX VIM EXPERIENCE
@@ -397,7 +424,8 @@ Plug 'tpope/vim-repeat'
 Plug 'roryokane/detectindent'
 augroup DetectIndent
   autocmd!
-  autocmd BufReadPost *  DetectIndent
+  let blacklist = ['go']
+  autocmd BufReadPost if index(blacklist, &ft) < 0 | DetectIndent
 augroup END
 
 " cyrillic localization hacks [russian language]
@@ -430,6 +458,7 @@ let g:polyglot_disabled += ['ansible']
 
 " latex editing package
 Plug 'lervag/vimtex'
+let g:tex_flavor = 'latex'
 let g:polyglot_disabled += ['latex']
 
 " better lua indentation/syntax (at least it was in ~2015?)
@@ -450,6 +479,12 @@ Plug 'tmhedberg/SimpylFold'
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 let g:polyglot_disabled += ['python']
 
+" .editorconfig integration
+Plug 'editorconfig/editorconfig-vim'
+
+" experimental syntax highlighting
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " POST-PLUGIN TASKS
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -466,7 +501,7 @@ call denite#custom#source('file/rec', 'matchers', ['matcher/substring',
       \ 'matcher/ignore_current_buffer'])
 
 call denite#custom#alias('source', 'file/rec/hidden', 'file/rec')
-call denite#custom#var('file/rec/hidden', 'command', ['rg', '--files', '-uu'])
+call denite#custom#var('file/rec/hidden', 'command', ['rg', '--files', '--hidden'])
 call denite#custom#source('file/rec/hidden', 'matchers', ['matcher/substring',
       \ 'matcher/ignore_current_buffer'])
 
@@ -483,6 +518,16 @@ let s:denite_options = {
      \ 'highlight_matched_char': 'Question',
      \ }
 call denite#custom#option('default', s:denite_options)
+
+" treesitter
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "all",
+  highlight = {
+    enable = true,
+  },
+}
+EOF
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " COLORSCHEME SETUP
@@ -537,6 +582,9 @@ set hidden
 set lazyredraw
 " coc.nvim requires lower value of this to show diagnostics faster on cursorhold
 set updatetime=300
+
+" to avoid error "pattern uses more memory than 'maxmempattern'" on big files
+set mmp=10000
 
 " cursor always in the center
 set scrolloff=999
@@ -593,7 +641,7 @@ set statusline=%m%H%W%q\ %{expand('%:~')}%<%=\ [%{&ft},\ %{&ff},\ %{strlen(&fenc
 set laststatus=2
 
 " highlight columns
-set colorcolumn=80
+set colorcolumn=120
 autocmd BufWinEnter * highlight ColorColumn ctermbg=8 ctermfg=none cterm=none
 
 " highlight trailing white space
@@ -646,7 +694,8 @@ autocmd FileType json,xml setlocal foldnestmax=20
 " DSLs
 autocmd FileType terraform,yaml,ansible setlocal foldnestmax=20
 autocmd FileType terraform,yaml,ansible setlocal foldlevel=20
-autocmd FileType terraform,yaml,ansible setlocal indentexpr=""
+autocmd FileType yaml setlocal indentexpr=""
+autocmd FileType make setlocal noexpandtab softtabstop=0
 
 " text
 autocmd FileType markdown,text,tex,rst setlocal foldnestmax=20
@@ -661,8 +710,8 @@ autocmd TextChanged,InsertLeave markdown,text,tex,rst silent! update
 " python
 " standard syntax highlightin configuration
 let python_highlight_all = 1
-autocmd FileType python setlocal tabstop=4
-autocmd FileType python setlocal shiftwidth=4
+autocmd FileType python setlocal tabstop=2
+autocmd FileType python setlocal shiftwidth=2
 " python debuggers
 autocmd FileType python nmap <buffer> <leader>b Ofrom IPython.terminal import debugger; debugger.set_trace()<C-[>
 autocmd FileType python nmap <buffer> <leader>B Oimport pudb; pudb.set_trace()<C-[>
@@ -678,6 +727,16 @@ autocmd FileType c,cpp nmap <buffer> <leader>b Oraise(SIGTRAP);<C-[>
 
 " php debugger
 autocmd FileType php nmap <buffer> <leader>b Orequire('/bin/psysh'); eval(\Psy\sh());<C-[>
+
+" go
+" folding
+autocmd FileType go setlocal foldlevel=1
+autocmd FileType go setlocal foldnestmax=1
+autocmd FileType go setlocal foldmethod=indent
+" debugger
+autocmd FileType go nmap <buffer> <leader>b Oruntime.Breakpoint()<C-[>
+" autoimports
+autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 
 " chef filetype detection
 augroup chefftdetect
@@ -797,6 +856,20 @@ tnoremap <Esc> <C-\><C-n>
 "   call termopen(g:TermMake_last_build_command)
 "   startinsert
 " endfunction
+
+function! DeleteHiddenBuffers()
+  let tpbl=[]
+  let closed = 0
+  call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
+  for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
+    if getbufvar(buf, '&mod') == 0
+      silent execute 'bwipeout' buf
+      let closed += 1
+    endif
+  endfor
+  echo "Closed ".closed." hidden buffers"
+endfunction
+command! DeleteHiddenBuffers call DeleteHiddenBuffers()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " POST-EVERYTHING

@@ -19,12 +19,13 @@ export WEB_BROWSER="firefox"
 export ANSIBLE_VAULT_PASSWORD_FILE="$HOME/.vault_password"
 export GOOGLE_CLOUD_KEYFILE_JSON="$HOME/.config/gcloud/application_default_credentials.json"
 export GOPATH="$HOME/.go"
+# export GOROOT="$HOME/.go"
 export PYENV_ROOT="$HOME/.pyenv"
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
-export NPM_CONFIG_PREFIX="$HOME/.node_modules"
+# export NPM_CONFIG_PREFIX="$HOME/.node_modules" # not compatible with NVM
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 # skaffold (tool for gcloud) update check disable
@@ -35,6 +36,7 @@ export GTK_IM_MODULE=xim
 export GPG_TTY='tty'
 # stupid virsh connect to a user qemu instance instead of system qemu by default
 export LIBVIRT_DEFAULT_URI=qemu:///system
+export WERF_STAGES_STORAGE=':local'
 
 # export env variables from environment.d
 env_dir="$HOME/.config/environment.d"
@@ -62,6 +64,7 @@ export PATH="/snap/bin:$PATH"
 export PATH="$HOME/.local/share/umake/bin:$PATH"
 
 # golang
+export PATH="/usr/local/go/bin:$PATH"
 export PATH="$GOPATH/bin:$PATH"
 
 # pyenv
@@ -82,5 +85,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # chef
 #export PATH="$(find ~/.chefdk/gem/ruby/ -maxdepth 2 -mindepth 2 -name bin -type d 2>/dev/null | tac | xargs printf '%s:')$PATH"
 
-# most specific path for manual overrides
-export PATH="$HOME/.bin:$PATH"
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*

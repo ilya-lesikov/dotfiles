@@ -1,0 +1,5 @@
+--ignore-file
+/home/user1/.gitignore
+-L
+--no-messages
+--smart-case

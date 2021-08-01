@@ -1,10 +1,11 @@
 {
-  "coc.preferences.diagnostic.displayByAle": true,
+  "diagnostic.displayByAle": true,
   "list.insertMappings": {
     "<C-j>": "do:next",
     "<C-k>": "do:previous"
   },
-  "yaml.validate": false,
+  "diagnostic.level": "error",
+  "list.height": 40,
   "coc.source.ultisnips.priority": 5,
   "coc.source.around.priority": 15,
   "coc.source.around.shortcut": "AR",
@@ -12,10 +13,14 @@
   "coc.source.buffer.shortcut": "BU",
   "coc.source.file.priority": 20,
   "coc.source.file.shortcut": "PA",
+  "go.enable": true,
+  "coc.preferences.useQuickfixForLocations": true,
   "suggest.languageSourcePriority": 99,
+  "codeLens.enable": true,
+  "yaml.validate": false,
   "yaml.schemas": {
-    "http://json.schemastore.org/ansible-stable-2.7": "tasks/*.yml",
-    "http://json.schemastore.org/ansible-stable-2.7": "tasks/*.yaml"
+    "http://json.schemastore.org/ansible-stable-2.7": "*/tasks/*.y*ml",
+    "kubernetes": "*.y*ml"
   },
   "languageserver": {
     "terraform": {

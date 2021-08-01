@@ -5,9 +5,13 @@
 	default = simple
 [merge]
 	tool = vimdiff
+	renamelimit = 999999
 [mergetool "vimdiff"]
 	path = nvim
-#[core]
-#	pager = diff-so-fancy | less --tabs=4 -RFX
-#[interactive]
-#	diffFilter = diff-so-fancy --patch
+[core]
+	pager = diff-so-fancy | less --tabs=4 -RX
+	hooksPath = /home/user1/.githooks
+[rebase]
+	instructionFormat = (%an <%ae>) %s
+[merge "ours"]
+	driver = true
