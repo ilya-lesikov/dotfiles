@@ -17,3 +17,6 @@
 	driver = true
 [interactive]
 	diffFilter = diff-so-fancy --patch
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
