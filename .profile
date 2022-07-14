@@ -16,7 +16,7 @@ export WEB_BROWSER="brave"
 
 # password to access vaulted encrypted data
 export ANSIBLE_VAULT_PASSWORD_FILE="$HOME/.vault_password"
-export GOPATH="$HOME/.go"
+export GOPATH="$HOME/go"
 export PYENV_ROOT="$HOME/.pyenv"
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 export XDG_CACHE_HOME="$HOME/.cache"
@@ -28,7 +28,6 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export GPG_TTY='tty'
 # stupid virsh connects to a user qemu instance instead of system qemu by default
 export LIBVIRT_DEFAULT_URI=qemu:///system
-export WERF_STAGES_STORAGE=':local'
 
 # export env variables from environment.d
 env_dir="$HOME/.config/environment.d"
@@ -77,4 +76,16 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 
+# goland
+if [ -e "$HOME/opt/goland/bin" ]; then
+  export PATH="$HOME/opt/goland/bin:$PATH"
+fi
+
+# webstorm
+if [ -e "$HOME/opt/webstorm/bin" ]; then
+  export PATH="$HOME/opt/webstorm/bin:$PATH"
+fi
+
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+export PATH="$HOME/bin:$PATH"

@@ -157,8 +157,8 @@ nmap <silent> <leader>ln <Plug>(ale_next_wrap)
 
 " fast file search + help, history, registers search and more
 Plug 'Shougo/denite.nvim', {'do': ':UpdateRemotePlugins'}
-nnoremap <C-p> :ccl<CR>:Denite file/rec<CR>
-nnoremap <C-A-p> :ccl<CR>:Denite file/rec/hidden<CR>
+nnoremap <C-A-p> :ccl<CR>:Denite file/rec<CR>
+nnoremap <C-p> :ccl<CR>:Denite file/rec/hidden<CR>
 nnoremap <leader>p :ccl<CR>:Denite buffer<CR>
 
 autocmd FileType denite call s:denite_my_settings()

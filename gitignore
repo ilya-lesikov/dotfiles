@@ -24,3 +24,4 @@ __pycache__/
 *.bz2
 *.xz
 *.iso
+*.test

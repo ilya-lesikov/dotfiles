@@ -70,6 +70,8 @@ unsetopt autopushd
 unsetopt pushd_ignore_dups
 # Disable command spelling correction
 unsetopt correct
+# > and >> overwrites again
+setopt clobber
 
 # Remove _approximate from completion to disable corrections in autocomplete
 zstyle ':completion:*' completer _complete _match
@@ -146,6 +148,6 @@ if [[ "$PLACE" == "work-flant" ]]; then
   /usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/id_rsa
   /usr/bin/keychain -q --inherit any --confirm $HOME/.ssh/tfadm-id-rsa
 
-  # multiwerf
-  source <(multiwerf use 1.2 ea 1>/dev/null)
+  # trdl
+  #source $(~/bin/trdl use werf 1.2 alpha)
 fi

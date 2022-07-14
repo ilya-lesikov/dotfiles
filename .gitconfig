@@ -1,16 +1,20 @@
 [user]
 	email = ilya@lesikov.com
 	name = Ilya Lesikov
+	signingkey = EF4939F7E8CF27C27AF62F343D2D40E2CBEF44DD
 [push]
 	default = simple
 [merge]
 	tool = vimdiff
+	renamelimit = 999999
+[diff]
 	renamelimit = 999999
 [mergetool "vimdiff"]
 	path = nvim
 [core]
 	pager = diff-so-fancy | less --tabs=4 -RX
 	hooksPath = /home/user1/.githooks
+	excludesfile = /home/user1/.gitignore_global
 [rebase]
 	instructionFormat = (%an <%ae>) %s
 [merge "ours"]
