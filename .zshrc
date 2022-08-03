@@ -88,6 +88,9 @@ HISTORY_IGNORE='(reset|cd ~|cd -|git status|top|ps aux|%|%1|%2|%3|&|pwd|exit|cle
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
 
+# Greatly improves performance with long lines
+ZSH_HIGHLIGHT_MAXLENGTH=600
+
 ################################################################################
 # AUTOCOMPLETE
 ################################################################################

@@ -176,6 +176,7 @@ zstyle ':prezto:module:prompt' pwd-length 'long'
 # By default, only the main highlighter is enabled.
  zstyle ':prezto:module:syntax-highlighting' highlighters \
    'main' \
+   'brackets' \
    'pattern' \
    'line' \
    'cursor' \
